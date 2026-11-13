@@ -41,3 +41,10 @@ main{width:min(720px,100% - 28px);margin:28px auto 90px}.welcome{padding:30px;di
 /* Make demo profile entry points easy to tap on mobile */
 .post-head .profile-open { position: relative; z-index: 1; }
 .post-head .post-user { min-height: 42px; }
+
+/* Dedicated full-screen section navigation */
+[hidden]{display:none!important}
+body.section-open main{width:min(720px,100% - 28px);margin:18px auto 32px;min-height:calc(100vh - 36px)}
+.section-back{display:inline-flex;align-items:center;gap:8px;margin:0 0 20px;padding:11px 16px}
+body.section-open .view.active{min-height:calc(100vh - 90px)}
+body.section-open footer{display:none}

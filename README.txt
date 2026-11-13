@@ -20,3 +20,10 @@ Important limitations:
 
 Next development phase:
 Connect Firebase Authentication and Firestore, then implement secure user records and role-based Founder/Admin access. Never place admin secrets in front-end JavaScript.
+
+
+Update (2026-11-13):
+- Main navigation and top header are hidden while a dedicated section is open.
+- Each non-home section receives a Back control; browser/Android Back remains supported.
+- Chat remains a local demo in this build. Supabase URL + publishable/anon key and a real authenticated account flow are required before live messaging can be enabled.
+- Never place a Supabase service_role key in frontend files.
