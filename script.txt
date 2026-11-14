@@ -9,6 +9,48 @@
   let activeDemoUser = { name: 'Riya Creates', handle: '@riya_demo' };
   let exitWarningAt = 0;
 
+  // Chat layout refinements: full-height conversation, no visible in-app Back controls.
+  const chatStyle = document.createElement('style');
+  chatStyle.textContent = `
+    body.section-open main { width:100%; max-width:none; margin:0 auto; padding:0 16px 18px; min-height:100dvh; }
+    body.section-open .view.active { min-height:calc(100dvh - 18px); }
+    body.section-open footer { display:none !important; }
+    .section-back, #chat > button[data-view], #demoProfile > button[data-view], #account > .back-home { display:none !important; }
+    #chat { display:flex; flex-direction:column; height:calc(100dvh - 16px); min-height:calc(100dvh - 16px); }
+    #chat .chat-heading { display:flex; align-items:center; gap:10px; padding:10px 0 14px; border-bottom:1px solid #1e2b40; }
+    #chat .chat-heading > div:last-child { display:flex; flex-direction:column; gap:0; }
+    #chat .chat-heading .muted { display:none !important; }
+    #chat .hug-action { margin-left:auto; min-width:54px; min-height:50px; padding:0 15px; border:1px solid #287bc5; border-radius:14px; color:#fff; background:linear-gradient(135deg,#0879f9,#25b9ff); font-size:22px; font-weight:800; box-shadow:0 5px 18px #168bff35; }
+    #chat .chat-messages { flex:1; min-height:0; max-height:none; overflow-y:auto; margin:12px 0; }
+    #chat .chat-compose { display:flex; gap:9px; margin:0 0 8px; padding-bottom:env(safe-area-inset-bottom); }
+    #chat .chat-compose input { flex:1; min-width:0; min-height:52px; margin:0; }
+    #chat .chat-compose button { min-width:76px; min-height:52px; padding:0 18px; font-size:14px; }
+    #chat > p.tiny { display:none !important; }
+    @media (min-width:720px) { body.section-open main { max-width:720px; } }
+  `;
+  document.head.appendChild(chatStyle);
+
+  function prepareChatHeader() {
+    const heading = document.querySelector('#chat .chat-heading');
+    if (!heading) return;
+    const oldSubtitle = heading.querySelector('small');
+    if (oldSubtitle) oldSubtitle.remove();
+    let hug = heading.querySelector('.hug-action');
+    if (!hug) {
+      hug = document.createElement('button');
+      hug.type = 'button';
+      hug.className = 'hug-action';
+      hug.setAttribute('aria-label', 'Send a virtual hug request');
+      hug.title = 'Send a Hug request';
+      hug.textContent = '🤗';
+      hug.addEventListener('click', () => {
+        const accepted = window.confirm('Send a Virtual Hug request to ' + activeDemoUser.name + '?');
+        if (accepted) window.alert('Hug request preview sent. Real-time delivery and Hug Back / Not Now require the connected YUNEX chat backend.');
+      });
+      heading.appendChild(hug);
+    }
+  }
+
   function renderView(id) {
     if (!document.getElementById(id)) id = 'feed';
     currentView = id;
@@ -22,18 +64,16 @@
     if (footer) footer.hidden = !isHome;
     document.body.classList.toggle('registration-open', id === 'account');
     document.body.classList.toggle('section-open', !isHome);
+
+    // Approved navigation: use Android/browser system Back; never inject visible Back buttons.
     views.forEach(view => {
-      let back = view.querySelector(':scope > .section-back');
-      if (view.id !== 'feed' && !back) {
-        back = document.createElement('button');
-        back.type = 'button';
-        back.className = 'secondary section-back';
-        back.textContent = '← Back';
-        back.addEventListener('click', () => history.back());
-        view.insertBefore(back, view.firstChild);
-      }
-      if (back) back.hidden = (view.id === 'feed');
+      view.querySelectorAll(':scope > button').forEach(button => {
+        if (/back/i.test(button.textContent || '') || button.classList.contains('section-back') || button.classList.contains('back-home')) {
+          button.remove();
+        }
+      });
     });
+    if (id === 'chat') prepareChatHeader();
     window.scrollTo(0, 0);
   }
 
@@ -43,11 +83,9 @@
     renderView(id);
   }
 
-  // Start with a clean Home Feed history entry.
   history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
   renderView('feed');
 
-  // All internal navigation uses one delegated handler, including dynamically shown controls.
   document.addEventListener('click', event => {
     const profileButton = event.target.closest('.profile-open');
     if (profileButton) {
@@ -57,8 +95,7 @@
       };
       document.getElementById('demoName').textContent = activeDemoUser.name;
       document.getElementById('demoHandle').textContent = activeDemoUser.handle;
-      document.getElementById('demoAvatar').textContent =
-        activeDemoUser.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
+      document.getElementById('demoAvatar').textContent = activeDemoUser.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
       document.getElementById('chatName').textContent = activeDemoUser.name;
       document.getElementById('chatAvatar').textContent = activeDemoUser.name[0].toUpperCase();
       const follow = document.getElementById('followDemo');
@@ -67,39 +104,26 @@
       navigate('demoProfile');
       return;
     }
-
     const viewButton = event.target.closest('[data-view]');
     if (viewButton) {
       event.preventDefault();
       navigate(viewButton.dataset.view);
       return;
     }
-
-    if (event.target.closest('#profileShortcut')) {
-      navigate('profile');
-      return;
-    }
-
-    if (event.target.closest('.brand')) {
-      event.preventDefault();
-      navigate('feed');
-      return;
-    }
-
+    if (event.target.closest('#profileShortcut')) { navigate('profile'); return; }
+    if (event.target.closest('.brand')) { event.preventDefault(); navigate('feed'); return; }
     if (event.target.closest('#followDemo')) {
       const button = document.getElementById('followDemo');
       const following = button.classList.toggle('following');
       button.textContent = following ? 'Following' : 'Follow';
       return;
     }
-
     if (event.target.closest('#messageDemo')) {
       document.getElementById('chatName').textContent = activeDemoUser.name;
       document.getElementById('chatAvatar').textContent = activeDemoUser.name[0].toUpperCase();
       navigate('chat');
       return;
     }
-
     const likeButton = event.target.closest('.like-btn');
     if (likeButton) {
       const liked = likeButton.classList.toggle('liked');
@@ -109,7 +133,6 @@
     }
   });
 
-  // Android/browser Back: go to the previous YUNEX screen, not out of the site.
   window.addEventListener('popstate', event => {
     if (event.state && event.state.yunex && event.state.view) {
       renderView(event.state.view);
@@ -146,27 +169,21 @@
     if (element.tagName === 'VIDEO') element.controls = true;
     preview.appendChild(element);
   });
-
   const demoPost = document.getElementById('demoPost');
   if (demoPost) demoPost.addEventListener('click', () => {
     const message = document.getElementById('uploadMessage');
     message.hidden = false;
-    message.textContent = fileInput.files.length
-      ? 'Local preview ready. This file has not been uploaded or published.'
-      : 'Choose a photo or video first to preview it.';
+    message.textContent = fileInput.files.length ? 'Local preview ready. This file has not been uploaded or published.' : 'Choose a photo or video first to preview it.';
   });
-
   const demoRegister = document.getElementById('demoRegister');
   if (demoRegister) demoRegister.addEventListener('click', () => {
     alert('YUNEX registration screen preview only. Backend authentication is not connected yet. Do not enter real credentials.');
   });
-
   document.querySelectorAll('.category-grid button').forEach(button => {
     button.addEventListener('click', () => {
       document.getElementById('exploreSearch').value = button.innerText.replace(/[^\w\s]/g, '').trim();
     });
   });
-
   const chatForm = document.getElementById('chatForm');
   if (chatForm) chatForm.addEventListener('submit', event => {
     event.preventDefault();
