@@ -1,6 +1,5 @@
 (() => {
   'use strict';
-
   const views = Array.from(document.querySelectorAll('.view'));
   const tabs = document.querySelector('.tabs');
   const topbar = document.querySelector('.topbar');
@@ -9,7 +8,6 @@
   let activeDemoUser = { name: 'Riya Creates', handle: '@riya_demo' };
   let exitWarningAt = 0;
 
-  // Chat layout refinements: full-height conversation, no visible in-app Back controls.
   const chatStyle = document.createElement('style');
   chatStyle.textContent = `
     body.section-open main { width:100%; max-width:none; margin:0 auto; padding:0 16px 18px; min-height:100dvh; }
@@ -42,7 +40,7 @@
       hug.className = 'hug-action';
       hug.setAttribute('aria-label', 'Send a virtual hug request');
       hug.title = 'Send a Hug request';
-      hug.textContent = '🤗';
+      hug.innerHTML = '<svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-8.5-8.4C2.2 8.2 4.1 5 7.3 5c2 0 3.4 1.2 4.7 3 1.3-1.8 2.7-3 4.7-3 3.2 0 5.1 3.2 3.8 6.6C19 15.6 12 20 12 20Z"/><path d="M8.5 12.5 10.5 14l3-3"/></svg>';
       hug.addEventListener('click', () => {
         const accepted = window.confirm('Send a Virtual Hug request to ' + activeDemoUser.name + '?');
         if (accepted) window.alert('Hug request preview sent. Real-time delivery and Hug Back / Not Now require the connected YUNEX chat backend.');
@@ -55,24 +53,16 @@
     if (!document.getElementById(id)) id = 'feed';
     currentView = id;
     views.forEach(view => view.classList.toggle('active', view.id === id));
-    document.querySelectorAll('.tab[data-view]').forEach(button => {
-      button.classList.toggle('active', button.dataset.view === id);
-    });
+    document.querySelectorAll('.tab[data-view]').forEach(button => button.classList.toggle('active', button.dataset.view === id));
     const isHome = id === 'feed';
     if (tabs) tabs.hidden = !isHome;
     if (topbar) topbar.hidden = !isHome;
     if (footer) footer.hidden = !isHome;
     document.body.classList.toggle('registration-open', id === 'account');
     document.body.classList.toggle('section-open', !isHome);
-
-    // Approved navigation: use Android/browser system Back; never inject visible Back buttons.
-    views.forEach(view => {
-      view.querySelectorAll(':scope > button').forEach(button => {
-        if (/back/i.test(button.textContent || '') || button.classList.contains('section-back') || button.classList.contains('back-home')) {
-          button.remove();
-        }
-      });
-    });
+    views.forEach(view => view.querySelectorAll(':scope > button').forEach(button => {
+      if (/back/i.test(button.textContent || '') || button.classList.contains('section-back') || button.classList.contains('back-home')) button.remove();
+    }));
     if (id === 'chat') prepareChatHeader();
     window.scrollTo(0, 0);
   }
@@ -86,13 +76,21 @@
   history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
   renderView('feed');
 
+  // Capture the Home hero's Create account tap before any other click handler.
+  // This forces the dedicated registration view and prevents accidental Chat routing.
+  const createAccountButton = document.querySelector('.welcome-actions [data-view="account"]');
+  if (createAccountButton) {
+    createAccountButton.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      navigate('account');
+    }, true);
+  }
+
   document.addEventListener('click', event => {
     const profileButton = event.target.closest('.profile-open');
     if (profileButton) {
-      activeDemoUser = {
-        name: profileButton.dataset.user || 'YUNEX Creator',
-        handle: profileButton.dataset.handle || '@creator_demo'
-      };
+      activeDemoUser = { name: profileButton.dataset.user || 'YUNEX Creator', handle: profileButton.dataset.handle || '@creator_demo' };
       document.getElementById('demoName').textContent = activeDemoUser.name;
       document.getElementById('demoHandle').textContent = activeDemoUser.handle;
       document.getElementById('demoAvatar').textContent = activeDemoUser.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
@@ -105,11 +103,7 @@
       return;
     }
     const viewButton = event.target.closest('[data-view]');
-    if (viewButton) {
-      event.preventDefault();
-      navigate(viewButton.dataset.view);
-      return;
-    }
+    if (viewButton) { event.preventDefault(); navigate(viewButton.dataset.view); return; }
     if (event.target.closest('#profileShortcut')) { navigate('profile'); return; }
     if (event.target.closest('.brand')) { event.preventDefault(); navigate('feed'); return; }
     if (event.target.closest('#followDemo')) {
@@ -134,28 +128,17 @@
   });
 
   window.addEventListener('popstate', event => {
-    if (event.state && event.state.yunex && event.state.view) {
-      renderView(event.state.view);
-      return;
-    }
+    if (event.state && event.state.yunex && event.state.view) { renderView(event.state.view); return; }
     if (currentView === 'feed') {
       const now = Date.now();
       if (exitWarningAt && now - exitWarningAt <= 2000) return;
       exitWarningAt = now;
       history.pushState({ yunex: true, view: 'feed' }, '', location.pathname + location.search + '#feed');
       let toast = document.getElementById('exitToast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'exitToast';
-        toast.className = 'exit-toast';
-        toast.textContent = 'Exit ke liye dobara Back dabayein';
-        document.body.appendChild(toast);
-      }
+      if (!toast) { toast = document.createElement('div'); toast.id = 'exitToast'; toast.className = 'exit-toast'; toast.textContent = 'Exit ke liye dobara Back dabayein'; document.body.appendChild(toast); }
       toast.classList.add('show');
       window.setTimeout(() => toast.classList.remove('show'), 1800);
-    } else {
-      renderView('feed');
-    }
+    } else renderView('feed');
   });
 
   const fileInput = document.getElementById('mediaFile');
@@ -176,14 +159,10 @@
     message.textContent = fileInput.files.length ? 'Local preview ready. This file has not been uploaded or published.' : 'Choose a photo or video first to preview it.';
   });
   const demoRegister = document.getElementById('demoRegister');
-  if (demoRegister) demoRegister.addEventListener('click', () => {
-    alert('YUNEX registration screen preview only. Backend authentication is not connected yet. Do not enter real credentials.');
-  });
-  document.querySelectorAll('.category-grid button').forEach(button => {
-    button.addEventListener('click', () => {
-      document.getElementById('exploreSearch').value = button.innerText.replace(/[^\w\s]/g, '').trim();
-    });
-  });
+  if (demoRegister) demoRegister.addEventListener('click', () => alert('YUNEX registration screen preview only. Backend authentication is not connected yet. Do not enter real credentials.'));
+  document.querySelectorAll('.category-grid button').forEach(button => button.addEventListener('click', () => {
+    document.getElementById('exploreSearch').value = button.innerText.replace(/[^\w\s]/g, '').trim();
+  }));
   const chatForm = document.getElementById('chatForm');
   if (chatForm) chatForm.addEventListener('submit', event => {
     event.preventDefault();
