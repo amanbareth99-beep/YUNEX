@@ -7,14 +7,15 @@
   let currentView = 'feed';
   let activeDemoUser = { name: 'Riya Creates', handle: '@riya_demo' };
   let exitWarningAt = 0;
-
   const style = document.createElement('style');
   style.textContent = `
     body.section-open main { width:100%; max-width:none; margin:0 auto; padding:0 16px 18px; min-height:100dvh; }
     body.section-open .view.active { min-height:calc(100dvh - 18px); }
     body.section-open footer { display:none !important; }
     .section-back, #chat > button[data-view], #demoProfile > button[data-view], #account > .back-home { display:none !important; }
-    #chat { display:flex; flex-direction:column; height:calc(100dvh - 16px); min-height:calc(100dvh - 16px); }
+    /* Critical visibility fix: Chat is flex ONLY while it is the active view. */
+    #chat.view:not(.active) { display:none !important; }
+    #chat.view.active { display:flex !important; flex-direction:column; height:calc(100dvh - 16px); min-height:calc(100dvh - 16px); }
     #chat .chat-heading { display:flex; align-items:center; gap:10px; padding:10px 0 14px; border-bottom:1px solid #1e2b40; }
     #chat .chat-heading .small-avatar { width:48px; height:48px; flex:0 0 48px; margin:0; }
     #chat .chat-heading > div:last-child { display:flex; flex-direction:column; gap:0; margin-left:0; }
@@ -37,7 +38,6 @@
     @media (min-width:720px) { body.section-open main { max-width:720px; } }
   `;
   document.head.appendChild(style);
-
   function prepareChatHeader() {
     const heading = document.querySelector('#chat .chat-heading');
     if (!heading) return;
@@ -62,7 +62,6 @@
       heading.appendChild(hug);
     }
   }
-
   function renderView(id) {
     if (!document.getElementById(id)) id = 'feed';
     currentView = id;
@@ -80,7 +79,6 @@
     if (id === 'chat') prepareChatHeader();
     window.scrollTo(0, 0);
   }
-
   function navigate(id) {
     if (!document.getElementById(id) || id === currentView) return;
     history.pushState({ yunex: true, view: id }, '', '#' + id);
@@ -90,7 +88,6 @@
 
   history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
   renderView('feed');
-
   // Capture the Create account action at document level so it cannot be swallowed
   // by another button handler or a stale delegated navigation listener.
   document.addEventListener('click', event => {
@@ -100,7 +97,6 @@
     event.stopImmediatePropagation();
     navigate('account');
   }, true);
-
   document.addEventListener('click', event => {
     const profileButton = event.target.closest('.profile-open');
     if (profileButton) {
@@ -140,7 +136,6 @@
       if (label) label.textContent = liked ? 'Liked' : 'Like';
     }
   });
-
   window.addEventListener('popstate', event => {
     if (event.state && event.state.yunex && event.state.view) { renderView(event.state.view); return; }
     if (currentView === 'feed') {
@@ -154,7 +149,6 @@
       window.setTimeout(() => toast.classList.remove('show'), 1800);
     } else renderView('feed');
   });
-
   const fileInput = document.getElementById('mediaFile');
   if (fileInput) fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
