@@ -8,17 +8,27 @@
   let activeDemoUser = { name: 'Riya Creates', handle: '@riya_demo' };
   let exitWarningAt = 0;
 
-  const chatStyle = document.createElement('style');
-  chatStyle.textContent = `
+  const style = document.createElement('style');
+  style.textContent = `
     body.section-open main { width:100%; max-width:none; margin:0 auto; padding:0 16px 18px; min-height:100dvh; }
     body.section-open .view.active { min-height:calc(100dvh - 18px); }
     body.section-open footer { display:none !important; }
     .section-back, #chat > button[data-view], #demoProfile > button[data-view], #account > .back-home { display:none !important; }
     #chat { display:flex; flex-direction:column; height:calc(100dvh - 16px); min-height:calc(100dvh - 16px); }
     #chat .chat-heading { display:flex; align-items:center; gap:10px; padding:10px 0 14px; border-bottom:1px solid #1e2b40; }
-    #chat .chat-heading > div:last-child { display:flex; flex-direction:column; gap:0; }
+    #chat .chat-heading .small-avatar { width:48px; height:48px; flex:0 0 48px; margin:0; }
+    #chat .chat-heading > div:last-child { display:flex; flex-direction:column; gap:0; margin-left:0; }
     #chat .chat-heading .muted { display:none !important; }
-    #chat .hug-action { margin-left:auto; min-width:54px; min-height:50px; padding:0 15px; border:1px solid #287bc5; border-radius:14px; color:#fff; background:linear-gradient(135deg,#0879f9,#25b9ff); font-size:22px; font-weight:800; box-shadow:0 5px 18px #168bff35; }
+    #chat .hug-action {
+      margin-left:auto; width:88px; height:78px; min-width:88px; min-height:78px;
+      padding:0; display:grid; place-items:center; flex:0 0 88px;
+      border:1px solid rgba(82,174,255,.55); border-radius:20px;
+      color:#eaf7ff; background:linear-gradient(145deg,rgba(25,112,190,.42),rgba(8,30,58,.94));
+      box-shadow:0 0 0 1px rgba(80,170,255,.08),0 8px 24px rgba(0,108,220,.22),inset 0 1px 0 rgba(255,255,255,.13);
+      transition:transform .16s ease, box-shadow .16s ease;
+    }
+    #chat .hug-action:active { transform:scale(.97); box-shadow:0 0 22px rgba(34,153,255,.34),inset 0 1px 0 rgba(255,255,255,.16); }
+    #chat .hug-action svg { width:34px; height:34px; filter:drop-shadow(0 0 7px rgba(79,190,255,.5)); }
     #chat .chat-messages { flex:1; min-height:0; max-height:none; overflow-y:auto; margin:12px 0; }
     #chat .chat-compose { display:flex; gap:9px; margin:0 0 8px; padding-bottom:env(safe-area-inset-bottom); }
     #chat .chat-compose input { flex:1; min-width:0; min-height:52px; margin:0; }
@@ -26,7 +36,7 @@
     #chat > p.tiny { display:none !important; }
     @media (min-width:720px) { body.section-open main { max-width:720px; } }
   `;
-  document.head.appendChild(chatStyle);
+  document.head.appendChild(style);
 
   function prepareChatHeader() {
     const heading = document.querySelector('#chat .chat-heading');
@@ -40,7 +50,11 @@
       hug.className = 'hug-action';
       hug.setAttribute('aria-label', 'Send a virtual hug request');
       hug.title = 'Send a Hug request';
-      hug.innerHTML = '<svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-8.5-8.4C2.2 8.2 4.1 5 7.3 5c2 0 3.4 1.2 4.7 3 1.3-1.8 2.7-3 4.7-3 3.2 0 5.1 3.2 3.8 6.6C19 15.6 12 20 12 20Z"/><path d="M8.5 12.5 10.5 14l3-3"/></svg>';
+      hug.innerHTML = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 27s-9.8-5.9-11.7-11.1C2.7 11.8 5 7.7 9 7.7c2.8 0 4.7 1.8 7 4.4 2.3-2.6 4.2-4.4 7-4.4 4 0 6.3 4.1 4.7 8.2C25.8 21.1 16 27 16 27Z"/>
+        <path d="M8.2 17.7l3.2-3.1 3.1 2.7 3.1-3.2 5.1 4.2"/>
+        <path d="M8.2 17.7l2.1 4.1 3.3 1.3M23.8 17.7l-2.1 4.1-3.3 1.3"/>
+      </svg>`;
       hug.addEventListener('click', () => {
         const accepted = window.confirm('Send a Virtual Hug request to ' + activeDemoUser.name + '?');
         if (accepted) window.alert('Hug request preview sent. Real-time delivery and Hug Back / Not Now require the connected YUNEX chat backend.');
@@ -72,20 +86,20 @@
     history.pushState({ yunex: true, view: id }, '', '#' + id);
     renderView(id);
   }
+  window.yunexNavigate = navigate;
 
   history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
   renderView('feed');
 
-  // Capture the Home hero's Create account tap before any other click handler.
-  // This forces the dedicated registration view and prevents accidental Chat routing.
-  const createAccountButton = document.querySelector('.welcome-actions [data-view="account"]');
-  if (createAccountButton) {
-    createAccountButton.addEventListener('click', event => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      navigate('account');
-    }, true);
-  }
+  // Capture the Create account action at document level so it cannot be swallowed
+  // by another button handler or a stale delegated navigation listener.
+  document.addEventListener('click', event => {
+    const createAccount = event.target.closest('.welcome-actions [data-view="account"]');
+    if (!createAccount) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    navigate('account');
+  }, true);
 
   document.addEventListener('click', event => {
     const profileButton = event.target.closest('.profile-open');
