@@ -94,9 +94,10 @@
     <section id="chat" class="view">
       <button class="secondary" data-view="demoProfile">← Back to profile</button>
       <div class="chat-heading"><div class="founder-avatar small-avatar" id="chatAvatar">R</div><div><b id="chatName">Riya Creates</b><small class="muted">Demo chat · not connected to a server</small></div></div>
-      <div id="chatMessages" class="chat-messages"><div class="chat-bubble received">Hi! Welcome to my YUNEX profile. 👋</div></div>
+      <div id="chatMessages" class="chat-messages"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div></div>
+      <div id="typingIndicator" class="typing-indicator" hidden><span></span><span></span><span></span> Riya is typing…</div>
       <form id="chatForm" class="chat-compose"><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
-      <p class="tiny muted">Messages are only shown in this browser demo. They are not sent to another person.</p>
+      <p class="tiny muted chat-demo-warning">Demo preview: Sent, Delivered, Seen and typing are simulated on this device only. No message is sent to another person.</p>
     </section>
 
     <section id="account" class="view">
