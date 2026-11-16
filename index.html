@@ -95,7 +95,7 @@
         <header class="chat-top-fixed">
           <div class="chat-heading">
             <div class="founder-avatar small-avatar" id="chatAvatar">R</div>
-            <div class="chat-person"><b id="chatName">Riya Creates</b><small class="muted">YUNEX chat · demo</small></div>
+            <div class="chat-person"><b id="chatName">Riya Creates</b><small id="chatPresence" class="chat-presence is-online"><span class="presence-dot" aria-hidden="true"></span><span class="presence-label">Online</span></small></div>
           </div>
           <div class="chat-tools">
             <button class="chat-tool hug-tool" id="hugButton" type="button" aria-label="Send a hug" title="Send a hug">
@@ -104,7 +104,7 @@
             <button class="chat-tool games-tool" id="gamesButton" type="button" aria-label="Games" title="Games"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 17h16a8 8 0 0 1 7.7 10l-1.4 5.2a4 4 0 0 1-6.5 2l-4.1-3.4h-8.4l-4.1 3.4a4 4 0 0 1-6.5-2L7.3 27A8 8 0 0 1 15 17Z"/><path d="M16 23v8m-4-4h8m11-2h.1m5 5h.1"/></svg></button>
           </div>
         </header>
-        <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div><div id="typingIndicator" class="typing-indicator" hidden><span></span><span></span><span></span> Riya is typing…</div></div>
+        <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div></div>
         <form id="chatForm" class="chat-compose"><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
       </div>
     </section>

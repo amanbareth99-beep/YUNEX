@@ -19,3 +19,10 @@ Important limitations:
 - This is still a local front-end demo. Authentication, database, real-time cross-device messages, delivery receipts, Virtual Hug requests, and synchronized multiplayer games require secure Supabase integration.
 - Do not enter real passwords or private information in this prototype.
 - Never put a Supabase service_role key in frontend files.
+
+
+2026-11-16 Chat presence update:
+- The chat partner status is shown under their name in the fixed header.
+- The local demo switches Online -> Typing... while a simulated reply is pending, then returns to Online.
+- The separate typing bubble has been removed from the message list.
+- Presence is a local preview only; real online presence and remote typing require Supabase Realtime.

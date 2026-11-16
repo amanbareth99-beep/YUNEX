@@ -237,7 +237,15 @@
   const chatForm = document.getElementById('chatForm');
   const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
-  const typingIndicator = document.getElementById('typingIndicator');
+  const chatPresence = document.getElementById('chatPresence');
+  const presenceLabel = chatPresence ? chatPresence.querySelector('.presence-label') : null;
+
+  function setChatPresence(isTyping) {
+    if (!chatPresence || !presenceLabel) return;
+    presenceLabel.textContent = isTyping ? 'Typing…' : 'Online';
+    chatPresence.classList.toggle('is-typing', isTyping);
+    chatPresence.classList.toggle('is-online', !isTyping);
+  }
 
   function addMessageMetaSafe(bubble) {
     const meta = document.createElement('div'); meta.className = 'message-meta sent-meta';
@@ -294,20 +302,19 @@
       if (status) status.textContent = '✓✓ Seen · demo';
     }, 2300);
 
-    if (typingIndicator) {
-      typingIndicator.hidden = false;
-      window.setTimeout(() => {
-        if (typingIndicator) typingIndicator.hidden = true;
-        const reply = document.createElement('div');
-        reply.className = 'chat-bubble received';
-        const replyText = document.createElement('div');
-        replyText.textContent = 'Message received in this local preview. 👋';
-        reply.appendChild(replyText);
-        addMessageMeta(reply, '', false);
-        chatMessages.appendChild(reply);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }, 1400);
-    }
+    // Demo presence appears under the chat partner's name, not in the message list.
+    setChatPresence(true);
+    window.setTimeout(() => {
+      const reply = document.createElement('div');
+      reply.className = 'chat-bubble received';
+      const replyText = document.createElement('div');
+      replyText.textContent = 'Message received in this local preview. 👋';
+      reply.appendChild(replyText);
+      addMessageMeta(reply, '', false);
+      chatMessages.appendChild(reply);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      setChatPresence(false);
+    }, 1400);
   });
 
 
