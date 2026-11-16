@@ -27,3 +27,12 @@ Update (2026-11-13):
 - Each non-home section receives a Back control; browser/Android Back remains supported.
 - Chat remains a local demo in this build. Supabase URL + publishable/anon key and a real authenticated account flow are required before live messaging can be enabled.
 - Never place a Supabase service_role key in frontend files.
+
+
+Update (2026-11-16) — Chat Screen UI repair:
+- Chat opens as a dedicated full-screen view; top header, main navigation and footer are hidden while Chat is open.
+- Removed the visible Back-to-profile button; browser/device Back navigation remains handled through history.
+- Added header Hug and Games controls, a flexible message area and bottom composer.
+- Added Tic-Tac-Toe and Word Game local UI with invitation/accept/decline flows.
+- Hug and game interactions are local demo only. Cross-device multiplayer, real-time messages, receipts, and secure Hug requests still require authenticated Supabase integration and server-side rules.
+- Keep the three files together in the same folder when deploying.

@@ -16,6 +16,7 @@
     });
     if (tabs) tabs.hidden = (id === 'account');
     document.body.classList.toggle('registration-open', id === 'account');
+    document.body.classList.toggle('chat-open', id === 'chat');
     window.scrollTo(0, 0);
   }
 
@@ -219,4 +220,37 @@
       }, 1400);
     }
   });
+
+
+  // Chat-only local game preview. A real two-device match needs Supabase Realtime.
+  const gamesPanel = document.getElementById('gamesPanel');
+  const gamesButton = document.getElementById('gamesButton');
+  const gameFeedback = document.getElementById('gameFeedback');
+  const inviteBox = document.getElementById('gameInvite');
+  let selectedGame = null, board = Array(9).fill(''), playerTurn = 'X', wordTurnUser = 'You';
+  let yourScore = 0, friendScore = 0, usedWords = new Set();
+  const tttBoard = document.getElementById('ticTacToeBoard');
+  const wordArea = document.getElementById('wordGameArea');
+  if (gamesButton) gamesButton.addEventListener('click', () => { gamesPanel.hidden = !gamesPanel.hidden; });
+  document.getElementById('closeGames')?.addEventListener('click', () => { gamesPanel.hidden = true; });
+  document.querySelectorAll('.game-choice').forEach(button => button.addEventListener('click', () => {
+    selectedGame = button.dataset.game; inviteBox.hidden = false; tttBoard.hidden = true; wordArea.hidden = true;
+    document.getElementById('gameInviteText').textContent = `${selectedGame === 'ttt' ? 'Tic-Tac-Toe' : 'Word Game'} invitation sent to ${activeDemoUser.name}. Accept the invitation to start (local preview).`;
+    gameFeedback.textContent = 'Waiting for the other player to accept…';
+  }));
+  document.getElementById('declineGame')?.addEventListener('click', () => { inviteBox.hidden = true; gameFeedback.textContent = 'Game invitation declined.'; });
+  function renderBoard(){
+    tttBoard.innerHTML='';
+    board.forEach((mark,i)=>{const cell=document.createElement('button');cell.type='button';cell.className='ttt-cell';cell.textContent=mark;cell.disabled=!!mark||!!winner();cell.addEventListener('click',()=>{if(winner()||board[i])return;board[i]=playerTurn;playerTurn=playerTurn==='X'?'O':'X';renderBoard();const win=winner();gameFeedback.textContent=win?`${win} wins!`:board.every(Boolean)?'It is a draw!':`${playerTurn}'s turn`;});tttBoard.appendChild(cell);});
+  }
+  function winner(){const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(const line of lines){const [a,b,c]=line;if(board[a]&&board[a]===board[b]&&board[a]===board[c])return board[a];}return '';}
+  document.getElementById('acceptGame')?.addEventListener('click',()=>{
+    inviteBox.hidden=true;gameFeedback.textContent='Game started! This is a local preview; the other phone is not connected yet.';
+    if(selectedGame==='ttt'){board=Array(9).fill('');playerTurn='X';tttBoard.hidden=false;wordArea.hidden=true;renderBoard();}
+    if(selectedGame==='word'){tttBoard.hidden=true;wordArea.hidden=false;wordTurnUser='You';yourScore=0;friendScore=0;usedWords.clear();document.getElementById('wordHistory').innerHTML='';updateWordScore();document.getElementById('wordTurn').textContent='Your turn';}
+  });
+  function updateWordScore(){document.getElementById('wordScore').textContent=`You: ${yourScore} · Friend: ${friendScore}`;}
+  document.getElementById('wordForm')?.addEventListener('submit',e=>{e.preventDefault();const input=document.getElementById('wordInput');const word=input.value.trim().toLowerCase();if(!/^[a-z]{2,16}$/.test(word)){gameFeedback.textContent='Please enter a word using 2–16 English letters.';return;}if(usedWords.has(word)){gameFeedback.textContent='That word was already used. Try another.';return;}usedWords.add(word);const points=word.length;yourScore+=points;const row=document.createElement('div');row.textContent=`You: ${word} (+${points})`;document.getElementById('wordHistory').prepend(row);input.value='';updateWordScore();document.getElementById('wordTurn').textContent='Friend’s turn (simulated)';gameFeedback.textContent='Word added. In the live version, your friend will receive the next turn.';});
+  document.getElementById('hugButton')?.addEventListener('click',()=>{const msg=document.createElement('div');msg.className='chat-bubble sent';msg.textContent='🤗 Sent a Hug · demo';chatMessages.appendChild(msg);chatMessages.scrollTop=chatMessages.scrollHeight;});
+
 })();

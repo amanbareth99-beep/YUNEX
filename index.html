@@ -91,13 +91,27 @@
       <div class="panel profile-card demo-user-card"><div class="founder-avatar" id="demoAvatar">R</div><h2 id="demoName">Riya Creates</h2><p class="muted" id="demoHandle">@riya_demo</p><div class="stats"><div><b>12</b><small>Posts</small></div><div><b id="demoFollowers">245</b><small>Followers</small></div><div><b>180</b><small>Following</small></div></div><div class="profile-actions"><button class="primary" id="followDemo">Follow</button><button class="secondary" id="messageDemo">Message</button></div><p class="tiny muted">Demo creator profile. Follow and chat are local previews only.</p></div>
     </section>
 
-    <section id="chat" class="view">
-      <button class="secondary" data-view="demoProfile">← Back to profile</button>
-      <div class="chat-heading"><div class="founder-avatar small-avatar" id="chatAvatar">R</div><div><b id="chatName">Riya Creates</b><small class="muted">Demo chat · not connected to a server</small></div></div>
+    <section id="chat" class="view chat-screen">
+      <div class="chat-heading">
+        <div class="chat-person"><div class="founder-avatar small-avatar" id="chatAvatar">R</div><div><b id="chatName">Riya Creates</b><small class="muted">Demo chat · local preview</small></div></div>
+        <div class="chat-tools">
+          <button class="chat-tool hug-button" id="hugButton" type="button" aria-label="Send a Hug"><span class="tool-icon">♡</span><span>Hug</span></button>
+          <button class="chat-tool" id="gamesButton" type="button"><span class="tool-icon">♟</span><span>Games</span></button>
+        </div>
+      </div>
       <div id="chatMessages" class="chat-messages"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div></div>
       <div id="typingIndicator" class="typing-indicator" hidden><span></span><span></span><span></span> Riya is typing…</div>
       <form id="chatForm" class="chat-compose"><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
-      <p class="tiny muted chat-demo-warning">Demo preview: Sent, Delivered, Seen and typing are simulated on this device only. No message is sent to another person.</p>
+      <p class="tiny muted chat-demo-warning">Local demo only: messages, Hug and games are not yet synchronized with another device.</p>
+      <div id="gamesPanel" class="games-panel" hidden>
+        <div class="games-panel-head"><b>Play together</b><button type="button" id="closeGames" aria-label="Close games">✕</button></div>
+        <p class="tiny muted">Choose a game and invite your friend.</p>
+        <div class="game-choices"><button type="button" class="game-choice" data-game="ttt"><span>✕ ○</span><b>Tic-Tac-Toe</b><small>Take turns to make a line of 3</small></button><button type="button" class="game-choice" data-game="word"><span>Wᴏʀᴅ</span><b>Word Game</b><small>Build words and earn points</small></button></div>
+        <div id="gameInvite" class="game-invite" hidden><p id="gameInviteText">Game invitation</p><button type="button" class="primary" id="acceptGame">Accept & Play</button><button type="button" class="secondary" id="declineGame">Not now</button></div>
+        <div id="ticTacToeBoard" class="ttt-board" hidden aria-label="Tic-Tac-Toe board"></div>
+        <div id="wordGameArea" class="word-game-area" hidden><p id="wordTurn">Your turn</p><form id="wordForm"><input id="wordInput" maxlength="16" placeholder="Type a word" autocomplete="off"><button class="primary" type="submit">Play word</button></form><div id="wordScore" class="word-score">You: 0 · Friend: 0</div><div id="wordHistory" class="word-history"></div></div>
+        <p id="gameFeedback" class="tiny muted" aria-live="polite"></p>
+      </div>
     </section>
 
     <section id="account" class="view">
