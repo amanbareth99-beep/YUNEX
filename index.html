@@ -91,31 +91,26 @@
       <div class="panel profile-card demo-user-card"><div class="founder-avatar" id="demoAvatar">R</div><h2 id="demoName">Riya Creates</h2><p class="muted" id="demoHandle">@riya_demo</p><div class="stats"><div><b>12</b><small>Posts</small></div><div><b id="demoFollowers">245</b><small>Followers</small></div><div><b>180</b><small>Following</small></div></div><div class="profile-actions"><button class="primary" id="followDemo">Follow</button><button class="secondary" id="messageDemo">Message</button></div><p class="tiny muted">Demo creator profile. Follow and chat are local previews only.</p></div>
     </section>
 
-    <section id="chat" class="view chat-screen">
-      <div class="chat-heading">
-        <div class="chat-person"><div class="founder-avatar small-avatar" id="chatAvatar">R</div><div><b id="chatName">Riya Creates</b><small class="muted">Demo chat · local preview</small></div></div>
-        <div class="chat-tools">
-          <button class="chat-tool hug-button" id="hugButton" type="button" aria-label="Send a Hug"><span class="tool-icon">♡</span><span>Hug</span></button>
-          <button class="chat-tool" id="gamesButton" type="button"><span class="tool-icon">♟</span><span>Games</span></button>
-        </div>
-      </div>
-      <div id="chatMessages" class="chat-messages"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div></div>
-      <div id="typingIndicator" class="typing-indicator" hidden><span></span><span></span><span></span> Riya is typing…</div>
-      <form id="chatForm" class="chat-compose"><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
-      <p class="tiny muted chat-demo-warning">Local demo only: messages, Hug and games are not yet synchronized with another device.</p>
-      <div id="gamesPanel" class="games-panel" hidden>
-        <div class="games-panel-head"><b>Play together</b><button type="button" id="closeGames" aria-label="Close games">✕</button></div>
-        <p class="tiny muted">Choose a game and invite your friend.</p>
-        <div class="game-choices"><button type="button" class="game-choice" data-game="ttt"><span>✕ ○</span><b>Tic-Tac-Toe</b><small>Take turns to make a line of 3</small></button><button type="button" class="game-choice" data-game="word"><span>Wᴏʀᴅ</span><b>Word Game</b><small>Build words and earn points</small></button></div>
-        <div id="gameInvite" class="game-invite" hidden><p id="gameInviteText">Game invitation</p><button type="button" class="primary" id="acceptGame">Accept & Play</button><button type="button" class="secondary" id="declineGame">Not now</button></div>
-        <div id="ticTacToeBoard" class="ttt-board" hidden aria-label="Tic-Tac-Toe board"></div>
-        <div id="wordGameArea" class="word-game-area" hidden><p id="wordTurn">Your turn</p><form id="wordForm"><input id="wordInput" maxlength="16" placeholder="Type a word" autocomplete="off"><button class="primary" type="submit">Play word</button></form><div id="wordScore" class="word-score">You: 0 · Friend: 0</div><div id="wordHistory" class="word-history"></div></div>
-        <p id="gameFeedback" class="tiny muted" aria-live="polite"></p>
+    <section id="chat" class="view chat-screen" aria-label="Chat">
+      <div class="chat-shell">
+        <header class="chat-top-fixed">
+          <div class="chat-heading">
+            <div class="founder-avatar small-avatar" id="chatAvatar">R</div>
+            <div class="chat-person"><b id="chatName">Riya Creates</b><small class="muted">YUNEX chat · demo</small></div>
+          </div>
+          <div class="chat-tools">
+            <button class="chat-tool hug-tool" id="hugButton" type="button" aria-label="Send a hug" title="Send a hug">
+              <svg viewBox="0 0 48 48" role="img" aria-hidden="true"><path d="M8 25c2-5 5-8 9-8 3 0 5 2 7 5l-4 4c-1-2-2-3-4-3-2 0-4 2-5 5l-3-3Z"/><path d="M40 25c-2-5-5-8-9-8-3 0-5 2-7 5l4 4c1-2 2-3 4-3 2 0 4 2 5 5l3-3Z"/><path d="M12 28c3 7 8 11 12 11s9-4 12-11M17 17l-2-4m16 4 2-4"/><path class="hug-heart" d="M24 28s-5-3-5-6a3 3 0 0 1 5-2 3 3 0 0 1 5 2c0 3-5 6-5 6Z"/></svg>
+            </button>
+            <button class="chat-tool games-tool" id="gamesButton" type="button" aria-label="Games" title="Games"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 17h16a8 8 0 0 1 7.7 10l-1.4 5.2a4 4 0 0 1-6.5 2l-4.1-3.4h-8.4l-4.1 3.4a4 4 0 0 1-6.5-2L7.3 27A8 8 0 0 1 15 17Z"/><path d="M16 23v8m-4-4h8m11-2h.1m5 5h.1"/></svg></button>
+          </div>
+        </header>
+        <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div><div id="typingIndicator" class="typing-indicator" hidden><span></span><span></span><span></span> Riya is typing…</div></div>
+        <form id="chatForm" class="chat-compose"><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
       </div>
     </section>
 
-    <section id="account" class="view">
-      <button class="back-home secondary" type="button" data-view="feed">← Back to Home</button>
+    <section id="account" class="view registration-screen">
       <p class="eyebrow">JOIN THE COMMUNITY</p><h2>Create your account</h2>
       <div class="panel form-panel">
         <label>Full name<input placeholder="Enter your name"></label>
@@ -129,6 +124,18 @@
       </div>
     </section>
   </main>
+
+  <div class="games-overlay" id="gamesOverlay" hidden>
+    <section class="games-dialog" role="dialog" aria-modal="true" aria-labelledby="gamesTitle">
+      <div class="games-dialog-head"><div><p class="eyebrow">PLAY TOGETHER</p><h2 id="gamesTitle">Chat Games</h2></div><button class="games-close" id="closeGames" aria-label="Close games">×</button></div>
+      <div class="game-choice-row"><button class="game-choice active" data-game="ttt">Tic-Tac-Toe</button><button class="game-choice" data-game="word">Word Game</button></div>
+      <p class="game-demo-note" id="gameStatus">Invite your chat friend. This is a local preview; invitations are not delivered to another device.</p>
+      <div class="game-invite-row"><button class="secondary" id="sendGameInvite">Send game invite</button><button class="secondary" id="acceptGameInvite">Accept</button><button class="secondary" id="declineGameInvite">Decline</button></div>
+      <div id="ticTacToeBoard" class="ttt-board" aria-label="Tic-Tac-Toe board"><button data-cell="0"></button><button data-cell="1"></button><button data-cell="2"></button><button data-cell="3"></button><button data-cell="4"></button><button data-cell="5"></button><button data-cell="6"></button><button data-cell="7"></button><button data-cell="8"></button></div>
+      <div id="wordGamePanel" class="word-game-panel" hidden><p>Take turns adding a word to the chain.</p><div id="wordChain" class="word-chain">YUNEX</div><form id="wordForm"><input id="wordInput" placeholder="Type your word…" aria-label="Type your word"><button class="primary" type="submit">Add</button></form></div>
+      <button class="secondary full" id="resetGame">Restart game</button>
+    </section>
+  </div>
 
   <footer>© 2026 YUNEX <span>Built to create something bigger.</span></footer>
   <script src="script.js"></script>
