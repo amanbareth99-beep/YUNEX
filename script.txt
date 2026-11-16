@@ -6,10 +6,12 @@
   let currentView = 'feed';
   let activeDemoUser = { name: 'Riya Creates', handle: '@riya_demo' };
   let exitWarningAt = 0;
+  let chatKeyboardHistoryEntry = false;
 
   function renderView(id) {
     if (!document.getElementById(id)) id = 'feed';
     currentView = id;
+    if (id !== 'chat') chatKeyboardHistoryEntry = false;
     views.forEach(view => view.classList.toggle('active', view.id === id));
     document.querySelectorAll('.tab[data-view]').forEach(button => {
       button.classList.toggle('active', button.dataset.view === id);
@@ -23,17 +25,21 @@
     else window.scrollTo(0, 0);
   }
 
-  // Keep the dedicated screen sized to the visible mobile viewport, including when the keyboard opens.
+  // Track the actual visible viewport. Android keyboards may resize the
+  // layout viewport or overlay it; bottom-gap handles both modes.
   function syncVisibleViewport() {
     const vv = window.visualViewport;
     const height = vv ? vv.height : window.innerHeight;
     const top = vv ? vv.offsetTop : 0;
+    const layoutHeight = document.documentElement.clientHeight || window.innerHeight;
+    const bottomGap = Math.max(0, layoutHeight - height - top);
     document.documentElement.style.setProperty('--yunex-vv-height', `${Math.max(1, height)}px`);
     document.documentElement.style.setProperty('--yunex-vv-top', `${Math.max(0, top)}px`);
-    document.documentElement.style.setProperty('--yunex-vv-bottom-gap', `${Math.max(0, window.innerHeight - height - top)}px`);
+    document.documentElement.style.setProperty('--yunex-vv-bottom-gap', `${bottomGap}px`);
   }
   syncVisibleViewport();
   window.addEventListener('resize', syncVisibleViewport, { passive: true });
+  window.addEventListener('orientationchange', () => window.setTimeout(syncVisibleViewport, 80), { passive: true });
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', syncVisibleViewport, { passive: true });
     window.visualViewport.addEventListener('scroll', syncVisibleViewport, { passive: true });
@@ -41,17 +47,20 @@
   const chatInputForViewport = document.getElementById('chatInput');
   if (chatInputForViewport) {
     chatInputForViewport.addEventListener('focus', () => {
+      if (!chatKeyboardHistoryEntry && currentView === 'chat') {
+        history.pushState({ yunex: true, view: 'chat', keyboardSentinel: true }, '', '#chat');
+        chatKeyboardHistoryEntry = true;
+      }
       syncVisibleViewport();
       requestAnimationFrame(() => {
         syncVisibleViewport();
-        const composer = document.getElementById('chatForm');
-        if (composer) composer.style.transform = 'translateZ(0)';
+        const box = document.getElementById('chatMessages');
+        if (box) box.scrollTop = box.scrollHeight;
       });
     });
     chatInputForViewport.addEventListener('blur', () => {
-      syncVisibleViewport();
-      const composer = document.getElementById('chatForm');
-      if (composer) composer.style.transform = '';
+      requestAnimationFrame(syncVisibleViewport);
+      window.setTimeout(syncVisibleViewport, 120);
     });
   }
 
@@ -149,6 +158,13 @@
 
   // Android/browser Back: go to the previous YUNEX screen, not out of the site.
   window.addEventListener('popstate', event => {
+    if (currentView === 'chat' && chatKeyboardHistoryEntry) {
+      chatKeyboardHistoryEntry = false;
+      const input = document.getElementById('chatInput');
+      if (input) input.blur();
+      syncVisibleViewport();
+      return;
+    }
     if (event.state && event.state.yunex && event.state.view) {
       renderView(event.state.view);
       return;
