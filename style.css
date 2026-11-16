@@ -159,3 +159,22 @@ body.chat-open .chat-compose button{height:46px!important;min-height:46px!import
 .chat-presence.is-typing .presence-dot{background:#38bdf8;box-shadow:0 0 7px #38bdf866;animation:yunexPresencePulse 1s ease-in-out infinite}
 .chat-presence.is-typing .presence-label{color:#7dd3fc}
 @keyframes yunexPresencePulse{0%,100%{opacity:.45}50%{opacity:1}}
+
+
+/* WhatsApp-style chat deletion controls */
+.chat-tools{position:relative}
+.chat-menu-trigger{width:34px;height:38px;border:1px solid #263c59;border-radius:11px;background:#101d30;color:#dceaff;font-size:25px;line-height:1;padding:0 0 5px;display:grid;place-items:center}
+.chat-options-menu{position:fixed;z-index:60;top:74px;right:max(12px,calc((100vw - 720px)/2));width:190px;padding:7px;background:#101b2c;border:1px solid #294365;border-radius:13px;box-shadow:0 16px 40px #0009}
+.chat-options-menu[hidden],.message-actions-overlay[hidden]{display:none!important}
+.chat-options-menu button,.message-actions-dialog button{width:100%;border:0;background:transparent;color:#eaf3ff;text-align:left;padding:12px;border-radius:9px;font-size:14px}
+.chat-options-menu button:active,.message-actions-dialog button:active{background:#1b3554}
+.chat-options-menu button:last-child{color:#ff9b9b}
+.message-actions-overlay{position:fixed;inset:0;z-index:70;background:#020711c9;display:grid;place-items:center;padding:18px}
+.message-actions-dialog{width:min(360px,100%);background:#101b2c;border:1px solid #294365;border-radius:18px;padding:18px;box-shadow:0 20px 60px #000b}
+.message-actions-dialog h3{margin:0 0 8px;font-size:18px}
+.message-actions-dialog p{margin:0 0 12px;color:#9eb0c8;font-size:13px;overflow-wrap:anywhere}
+.message-actions-dialog button{border-top:1px solid #ffffff12;border-radius:0}
+.message-actions-dialog button[data-message-action="everyone"]{color:#ffb5b5}
+.message-actions-dialog .cancel-action{color:#8ebfff;text-align:center}
+.chat-bubble{position:relative;cursor:pointer}
+.chat-bubble:focus-visible{outline:2px solid #36d7ff;outline-offset:2px}

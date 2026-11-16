@@ -353,6 +353,91 @@
     e.preventDefault(); const input = document.getElementById('wordInput'); const word = input.value.trim();
     if (!word) return; wordItems.push(word); document.getElementById('wordChain').textContent = wordItems.join(' · '); input.value = '';
   });
+
+  // Chat deletion controls are local-demo interactions. A real multi-device
+  // delete-for-everyone action must be enforced by the authenticated backend.
+  const chatMenuTrigger = document.getElementById('chatMenuTrigger');
+  const chatOptionsMenu = document.getElementById('chatOptionsMenu');
+  const messageActionsOverlay = document.getElementById('messageActionsOverlay');
+  const messageActionsPreview = document.getElementById('messageActionsPreview');
+  let activeMessageBubble = null;
+
+  function closeChatMenus() {
+    if (chatOptionsMenu) chatOptionsMenu.hidden = true;
+    if (messageActionsOverlay) messageActionsOverlay.hidden = true;
+    activeMessageBubble = null;
+  }
+  if (chatMenuTrigger && chatOptionsMenu) {
+    chatMenuTrigger.addEventListener('click', () => {
+      chatOptionsMenu.hidden = !chatOptionsMenu.hidden;
+    });
+  }
+  if (chatMessages && messageActionsOverlay) {
+    chatMessages.addEventListener('click', event => {
+      const bubble = event.target.closest('.chat-bubble');
+      if (!bubble) return;
+      activeMessageBubble = bubble;
+      const textNode = bubble.querySelector(':scope > div');
+      const message = textNode ? textNode.textContent : 'Selected message';
+      messageActionsPreview.textContent = message.length > 120 ? message.slice(0, 117) + '…' : message;
+      messageActionsOverlay.hidden = false;
+    });
+    chatMessages.addEventListener('contextmenu', event => {
+      const bubble = event.target.closest('.chat-bubble');
+      if (!bubble) return;
+      event.preventDefault();
+      activeMessageBubble = bubble;
+      const textNode = bubble.querySelector(':scope > div');
+      messageActionsPreview.textContent = textNode ? textNode.textContent : 'Selected message';
+      messageActionsOverlay.hidden = false;
+    });
+  }
+  document.querySelectorAll('[data-message-action]').forEach(button => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.messageAction;
+      if (action === 'cancel') { closeChatMenus(); return; }
+      if (!activeMessageBubble) { closeChatMenus(); return; }
+      const label = action === 'everyone' ? 'Delete this message for everyone?' : 'Delete this message for you?';
+      if (window.confirm(label)) {
+        if (action === 'everyone') {
+          const replacement = document.createElement('div');
+          replacement.className = 'chat-bubble deleted-message';
+          replacement.textContent = 'This message was deleted';
+          activeMessageBubble.replaceWith(replacement);
+        } else {
+          activeMessageBubble.remove();
+        }
+      }
+      closeChatMenus();
+    });
+  });
+  document.querySelectorAll('[data-chat-action]').forEach(button => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.chatAction;
+      if (action === 'clear') {
+        if (window.confirm('Clear all messages from this chat on your side?')) {
+          chatMessages.replaceChildren();
+        }
+      } else if (action === 'delete') {
+        if (window.confirm('Delete this chat from your chat list? This demo will clear the conversation and return to Profile.')) {
+          chatMessages.replaceChildren();
+          closeChatMenus();
+          renderView('profile');
+          return;
+        }
+      }
+      closeChatMenus();
+    });
+  });
+  if (messageActionsOverlay) {
+    messageActionsOverlay.addEventListener('click', event => {
+      if (event.target === messageActionsOverlay) closeChatMenus();
+    });
+  }
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeChatMenus();
+  });
+
   selectGame('ttt');
 
 })();

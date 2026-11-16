@@ -98,6 +98,7 @@
             <div class="chat-person"><b id="chatName">Riya Creates</b><small id="chatPresence" class="chat-presence is-online"><span class="presence-dot" aria-hidden="true"></span><span class="presence-label">Online</span></small></div>
           </div>
           <div class="chat-tools">
+            <button class="chat-menu-trigger" id="chatMenuTrigger" type="button" aria-label="Chat options" title="Chat options">⋮</button>
             <button class="chat-tool hug-tool" id="hugButton" type="button" aria-label="Send a hug" title="Send a hug">
               <svg viewBox="0 0 48 48" role="img" aria-hidden="true" class="hug-people-icon"><circle cx="15" cy="12" r="5"/><circle cx="33" cy="12" r="5"/><path d="M6.5 34c.8-7.2 4-11 9-11 3.3 0 5.7 1.7 7.1 4.7M41.5 34c-.8-7.2-4-11-9-11-3.3 0-5.7 1.7-7.1 4.7"/><path d="M8 29c2.8 7.2 8.2 11 16 11s13.2-3.8 16-11"/><path class="hug-heart" d="M24 31s-5.8-3.6-5.8-7.2a3.5 3.5 0 0 1 5.8-2.5 3.5 3.5 0 0 1 5.8 2.5C29.8 27.4 24 31 24 31Z"/></svg>
             </button>
@@ -106,6 +107,19 @@
         </header>
         <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div></div>
         <form id="chatForm" class="chat-compose"><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
+      </div>
+      <div class="chat-options-menu" id="chatOptionsMenu" hidden>
+        <button type="button" data-chat-action="clear">Clear chat</button>
+        <button type="button" data-chat-action="delete">Delete chat</button>
+      </div>
+      <div class="message-actions-overlay" id="messageActionsOverlay" hidden>
+        <section class="message-actions-dialog" role="dialog" aria-modal="true" aria-labelledby="messageActionsTitle">
+          <h3 id="messageActionsTitle">Message options</h3>
+          <p id="messageActionsPreview"></p>
+          <button type="button" data-message-action="me">Delete for me</button>
+          <button type="button" data-message-action="everyone">Delete for everyone</button>
+          <button type="button" class="cancel-action" data-message-action="cancel">Cancel</button>
+        </section>
       </div>
     </section>
 

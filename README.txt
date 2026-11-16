@@ -26,3 +26,10 @@ Important limitations:
 - The local demo switches Online -> Typing... while a simulated reply is pending, then returns to Online.
 - The separate typing bubble has been removed from the message list.
 - Presence is a local preview only; real online presence and remote typing require Supabase Realtime.
+
+2026-11-16 Chat deletion controls:
+- Chat header overflow menu includes Clear chat and Delete chat.
+- Tap a message to open Delete for me / Delete for everyone / Cancel actions.
+- Destructive actions ask for confirmation.
+- This front-end demo only changes the local preview. True Delete for everyone across devices,
+  message retention, and conversation deletion require authenticated Supabase backend policies.
