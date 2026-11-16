@@ -104,3 +104,39 @@ body.chat-open main,body.registration-open main{width:100%;max-width:none;margin
 #wordForm input{min-width:0;flex:1;margin:0;}
 #wordForm button{padding:10px 15px;}
 @media(max-width:540px){.chat-top-fixed{min-height:60px;padding:6px 10px}.chat-tool{width:40px;height:40px}.chat-tool svg{width:24px;height:24px}.chat-compose{padding-left:9px;padding-right:9px}.registration-screen>.form-panel{padding:16px}.games-dialog{padding:15px;}}
+
+/* YUNEX mobile full-screen section and keyboard-safe chat correction (2026-11-16) */
+:root{--yunex-vv-height:100dvh;--yunex-vv-top:0px}
+body.section-open{overflow:hidden;height:var(--yunex-vv-height);min-height:0}
+body.section-open .topbar,body.section-open .tabs,body.section-open footer{display:none!important}
+body.section-open main{position:fixed!important;inset:var(--yunex-vv-top) 0 auto!important;width:100%!important;max-width:none!important;height:var(--yunex-vv-height)!important;max-height:var(--yunex-vv-height)!important;margin:0!important;padding:0!important;overflow:hidden!important}
+body.section-open main>.view.active{display:block;height:100%;max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:calc(18px + env(safe-area-inset-top)) 14px calc(22px + env(safe-area-inset-bottom))}
+body.section-open main>#chat.view.active{position:fixed;inset:var(--yunex-vv-top) 0 auto;width:100%;height:var(--yunex-vv-height);max-height:var(--yunex-vv-height);padding:0;overflow:hidden;display:block}
+body.chat-open main{position:fixed!important;inset:var(--yunex-vv-top) 0 auto!important;height:var(--yunex-vv-height)!important;max-height:var(--yunex-vv-height)!important}
+body.chat-open .chat-shell{position:absolute;inset:0;width:100%;height:100%;max-height:100%;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+body.chat-open .chat-top-fixed{position:relative;top:auto;left:auto;right:auto;min-height:58px;max-height:66px;flex:none;padding:5px 12px;z-index:5}
+body.chat-open .chat-messages{min-height:0;height:100%;max-height:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:12px 12px 16px}
+body.chat-open .chat-compose{position:relative;left:auto;right:auto;bottom:auto;width:100%;min-height:62px;display:flex;align-items:center;gap:8px;margin:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:6;background:#0b1422;border-top:1px solid #1c3049}
+body.chat-open .chat-compose input{min-width:0;flex:1;height:44px;margin:0!important}
+body.chat-open .chat-compose button{flex:none;height:44px;min-width:68px}
+body.registration-open main>.registration-screen.active{padding:calc(22px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));}
+body.section-open main>#demoProfile.view.active{padding-top:calc(18px + env(safe-area-inset-top))}
+@media(max-width:540px){body.chat-open .chat-top-fixed{min-height:56px;padding:4px 10px}body.chat-open .chat-tool{width:40px;height:40px}body.chat-open .chat-compose{padding-left:9px;padding-right:9px}}
+
+
+/* Final Android keyboard/composer and profile-view correction */
+html,body{overscroll-behavior:none}
+body.chat-open{position:fixed!important;inset:0!important;width:100%;height:var(--yunex-vv-height)!important;min-height:0!important;overflow:hidden!important}
+body.chat-open main{position:fixed!important;top:var(--yunex-vv-top)!important;left:0!important;right:0!important;bottom:auto!important;width:100%!important;height:var(--yunex-vv-height)!important;max-height:var(--yunex-vv-height)!important;margin:0!important;padding:0!important;overflow:hidden!important}
+body.chat-open main>#chat.view.active{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-height:100%!important;padding:0!important;margin:0!important;overflow:hidden!important}
+body.chat-open .chat-shell{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-height:100%!important;min-height:0!important;padding:0!important;margin:0!important;overflow:hidden!important;display:grid!important;grid-template-rows:58px minmax(0,1fr) 62px!important}
+body.chat-open .chat-top-fixed{position:relative!important;min-height:58px!important;height:58px!important;max-height:58px!important;padding:4px 10px!important;margin:0!important}
+body.chat-open .chat-messages{min-height:0!important;height:auto!important;max-height:none!important;overflow-y:auto!important;padding:12px 12px 16px!important;margin:0!important}
+body.chat-open .chat-compose{position:relative!important;inset:auto!important;align-self:stretch!important;width:100%!important;height:62px!important;min-height:62px!important;max-height:62px!important;margin:0!important;padding:7px 10px!important;padding-bottom:7px!important;display:flex!important;align-items:center!important;gap:8px!important;background:#0b1422!important;border-top:1px solid #1c3049!important;z-index:20!important}
+body.chat-open .chat-compose input{height:46px!important;min-height:46px!important;margin:0!important;padding:0 14px!important;flex:1 1 auto!important}
+body.chat-open .chat-compose button{height:46px!important;min-height:46px!important;min-width:72px!important;margin:0!important;flex:0 0 auto!important}
+body.section-open main>.view.active .back-home,body.section-open main>.view.active .back-button,body.section-open main>.view.active .back-btn,body.section-open main>.view.active [data-action="back"]{display:none!important}
+body.section-open main>#demoProfile.view.active{padding:18px 14px 22px!important}
+.chat-tool.hug-tool svg{width:27px!important;height:27px!important;fill:none!important;stroke:#f4fbff!important;stroke-width:2.1!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.chat-tool.hug-tool svg .hug-heart{fill:#36d7ff!important;stroke:#fff!important;stroke-width:1.4!important}
+@media(max-width:540px){body.chat-open .chat-shell{grid-template-rows:56px minmax(0,1fr) 62px!important}body.chat-open .chat-top-fixed{height:56px!important;min-height:56px!important;max-height:56px!important}}

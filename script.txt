@@ -15,10 +15,44 @@
       button.classList.toggle('active', button.dataset.view === id);
     });
     if (tabs) tabs.hidden = (id === 'account' || id === 'chat');
+    document.body.classList.toggle('section-open', id !== 'feed');
     document.body.classList.toggle('registration-open', id === 'account');
     document.body.classList.toggle('chat-open', id === 'chat');
-    if (id === 'chat') { const box = document.getElementById('chatMessages'); if (box) requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; }); }
+    document.querySelectorAll('main > .view.active .back-home, main > .view.active .back-button, main > .view.active .back-btn, main > .view.active [data-action="back"]').forEach(button => button.remove());
+    if (id === 'chat') { syncVisibleViewport(); const box = document.getElementById('chatMessages'); if (box) requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; }); }
     else window.scrollTo(0, 0);
+  }
+
+  // Keep the dedicated screen sized to the visible mobile viewport, including when the keyboard opens.
+  function syncVisibleViewport() {
+    const vv = window.visualViewport;
+    const height = vv ? vv.height : window.innerHeight;
+    const top = vv ? vv.offsetTop : 0;
+    document.documentElement.style.setProperty('--yunex-vv-height', `${Math.max(1, height)}px`);
+    document.documentElement.style.setProperty('--yunex-vv-top', `${Math.max(0, top)}px`);
+    document.documentElement.style.setProperty('--yunex-vv-bottom-gap', `${Math.max(0, window.innerHeight - height - top)}px`);
+  }
+  syncVisibleViewport();
+  window.addEventListener('resize', syncVisibleViewport, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncVisibleViewport, { passive: true });
+    window.visualViewport.addEventListener('scroll', syncVisibleViewport, { passive: true });
+  }
+  const chatInputForViewport = document.getElementById('chatInput');
+  if (chatInputForViewport) {
+    chatInputForViewport.addEventListener('focus', () => {
+      syncVisibleViewport();
+      requestAnimationFrame(() => {
+        syncVisibleViewport();
+        const composer = document.getElementById('chatForm');
+        if (composer) composer.style.transform = 'translateZ(0)';
+      });
+    });
+    chatInputForViewport.addEventListener('blur', () => {
+      syncVisibleViewport();
+      const composer = document.getElementById('chatForm');
+      if (composer) composer.style.transform = '';
+    });
   }
 
   function navigate(id) {
@@ -138,6 +172,17 @@
       renderView('feed');
     }
   });
+
+  const chatInputForFocus = document.getElementById('chatInput');
+  if (chatInputForFocus) {
+    chatInputForFocus.addEventListener('focus', () => {
+      syncVisibleViewport();
+      requestAnimationFrame(() => {
+        const box = document.getElementById('chatMessages');
+        if (box) box.scrollTop = box.scrollHeight;
+      });
+    });
+  }
 
   const fileInput = document.getElementById('mediaFile');
   if (fileInput) fileInput.addEventListener('change', () => {
