@@ -76,15 +76,8 @@
 
 
   // Subtle local-demo chat effects. Realtime delivery requires backend integration.
-  const chatEffectPresets = {
-    hug: { symbol: '🤗', label: 'A warm hug' },
-    kiss: { symbol: '💋', label: 'A little kiss' },
-    love: { symbol: '💙', label: 'Love You' },
-    miss: { symbol: '🥺', label: 'Miss You' },
-    laugh: { symbol: '😊', label: 'That made me smile' },
-    cry: { symbol: '😢', label: 'Feeling emotional' },
-    horror: { symbol: '👻', label: 'Boo!' }
-  };
+  // The existing dedicated Hug button keeps its original local-preview behavior.
+  const chatEffectPresets = { hug: { symbol: '🤗', label: 'A warm hug' } };
   function showChatEffect(effectName) {
     const preset = chatEffectPresets[effectName];
     const layer = document.getElementById('chatEffectLayer');
@@ -109,6 +102,53 @@
       card.classList.add('is-leaving');
       window.setTimeout(() => card.remove(), 600);
     }, 1500);
+  }
+
+
+  // Automatic text-triggered cartoon scenes. This is a lightweight, self-contained
+  // 2.5D SVG/CSS demo; real 3D assets and cross-device delivery belong to the backend phase.
+  const cartoonTriggers = [
+    { key: 'kiss', label: 'A little kiss', patterns: [/\bkiss\b/i, /\bmuah\b/i, /\bmwah\b/i, /😘/], art: 'kiss' },
+    { key: 'love', label: 'Love You', patterns: [/\blove\s+you\b/i, /\blove\s+u\b/i, /\bluv\s+u\b/i, /❤️/], art: 'love' },
+    { key: 'miss', label: 'Miss You', patterns: [/\bmiss\s+you\b/i, /\bmiss\s+u\b/i, /🥺/], art: 'miss' },
+    { key: 'laugh', label: 'Laugh', patterns: [/\bhaha+\b/i, /\blol\b/i, /\blmao\b/i, /😂/], art: 'laugh' },
+    { key: 'cry', label: 'Cry', patterns: [/\bcry(?:ing)?\b/i, /\bsobbing\b/i, /😭/], art: 'cry' },
+    { key: 'horror', label: 'Horror', patterns: [/\bhorror\b/i, /\bboo\b/i, /\bscary\b/i, /\bghost\b/i, /👻/], art: 'horror' }
+  ];
+  function detectCartoonTrigger(message) {
+    const found = cartoonTriggers.find(item => item.patterns.some(pattern => pattern.test(message)));
+    return found || null;
+  }
+  function cartoonArtwork(kind) {
+    const common = `<defs>
+      <linearGradient id="skin" x2="0" y2="1"><stop stop-color="#ffe2c4"/><stop offset="1" stop-color="#d99b78"/></linearGradient>
+      <linearGradient id="blue" x2="0" y2="1"><stop stop-color="#8be4ff"/><stop offset="1" stop-color="#2775c8"/></linearGradient>
+      <linearGradient id="pink" x2="0" y2="1"><stop stop-color="#ffb7d5"/><stop offset="1" stop-color="#bd5d98"/></linearGradient>
+      <radialGradient id="glow"><stop stop-color="#4aaeff" stop-opacity=".34"/><stop offset="1" stop-color="#4aaeff" stop-opacity="0"/></radialGradient>
+      <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur stdDeviation="3"/></filter>
+    </defs><ellipse cx="160" cy="178" rx="116" ry="13" fill="#000" opacity=".35" filter="url(#shadow)"/><ellipse cx="160" cy="104" rx="145" ry="94" fill="url(#glow)"/>`;
+    const head=(x,y,color='url(#skin)')=>`<circle cx="${x}" cy="${y}" r="28" fill="${color}" stroke="#f8d9c6" stroke-width="2"/><path d="M${x-25} ${y-9}q5-26 27-21q19 4 24 22q-14-10-25-9q-14 0-26 8" fill="#26334d"/><ellipse cx="${x-9}" cy="${y+2}" rx="2.5" ry="4" fill="#26334d"/><ellipse cx="${x+9}" cy="${y+2}" rx="2.5" ry="4" fill="#26334d"/><path d="M${x-6} ${y+14}q6 6 12 0" fill="none" stroke="#a85f63" stroke-width="2" stroke-linecap="round"/>`;
+    const body=(x,y,color='url(#blue)')=>`<path d="M${x-31} ${y+65}q0-44 31-44t31 44z" fill="${color}" stroke="#b9eaff" stroke-width="2"/>`;
+    let scene='';
+    if(kind==='kiss') scene=`<g class="toon-left">${body(108,74)}${head(108,57)}</g><g class="toon-right">${body(213,74,'url(#pink)')}${head(213,57)}</g><path class="toon-heart" d="M155 75c-19-17-36 10 0 32c36-22 19-49 0-32z" fill="#ff7daf" stroke="#ffd5e5" stroke-width="2"/><path d="M139 55q-10-12 2-16m37 13q12-13 20-4" fill="none" stroke="#8bdcff" stroke-width="3" stroke-linecap="round"/>`;
+    if(kind==='love') scene=`<g class="toon-left">${body(108,74)}${head(108,57)}</g><g class="toon-right">${body(213,74,'url(#pink)')}${head(213,57)}</g><path class="toon-heart" d="M160 77c-24-22-45 13 0 43c45-30 24-65 0-43z" fill="#ff6e9e" stroke="#ffd1e1" stroke-width="3"/><path d="M76 40l5-9m158 9l-5-9" stroke="#8bdcff" stroke-width="3" stroke-linecap="round"/>`;
+    if(kind==='miss') scene=`<g class="toon-solo">${body(160,73)}${head(160,56)}</g><path class="toon-heart" d="M220 55c-15-14-29 8 0 27c29-19 15-41 0-27z" fill="#ff85b6"/><path d="M95 55q-16-12-23 3m7 13q-15 5-18 18" fill="none" stroke="#91dfff" stroke-width="3" stroke-linecap="round"/><circle cx="203" cy="110" r="5" fill="#83d8ff" opacity=".8"/>`;
+    if(kind==='laugh') scene=`<g class="toon-left">${body(108,74)}${head(108,57)}</g><g class="toon-right">${body(213,74,'url(#pink)')}${head(213,57)}</g><path d="M94 61q14 13 28 0m77 0q14 13 28 0" fill="none" stroke="#26334d" stroke-width="4" stroke-linecap="round"/><path d="M73 38l-8-8m130 0l8-8m28 20l9-6" stroke="#ffd36f" stroke-width="4" stroke-linecap="round"/><g class="toon-bubble"><circle cx="160" cy="36" r="17" fill="#173d68" stroke="#7bd7ff" stroke-width="2"/><path d="M151 35q9-13 18 0q-9 15-18 0" fill="#b5efff"/></g>`;
+    if(kind==='cry') scene=`<g class="toon-solo">${body(160,73,'url(#blue)')}${head(160,56)}</g><path class="toon-tear" d="M139 68q-9 13 0 17q9-4 0-17zm42 0q-9 13 0 17q9-4 0-17z" fill="#75d8ff"/><path d="M149 79q11-8 22 0" fill="none" stroke="#a85f63" stroke-width="2.5" stroke-linecap="round"/><path d="M96 55q-10-10-17 0m97-24q8-10 16 0" fill="none" stroke="#8bdcff" stroke-width="3"/>`;
+    if(kind==='horror') scene=`<g class="toon-solo">${body(160,73)}${head(160,56)}</g><g class="toon-ghost"><path d="M207 124V82q0-29 25-29t25 29v42l-12-9-13 10-13-10z" fill="#d9f4ff" stroke="#7fcfff" stroke-width="3"/><ellipse cx="224" cy="82" rx="3" ry="5" fill="#243653"/><ellipse cx="241" cy="82" rx="3" ry="5" fill="#243653"/><ellipse cx="233" cy="97" rx="5" ry="6" fill="#8b6d91"/></g><path d="M88 35l-8-8m99 1l8-8m-100 40l-9 1" stroke="#b8eaff" stroke-width="3" stroke-linecap="round"/>`;
+    return `<svg viewBox="0 0 320 190" role="img" aria-label="${kind} cartoon animation" xmlns="http://www.w3.org/2000/svg">${common}${scene}</svg>`;
+  }
+  function showAutomaticCartoon(trigger) {
+    const layer = document.getElementById('chatEffectLayer');
+    if (!trigger || !layer) return;
+    layer.replaceChildren();
+    const card = document.createElement('div');
+    card.className = `chat-effect-card cartoon-card cartoon-${trigger.key}`;
+    const art = document.createElement('div'); art.className = 'cartoon-art';
+    art.innerHTML = cartoonArtwork(trigger.art);
+    const caption = document.createElement('div'); caption.className = 'chat-effect-caption'; caption.textContent = trigger.label;
+    card.append(art, caption); layer.appendChild(card);
+    window.setTimeout(() => { if (!card.isConnected) return; card.classList.add('is-leaving'); window.setTimeout(() => card.remove(), 250); }, 1750);
   }
 
   // All internal navigation uses one delegated handler, including dynamically shown controls.
@@ -166,20 +206,6 @@
 
     if (event.target.closest('#hugButton')) {
       showChatEffect('hug');
-      return;
-    }
-    if (event.target.closest('#chatEffectsToggle')) {
-      const tray = document.getElementById('chatEffectsTray');
-      const toggle = document.getElementById('chatEffectsToggle');
-      if (tray && toggle) {
-        tray.hidden = !tray.hidden;
-        toggle.setAttribute('aria-expanded', String(!tray.hidden));
-      }
-      return;
-    }
-    const effectButton = event.target.closest('[data-chat-effect]');
-    if (effectButton) {
-      showChatEffect(effectButton.dataset.chatEffect);
       return;
     }
     if (event.target.closest('#gamesButton')) { document.getElementById('gamesOverlay').hidden = false; return; }
@@ -336,6 +362,8 @@
     bubble.appendChild(messageText);
     addMessageMeta(bubble, '✓ Sent · demo', true);
     chatMessages.appendChild(bubble);
+    const automaticEffect = detectCartoonTrigger(value);
+    if (automaticEffect) showAutomaticCartoon(automaticEffect);
     chatInput.value = '';
     chatMessages.scrollTop = chatMessages.scrollHeight;
 

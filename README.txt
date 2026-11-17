@@ -54,3 +54,13 @@ YUNEX Chat UI + Keyboard Follow-up Fix
 - Adds enterkeyhint=send for a more suitable mobile keyboard action.
 - Retains chat animations, trash/delete icon, Clear Chat/Delete Chat, message deletion options, and existing presence demo.
 - Keyboard behavior should be tested on the target Android browser; device/browser focus policies can vary.
+
+
+YUNEX Automatic Text-Triggered Cartoon Animation Update (2026-11-17)
+- Removes the manual sparkle/effects button and the effects picker from the chat composer.
+- Six effects trigger automatically when a matching word/phrase is sent: Kiss, Love You, Miss You, Laugh, Cry, Horror.
+- The existing dedicated Hug button is retained separately with its existing behavior; no second Hug control or Hug picker item is added.
+- Uses self-contained animated SVG/CSS cartoon scenes with a soft 2.5D-style look, low-light YUNEX colors, and a 2-second display window. These are lightweight vector animations, not full 3D-rendered character assets.
+- Animation is positioned within the chat content region between the fixed header and composer/keyboard; it does not cover either control. Reduced-motion preferences are respected.
+- Trigger matching is local demo behavior. To show the same effect to both participants in real accounts, store/send the detected effect key with the message through Supabase Realtime and render it on both devices.
+- Existing chat presence, message deletion, clear/delete chat, trash icon, and Android keyboard refocus fixes are retained.
