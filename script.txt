@@ -75,69 +75,86 @@
   renderView('feed');
 
 
-  // The dedicated Hug button remains separate and keeps its existing behavior.
-  const chatEffectPresets = { hug: { symbol: '🤗', label: 'A warm hug' } };
+  // Subtle local-demo chat effects. Realtime delivery requires backend integration.
+  const chatEffectPresets = {
+    hug: { symbol: '🤗', label: 'A warm hug' }
+  };
   function showChatEffect(effectName) {
-    const preset = chatEffectPresets[effectName];
+    // The existing dedicated Hug button keeps its original lightweight preview behavior.
+    if (effectName !== 'hug') return showCartoonEffect(effectName);
     const layer = document.getElementById('chatEffectLayer');
-    if (!preset || !layer) return;
+    if (!layer) return;
+    const messageStream = document.getElementById('chatMessages');
+    if (messageStream) messageStream.appendChild(layer);
     layer.replaceChildren();
-    const card = document.createElement('div'); card.className = 'chat-effect-card';
-    const symbol = document.createElement('div'); symbol.className = 'chat-effect-symbol'; symbol.textContent = preset.symbol;
-    const caption = document.createElement('div'); caption.className = 'chat-effect-caption'; caption.textContent = preset.label;
+    const card = document.createElement('div');
+    card.className = 'chat-effect-card hug-effect-card';
+    const symbol = document.createElement('div'); symbol.className = 'chat-effect-symbol'; symbol.textContent = '🤗';
+    const caption = document.createElement('div'); caption.className = 'chat-effect-caption'; caption.textContent = 'A warm hug';
     card.append(symbol, caption); layer.appendChild(card);
-    window.setTimeout(() => { if (!card.isConnected) return; card.classList.add('is-leaving'); window.setTimeout(() => card.remove(), 600); }, 1400);
+    window.setTimeout(() => { if (card.isConnected) card.remove(); }, 1500);
   }
-
-  // Automatic text-triggered cartoon scenes. This is a lightweight, self-contained
-  // 2.5D SVG/CSS demo; real 3D assets and cross-device delivery belong to the backend phase.
-  const cartoonTriggers = [
-    { key: 'kiss', label: 'Kiss', patterns: [/\bkiss(?:es|ed|ing)?\b/i, /\bkissi\b/i, /\bmuah\b/i, /\bmwah\b/i, /चुम्मा|किस्स?ी|पप्पी/i, /😘|💋/] , art: 'kiss', neg: /\b(?:no|not|don't|dont|never|stop|avoid|mat|nahi|nahin|na|mana)\b.{0,24}(?:kiss|kissi|muah|चुम्मा|पप्पी)|(?:kiss|kissi|muah|चुम्मा|पप्पी).{0,18}\b(?:mat|nahi|nahin|no|not)\b/i },
-    { key: 'love', label: 'Love You', patterns: [/\blove\s*(?:you|u)\b/i, /\bluv\s*(?:you|u)\b/i, /प्यार करता|प्यार करती|तुमसे प्यार/i, /❤️|😍/] , art: 'love', neg: /\b(?:don't|dont|do not|not|never|mat|nahi|nahin)\b.{0,22}(?:love\s*(?:you|u)|luv\s*(?:you|u)|प्यार)/i },
-    { key: 'miss', label: 'Miss You', patterns: [/\bmiss(?:ing)?\s*(?:you|u)\b/i, /याद आ रही|याद आ रहा|याद आती/i, /🥺|🫶/] , art: 'miss', neg: /\b(?:don't|dont|do not|not|never|mat|nahi|nahin)\b.{0,22}(?:miss\s*(?:you|u)|याद)/i },
-    { key: 'laugh', label: 'Laugh', patterns: [/\bhaha+\b/i, /\blol\b/i, /\blmao\b/i, /हंस|हँस|मजाक|जोक/i, /😂|🤣/] , art: 'laugh', neg: /\b(?:don't|dont|do not|not|never|mat|nahi|nahin)\b.{0,22}(?:laugh|haha|हंस|हँस)/i },
-    { key: 'cry', label: 'Cry', patterns: [/\bcry(?:ing)?\b/i, /\bsobbing\b/i, /रोना|रो रहा|रो रही|आंसू|आँसू/i, /😭|😢/] , art: 'cry', neg: /\b(?:don't|dont|do not|not|never|mat|nahi|nahin)\b.{0,22}(?:cry|रोना|रो रहा|रो रही)/i },
-    { key: 'horror', label: 'Horror', patterns: [/\bhorror\b/i, /\bboo\b/i, /\bscary\b/i, /\bghost\b/i, /डरावना|भूत|डर लग/i, /👻|😱/] , art: 'horror', neg: /\b(?:not|no|don't|dont|mat|nahi|nahin)\b.{0,22}(?:horror|scary|ghost|डरावना|भूत)/i }
-  ];
-  function detectCartoonTrigger(message) {
-    const text = String(message || '').normalize('NFKC').toLowerCase();
-    for (const item of cartoonTriggers) {
-      if (item.neg && item.neg.test(text)) continue;
-      if (item.patterns.some(pattern => pattern.test(text))) return item;
+  const cartoonEffects = {
+    kiss: { title: 'A little kiss', face: '😘', other: '🥰', motion: 'kiss' },
+    love: { title: 'Love You', face: '💙', other: '💗', motion: 'love' },
+    miss: { title: 'Missing you', face: '🥺', other: '💌', motion: 'miss' },
+    laugh: { title: 'That’s hilarious!', face: '😄', other: '😂', motion: 'laugh' },
+    cry: { title: 'Feeling emotional', face: '🥹', other: '💧', motion: 'cry' },
+    horror: { title: 'Boo! A little spooky', face: '👻', other: '✨', motion: 'horror' }
+  };
+  function showCartoonEffect(name) {
+    const preset = cartoonEffects[name], layer = document.getElementById('chatEffectLayer');
+    if (!preset || !layer) return;
+    const messageStream = document.getElementById('chatMessages');
+    if (messageStream) messageStream.appendChild(layer);
+    layer.replaceChildren();
+    if (name === 'kiss') {
+      const image = document.createElement('img');
+      image.className = 'yunex-kiss-gif';
+      image.src = 'assets/chat-animations/kiss-3d-transparent.gif';
+      image.alt = 'Cute 3D cartoon couple sharing a kiss';
+      layer.replaceChildren(image);
+      window.setTimeout(() => { if (image.isConnected) image.remove(); }, 2000);
+      return;
+    }
+    const scene = document.createElement('div'); scene.className = `yunex-cartoon-scene scene-${preset.motion}`;
+    scene.setAttribute('role','status'); scene.setAttribute('aria-label',preset.title);
+    const glow = document.createElement('div'); glow.className = 'cartoon-glow';
+    const characterA = document.createElement('div'); characterA.className = 'cartoon-character character-a';
+    const faceA = document.createElement('span'); faceA.className = 'cartoon-face'; faceA.textContent = preset.face;
+    const characterB = document.createElement('div'); characterB.className = 'cartoon-character character-b';
+    const faceB = document.createElement('span'); faceB.className = 'cartoon-face'; faceB.textContent = preset.other;
+    const title = document.createElement('div'); title.className = 'cartoon-caption'; title.textContent = preset.title;
+    characterA.appendChild(faceA); characterB.appendChild(faceB); scene.append(glow,characterA,characterB,title); layer.appendChild(scene);
+    window.setTimeout(() => { if (scene.isConnected) scene.classList.add('cartoon-leave'); }, 1550);
+    window.setTimeout(() => { if (scene.isConnected) scene.remove(); }, 2000);
+  }
+  function detectChatAnimation(message) {
+    const raw = String(message || '').normalize('NFKC').toLowerCase();
+    const text = raw.replace(/[“”"'`]/g,' ').replace(/[^\p{L}\p{N}\s\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,' ').replace(/\s+/g,' ').trim();
+    if (!text) return null;
+    // Avoid triggering on explicit negation or when the user is merely discussing a keyword.
+    const negated = /\b(dont|don't|do not|never|mat|nahi|nahin|not|without|stop)\b/i;
+    const quotedMention = /\b(word|meaning|spelling|example|type|typing|likh|matlab)\b/i;
+    const rules = [
+      ['kiss', /\b(kiss|kissi|kisi|kisse|kissing|muah|mwah|umaah|chumma)\b|चुम्मा|किस्सी|किस्स?ी|किस दे|किस देना|चूमना|चूम लो/i],
+      ['love', /\b(i love you|love u|luv u|love you|luv you|i luv you|pyaar karta|pyaar karti|pyar karta|pyar karti)\b|तुमसे प्यार|लव यू|प्यार करता|प्यार करती/i],
+      ['miss', /\b(i miss you|miss u|missing you|miss you|miss u so much|yaad aa rahi|yaad aa raha|teri yaad|tumhari yaad|yaad kar raha|yaad kar rahi)\b|याद आ रही|याद आ रहा|तुम्हारी याद|तेरी याद|मिस कर रहा|मिस कर रही|😞|🙁|☹️/i],
+      ['laugh', /\b(haha+|hehe+|hihi+|lol|lmao|rofl|hasi aa gai|hasi aa gayi|hasna|hans raha|hans rahi)\b|हाहाहा|हा हा|हंसी आ गई|हँसी आ गई|मजेदार है|😂|🤣|😅/i],
+      ['cry', /\b(cry|crying|tears|ro raha hu|ro rahi hu|rona aa raha|about to cry)\b|रोना आ रहा|रो रही हूँ|रो रहा हूँ|आँसू आ रहे|आंसू आ रहे|😭|😢|🥺/i],
+      ['horror', /\b(ghost|horror|scared|afraid|dar lag|darr lag|bhoot|bhut|dar gaya|dar gayi)\b|डर लग रहा|डर गया|डर गई|भूत|डरावना|👻/i]
+    ];
+    for (const [effect, pattern] of rules) {
+      const match = pattern.test(text);
+      if (!match) continue;
+      const matchedPart = text.match(pattern)?.[0] || '';
+      const before = text.slice(Math.max(0,text.indexOf(matchedPart)-28), text.indexOf(matchedPart));
+      if (negated.test(before) || (quotedMention.test(before) && !/\b(i|me|you|tum|mujhe|mujhko|please|plz)\b/i.test(before))) continue;
+      return effect;
     }
     return null;
   }
-  function cartoonArtwork(kind) {
-    const common = `<defs>
-      <linearGradient id="skin" x2="0" y2="1"><stop stop-color="#ffe2c4"/><stop offset="1" stop-color="#d99b78"/></linearGradient>
-      <linearGradient id="blue" x2="0" y2="1"><stop stop-color="#8be4ff"/><stop offset="1" stop-color="#2775c8"/></linearGradient>
-      <linearGradient id="pink" x2="0" y2="1"><stop stop-color="#ffb7d5"/><stop offset="1" stop-color="#bd5d98"/></linearGradient>
-      <radialGradient id="glow"><stop stop-color="#4aaeff" stop-opacity=".34"/><stop offset="1" stop-color="#4aaeff" stop-opacity="0"/></radialGradient>
-      <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur stdDeviation="3"/></filter>
-    </defs><ellipse cx="160" cy="178" rx="116" ry="13" fill="#000" opacity=".35" filter="url(#shadow)"/><ellipse cx="160" cy="104" rx="145" ry="94" fill="url(#glow)"/>`;
-    const head=(x,y,color='url(#skin)')=>`<circle cx="${x}" cy="${y}" r="28" fill="${color}" stroke="#f8d9c6" stroke-width="2"/><path d="M${x-25} ${y-9}q5-26 27-21q19 4 24 22q-14-10-25-9q-14 0-26 8" fill="#26334d"/><ellipse cx="${x-9}" cy="${y+2}" rx="2.5" ry="4" fill="#26334d"/><ellipse cx="${x+9}" cy="${y+2}" rx="2.5" ry="4" fill="#26334d"/><path d="M${x-6} ${y+14}q6 6 12 0" fill="none" stroke="#a85f63" stroke-width="2" stroke-linecap="round"/>`;
-    const body=(x,y,color='url(#blue)')=>`<path d="M${x-31} ${y+65}q0-44 31-44t31 44z" fill="${color}" stroke="#b9eaff" stroke-width="2"/>`;
-    let scene='';
-    if(kind==='kiss') scene=`<g class="toon-left">${body(108,74)}${head(108,57)}</g><g class="toon-right">${body(213,74,'url(#pink)')}${head(213,57)}</g><path class="toon-heart" d="M155 75c-19-17-36 10 0 32c36-22 19-49 0-32z" fill="#ff7daf" stroke="#ffd5e5" stroke-width="2"/><path d="M139 55q-10-12 2-16m37 13q12-13 20-4" fill="none" stroke="#8bdcff" stroke-width="3" stroke-linecap="round"/>`;
-    if(kind==='love') scene=`<g class="toon-left">${body(108,74)}${head(108,57)}</g><g class="toon-right">${body(213,74,'url(#pink)')}${head(213,57)}</g><path class="toon-heart" d="M160 77c-24-22-45 13 0 43c45-30 24-65 0-43z" fill="#ff6e9e" stroke="#ffd1e1" stroke-width="3"/><path d="M76 40l5-9m158 9l-5-9" stroke="#8bdcff" stroke-width="3" stroke-linecap="round"/>`;
-    if(kind==='miss') scene=`<g class="toon-solo">${body(160,73)}${head(160,56)}</g><path class="toon-heart" d="M220 55c-15-14-29 8 0 27c29-19 15-41 0-27z" fill="#ff85b6"/><path d="M95 55q-16-12-23 3m7 13q-15 5-18 18" fill="none" stroke="#91dfff" stroke-width="3" stroke-linecap="round"/><circle cx="203" cy="110" r="5" fill="#83d8ff" opacity=".8"/>`;
-    if(kind==='laugh') scene=`<g class="toon-left">${body(108,74)}${head(108,57)}</g><g class="toon-right">${body(213,74,'url(#pink)')}${head(213,57)}</g><path d="M94 61q14 13 28 0m77 0q14 13 28 0" fill="none" stroke="#26334d" stroke-width="4" stroke-linecap="round"/><path d="M73 38l-8-8m130 0l8-8m28 20l9-6" stroke="#ffd36f" stroke-width="4" stroke-linecap="round"/><g class="toon-bubble"><circle cx="160" cy="36" r="17" fill="#173d68" stroke="#7bd7ff" stroke-width="2"/><path d="M151 35q9-13 18 0q-9 15-18 0" fill="#b5efff"/></g>`;
-    if(kind==='cry') scene=`<g class="toon-solo">${body(160,73,'url(#blue)')}${head(160,56)}</g><path class="toon-tear" d="M139 68q-9 13 0 17q9-4 0-17zm42 0q-9 13 0 17q9-4 0-17z" fill="#75d8ff"/><path d="M149 79q11-8 22 0" fill="none" stroke="#a85f63" stroke-width="2.5" stroke-linecap="round"/><path d="M96 55q-10-10-17 0m97-24q8-10 16 0" fill="none" stroke="#8bdcff" stroke-width="3"/>`;
-    if(kind==='horror') scene=`<g class="toon-solo">${body(160,73)}${head(160,56)}</g><g class="toon-ghost"><path d="M207 124V82q0-29 25-29t25 29v42l-12-9-13 10-13-10z" fill="#d9f4ff" stroke="#7fcfff" stroke-width="3"/><ellipse cx="224" cy="82" rx="3" ry="5" fill="#243653"/><ellipse cx="241" cy="82" rx="3" ry="5" fill="#243653"/><ellipse cx="233" cy="97" rx="5" ry="6" fill="#8b6d91"/></g><path d="M88 35l-8-8m99 1l8-8m-100 40l-9 1" stroke="#b8eaff" stroke-width="3" stroke-linecap="round"/>`;
-    return `<svg viewBox="0 0 320 190" role="img" aria-label="${kind} cartoon animation" xmlns="http://www.w3.org/2000/svg">${common}${scene}</svg>`;
-  }
-  function showAutomaticCartoon(trigger) {
-    const layer = document.getElementById('chatEffectLayer');
-    if (!trigger || !layer) return;
-    layer.replaceChildren();
-    const card = document.createElement('div');
-    card.className = `chat-effect-card cartoon-card cartoon-${trigger.key}`;
-    const art = document.createElement('div'); art.className = 'cartoon-art';
-    art.innerHTML = cartoonArtwork(trigger.art);
-    const caption = document.createElement('div'); caption.className = 'chat-effect-caption'; caption.textContent = trigger.label;
-    card.append(art, caption); layer.appendChild(card);
-    window.setTimeout(() => { if (!card.isConnected) return; card.classList.add('is-leaving'); window.setTimeout(() => card.remove(), 250); }, 1750);
-  }
+
 
   // All internal navigation uses one delegated handler, including dynamically shown controls.
   document.addEventListener('click', event => {
@@ -194,12 +211,6 @@
 
     if (event.target.closest('#hugButton')) {
       showChatEffect('hug');
-      return;
-    }
-    const effectButton = event.target.closest('[data-chat-effect]');
-    if (effectButton) {
-      const item = cartoonTriggers.find(x => x.key === effectButton.dataset.chatEffect);
-      if (item) showAutomaticCartoon(item);
       return;
     }
     if (event.target.closest('#gamesButton')) { document.getElementById('gamesOverlay').hidden = false; return; }
@@ -303,6 +314,32 @@
   const chatForm = document.getElementById('chatForm');
   const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
+  const chatGalleryButton = document.getElementById('chatGalleryButton');
+  const chatGalleryInput = document.getElementById('chatGalleryInput');
+  const chatAttachmentPreview = document.getElementById('chatAttachmentPreview');
+  let pendingChatMedia = [];
+  function renderChatMediaPreview() {
+    if (!chatAttachmentPreview) return;
+    chatAttachmentPreview.replaceChildren();
+    chatAttachmentPreview.hidden = pendingChatMedia.length === 0;
+    pendingChatMedia.forEach((file,index) => {
+      const item = document.createElement('div'); item.className='chat-attachment-thumb';
+      const media = document.createElement(file.type.startsWith('video/') ? 'video' : 'img');
+      media.src = URL.createObjectURL(file); if (media.tagName === 'VIDEO') media.muted = true;
+      item.appendChild(media);
+      const remove = document.createElement('button'); remove.type='button'; remove.textContent='×'; remove.setAttribute('aria-label','Remove selected file');
+      remove.addEventListener('click',()=>{ pendingChatMedia.splice(index,1); renderChatMediaPreview(); });
+      item.appendChild(remove); chatAttachmentPreview.appendChild(item);
+    });
+  }
+  if (chatGalleryButton && chatGalleryInput) {
+    chatGalleryButton.addEventListener('click',()=>chatGalleryInput.click());
+    chatGalleryInput.addEventListener('change',()=>{
+      const selected = Array.from(chatGalleryInput.files || []).filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+      pendingChatMedia = pendingChatMedia.concat(selected).slice(0,10);
+      renderChatMediaPreview(); chatGalleryInput.value='';
+    });
+  }
   const chatPresence = document.getElementById('chatPresence');
   const presenceLabel = chatPresence ? chatPresence.querySelector('.presence-label') : null;
 
@@ -347,17 +384,24 @@
   if (chatForm) chatForm.addEventListener('submit', event => {
     event.preventDefault();
     const value = chatInput.value.trim();
-    if (!value) return;
+    if (!value && pendingChatMedia.length === 0) return;
 
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble sent';
     const messageText = document.createElement('div');
     messageText.textContent = value;
-    bubble.appendChild(messageText);
-    addMessageMeta(bubble, '✓ Sent · demo', true);
+    if (value) bubble.appendChild(messageText);
+    pendingChatMedia.forEach(file => {
+      const media = document.createElement(file.type.startsWith('video/') ? 'video' : 'img');
+      media.className='chat-message-media'; media.src=URL.createObjectURL(file);
+      if (media.tagName === 'VIDEO') { media.controls=true; media.playsInline=true; }
+      media.alt = file.name; bubble.appendChild(media);
+    });
+    addMessageMeta(bubble, '✓ Sent · local demo', true);
+    const detectedEffect = detectChatAnimation(value);
+    pendingChatMedia = []; renderChatMediaPreview();
     chatMessages.appendChild(bubble);
-    const matchedEffect = detectCartoonTrigger(value);
-    if (matchedEffect) showAutomaticCartoon(matchedEffect);
+    if (detectedEffect) showCartoonEffect(detectedEffect);
     chatInput.value = '';
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -384,7 +428,7 @@
       const reply = document.createElement('div');
       reply.className = 'chat-bubble received';
       const replyText = document.createElement('div');
-      replyText.textContent = 'Message received in this local preview. 👋';
+      replyText.textContent = 'Local demo reply. Media/messages are not delivered to another account yet. 👋';
       reply.appendChild(replyText);
       addMessageMeta(reply, '', false);
       chatMessages.appendChild(reply);

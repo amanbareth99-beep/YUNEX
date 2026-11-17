@@ -206,28 +206,47 @@ body.chat-open .chat-compose button{height:46px!important;min-height:46px!import
 .chat-effect-layer{position:absolute;left:12px;right:12px;top:74px;bottom:74px;z-index:5;display:grid;place-items:center;pointer-events:none;overflow:hidden}
 
 
-/* YUNEX automatic text-trigger cartoon animations: confined to chat content only. */
-.chat-shell{position:relative;overflow:hidden}
-.chat-effect-layer{position:absolute;top:68px;left:10px;right:10px;bottom:70px;z-index:2;display:grid;place-items:center;pointer-events:none;overflow:hidden;contain:layout paint}
-.chat-effect-card{width:min(92%,360px);display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 12px 8px;border:1px solid #31547a;border-radius:20px;background:radial-gradient(ellipse at 50% 35%,#17395aee,#091525f5 72%);color:#d8efff;box-shadow:0 10px 28px #0009;animation:yunexCartoonEnter .22s ease-out both}
-.cartoon-art{width:100%;max-width:320px;filter:drop-shadow(0 5px 8px #0006)}
-.cartoon-art svg{display:block;width:100%;height:auto;max-height:min(31vh,210px);overflow:visible}
-.chat-effect-caption{font-size:12px;letter-spacing:.04em;color:#b9dfff;text-shadow:0 1px 5px #000}
-.cartoon-left{transform-origin:108px 105px;animation:toonLean 1.1s ease-in-out infinite alternate}
-.cartoon-right{transform-origin:213px 105px;animation:toonLean 1.1s ease-in-out infinite alternate-reverse}
-.toon-heart{transform-box:fill-box;transform-origin:center;animation:toonHeart .65s ease-in-out infinite alternate}
-.toon-solo{transform-origin:160px 130px;animation:toonBob .8s ease-in-out infinite alternate}
-.toon-tear{animation:toonTear .65s ease-in infinite}
-.toon-ghost{transform-origin:233px 90px;animation:toonGhost .7s ease-in-out infinite alternate}
-.toon-bubble{transform-origin:160px 36px;animation:toonPop .65s ease-in-out infinite alternate}
-.chat-effect-card.is-leaving{animation:yunexCartoonExit .25s ease-in both}
-@keyframes yunexCartoonEnter{from{opacity:0;transform:translateY(9px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes yunexCartoonExit{to{opacity:0;transform:translateY(-5px) scale(.96)}}
-@keyframes toonLean{to{transform:rotate(5deg) translateY(-2px)}}
-@keyframes toonHeart{to{transform:scale(1.16) rotate(5deg)}}
-@keyframes toonBob{to{transform:translateY(-5px) rotate(-2deg)}}
-@keyframes toonTear{to{transform:translateY(8px);opacity:.35}}
-@keyframes toonGhost{to{transform:translateY(-7px) rotate(5deg)}}
-@keyframes toonPop{to{transform:scale(1.12)}}
-@media(prefers-reduced-motion:reduce){.chat-effect-card,.chat-effect-card.is-leaving,.cartoon-art *{animation:none!important}}
+/* YUNEX Gallery attachment picker: local preview only until authenticated Storage is connected. */
+.chat-compose{align-items:center;gap:7px}
+.chat-gallery-button{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;padding:0!important;border:1px solid #294768;border-radius:12px;background:#0d1b2d;color:#a9d8ff}
+.chat-gallery-button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.chat-attachment-preview{display:flex;gap:8px;overflow-x:auto;padding:8px 10px;margin:6px 0;background:#0a1422;border:1px solid #203653;border-radius:12px}
+.chat-attachment-preview[hidden]{display:none}
+.chat-attachment-thumb{position:relative;flex:0 0 64px;width:64px;height:64px}
+.chat-attachment-thumb img,.chat-attachment-thumb video{width:100%;height:100%;object-fit:cover;border-radius:9px;background:#111c2b}
+.chat-attachment-thumb button{position:absolute;top:-5px;right:-5px;width:22px;height:22px;padding:0;border:1px solid #52708d;border-radius:50%;background:#14263a;color:white;font-size:17px;line-height:18px}
+.chat-message-media{display:block;max-width:min(240px,70vw);max-height:230px;object-fit:contain;border-radius:12px;margin:5px 0;background:#07111e}
 
+/* Soft 2.5D cartoon-style CSS scenes; constrained to the chat content viewport. */
+.chat-effect-layer{inset:54px 12px 72px;overflow:hidden}
+.yunex-cartoon-scene{position:relative;width:min(290px,82%);height:190px;display:flex;align-items:center;justify-content:center;gap:20px;overflow:hidden;border:1px solid #31547a;border-radius:24px;background:radial-gradient(ellipse at 50% 45%,#203b59 0%,#10243b 52%,#081321 100%);box-shadow:0 12px 34px #0009;animation:yunexSceneIn .28s ease-out both}
+.cartoon-glow{position:absolute;width:150px;height:90px;border-radius:50%;background:#69baff22;filter:blur(24px)}
+.cartoon-character{position:relative;z-index:1;width:76px;height:100px;display:grid;place-items:center;border-radius:42px 42px 28px 28px;background:linear-gradient(145deg,#b9e3ff,#3979ad 72%,#1c4269);box-shadow:inset -8px -8px 14px #06182a66, inset 5px 5px 10px #ffffff44,0 8px 16px #0006;animation:yunexCharacterFloat 1.1s ease-in-out infinite alternate}
+.character-b{background:linear-gradient(145deg,#ffe4ee,#b65e91 72%,#65345f);animation-delay:-.35s}
+.cartoon-face{font-size:42px;filter:drop-shadow(0 3px 4px #0005);transform:translateY(-4px)}
+.cartoon-caption{position:absolute;z-index:2;bottom:13px;left:10px;right:10px;text-align:center;color:#d9edff;font-size:13px;font-weight:650;letter-spacing:.03em;text-shadow:0 2px 8px #000}
+.scene-kiss .character-a{animation:yunexKissA .7s ease-in-out infinite alternate}
+.scene-kiss .character-b{animation:yunexKissB .7s ease-in-out infinite alternate}
+.scene-love .cartoon-glow{background:#58aaff38;animation:yunexGlow .8s ease-in-out infinite alternate}
+.scene-miss .character-b{opacity:.78;transform:translateY(7px)}
+.scene-laugh .cartoon-character{animation:yunexLaugh .22s ease-in-out infinite alternate}
+.scene-cry .cartoon-glow{background:#7abfff22}
+.scene-horror .cartoon-character{animation:yunexSpook .55s ease-in-out infinite alternate}
+.yunex-cartoon-scene.cartoon-leave{animation:yunexSceneOut .42s ease-in forwards}
+@keyframes yunexSceneIn{from{opacity:0;transform:translateY(9px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes yunexSceneOut{to{opacity:0;transform:translateY(-5px) scale(.97)}}
+@keyframes yunexCharacterFloat{to{transform:translateY(-5px) rotate(2deg)}}
+@keyframes yunexKissA{to{transform:translateX(12px) rotate(7deg)}}
+@keyframes yunexKissB{to{transform:translateX(-12px) rotate(-7deg)}}
+@keyframes yunexGlow{to{transform:scale(1.25);opacity:.55}}
+@keyframes yunexLaugh{to{transform:translateY(-8px) rotate(5deg)}}
+@keyframes yunexSpook{to{transform:translateY(-6px) rotate(-5deg)}}
+@media(prefers-reduced-motion:reduce){.yunex-cartoon-scene,.cartoon-character,.cartoon-glow{animation:none!important}}
+
+
+/* Final chat fix: effects live in the scrollable message stream, never over messages, header, composer or keyboard. */
+.chat-effect-layer{position:relative!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;z-index:1!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:0!important;height:auto!important;margin:8px 0!important;padding:0!important;overflow:visible!important;pointer-events:none!important}
+.chat-effect-layer:empty{display:none!important}
+.yunex-kiss-gif{display:block;width:min(270px,76vw);max-height:170px;height:auto;object-fit:contain;margin:0 auto;border-radius:12px;filter:drop-shadow(0 5px 12px #0006);animation:yunexSceneIn .25s ease-out both}
+.yunex-cartoon-scene{width:min(270px,78vw)!important;height:150px!important;max-height:150px!important;box-shadow:0 5px 16px #0005!important}
+@media(prefers-reduced-motion:reduce){.yunex-kiss-gif{animation:none!important}}

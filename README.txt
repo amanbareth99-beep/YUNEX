@@ -1,66 +1,12 @@
-YUNEX FRONT-END PROTOTYPE (DEMO ONLY)
+YUNEX CHAT UPDATE — GALLERY + MESSAGE ANIMATION FIX
 
-Files:
-- index.html
-- style.css
-- script.js
-- README.txt
+Files: index.html, style.css, script.js, assets/chat-animations/kiss-3d-transparent.gif
 
-2026-11-16 Mobile correction:
-- Chat header remains fixed and only the message list scrolls.
-- Composer is held at the bottom of the visible mobile viewport; the Android keyboard viewport resize is handled through VisualViewport.
-- Composer uses a compact fixed-height row without extra bottom safe-area padding that could leave a gap.
-- Hug icon is a custom two-person embrace with a small electric-blue heart, white outline, and no emoji glyph.
-- Hug and Games controls remain side-by-side.
-- Legacy visible Back controls are removed from active section views; device/browser Back navigation remains.
-- Full-screen sections hide global navigation and footer.
+Changes in this package:
+- Removes the standalone ✦ effects picker from the message composer. Effects are triggered by message text.
+- Restores a Gallery button in the composer for selecting image/video files and previewing/removing them before local demo send.
+- Places the animation container inside the scrollable chat message area. It takes its own space and does not float over existing messages, header, composer, or keyboard.
+- Uses the supplied transparent 3D couple GIF for the Kiss effect (2 seconds). Other effects currently use CSS cartoon-style scenes; matching bespoke 3D animated assets for all five are not included in this package.
+- Keeps the dedicated Hug button separate.
 
-Important limitations:
-- This is still a local front-end demo. Authentication, database, real-time cross-device messages, delivery receipts, Virtual Hug requests, and synchronized multiplayer games require secure Supabase integration.
-- Do not enter real passwords or private information in this prototype.
-- Never put a Supabase service_role key in frontend files.
-
-
-2026-11-16 Chat presence update:
-- The chat partner status is shown under their name in the fixed header.
-- The local demo switches Online -> Typing... while a simulated reply is pending, then returns to Online.
-- The separate typing bubble has been removed from the message list.
-- Presence is a local preview only; real online presence and remote typing require Supabase Realtime.
-
-2026-11-16 Chat deletion controls:
-- Chat header overflow menu includes Clear chat and Delete chat.
-- Tap a message to open Delete for me / Delete for everyone / Cancel actions.
-- Destructive actions ask for confirmation.
-- This front-end demo only changes the local preview. True Delete for everyone across devices,
-  message retention, and conversation deletion require authenticated Supabase backend policies.
-
-
-YUNEX Chat Animations + Delete Icon Update
-- Replaces the whole-chat three-dot menu trigger with a clear trash/delete icon.
-- The trash icon still opens Clear chat and Delete chat actions with confirmations.
-- Preserves message-level Delete for me / Delete for everyone actions.
-- Adds a compact effects picker: Hug, Kiss, Love You, Miss You, Laugh, Cry and Horror.
-- Reuses the header Hug control to play the subtle Hug effect.
-- Effects are low-light, moderate-size, non-flashing and fade out smoothly.
-- Respects the device reduced-motion preference.
-- Front-end demo only: sending effects to the other participant requires Supabase realtime/backend integration.
-- Existing chat presence and delete-option demo changes are retained.
-
-
-YUNEX Chat UI + Keyboard Follow-up Fix
-- Moves the chat effects tray into an anchored overlay directly above the message composer.
-- Prevents the effects tray and animation layer from creating extra CSS grid rows that can place controls in the wrong area.
-- After sending a message, restores focus to the message input so the Android keyboard remains available for the next message.
-- Adds enterkeyhint=send for a more suitable mobile keyboard action.
-- Retains chat animations, trash/delete icon, Clear Chat/Delete Chat, message deletion options, and existing presence demo.
-- Keyboard behavior should be tested on the target Android browser; device/browser focus policies can vary.
-
-
-2026-11-17 YUNEX chat animation cleanup:
-- Removed Hug from the effects picker; the existing dedicated Hug button remains unchanged.
-- The six effect picker contains Kiss, Love You, Miss You, Laugh, Cry and Horror only.
-- Added automatic message-triggered cartoon scenes with Hindi/Hinglish/English patterns, common spelling variants and basic negation checks.
-- Each automatic cartoon scene is shown for approximately 2 seconds, inside the chat content area.
-- Artwork is self-contained gradient SVG/CSS (2.5D-style prototype), not production-grade full 3D character animation.
-- Text matching is heuristic and needs real-user testing; it is not an AI semantic classifier.
-- This remains a local front-end demo; effects are not delivered to the other participant without backend realtime integration.
+IMPORTANT: This is a frontend/local-demo update. Gallery media and messages are not delivered to another account until Supabase Storage and messaging are connected. Back up the current repository before replacing these four paths. Upload the assets folder too; do not upload only the three code files.
