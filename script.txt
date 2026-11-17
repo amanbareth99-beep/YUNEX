@@ -339,6 +339,14 @@
     chatInput.value = '';
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
+    // Keep the composer focused after Send so Android can type the next message immediately.
+    window.setTimeout(() => {
+      if (document.getElementById('chat')?.classList.contains('active')) {
+        try { chatInput.focus({ preventScroll: true }); } catch (_) { chatInput.focus(); }
+        if (typeof syncVisibleViewport === 'function') syncVisibleViewport();
+      }
+    }, 60);
+
     // Simulated state changes are deliberately labeled DEMO, not real receipts.
     const status = bubble.querySelector('.message-status');
     window.setTimeout(() => {

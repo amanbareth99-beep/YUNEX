@@ -45,3 +45,12 @@ YUNEX Chat Animations + Delete Icon Update
 - Respects the device reduced-motion preference.
 - Front-end demo only: sending effects to the other participant requires Supabase realtime/backend integration.
 - Existing chat presence and delete-option demo changes are retained.
+
+
+YUNEX Chat UI + Keyboard Follow-up Fix
+- Moves the chat effects tray into an anchored overlay directly above the message composer.
+- Prevents the effects tray and animation layer from creating extra CSS grid rows that can place controls in the wrong area.
+- After sending a message, restores focus to the message input so the Android keyboard remains available for the next message.
+- Adds enterkeyhint=send for a more suitable mobile keyboard action.
+- Retains chat animations, trash/delete icon, Clear Chat/Delete Chat, message deletion options, and existing presence demo.
+- Keyboard behavior should be tested on the target Android browser; device/browser focus policies can vary.

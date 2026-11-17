@@ -198,3 +198,9 @@ body.chat-open .chat-compose button{height:46px!important;min-height:46px!import
 @keyframes yunexEffectIn{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes yunexEffectOut{to{opacity:0;transform:translateY(-5px) scale(.97)}}
 @media(prefers-reduced-motion:reduce){.chat-effect-card,.chat-effect-card.is-leaving{animation:none;opacity:1}.chat-effect-card.is-leaving{opacity:0;transition:opacity .2s}}
+
+
+/* Keep the effects tray anchored immediately above the composer, not in an extra grid row. */
+.chat-shell{position:relative}
+.chat-effects-tray{position:absolute;left:10px;right:10px;bottom:calc(62px + env(safe-area-inset-bottom));z-index:6;margin:0;max-width:calc(100% - 20px);box-sizing:border-box}
+.chat-effect-layer{position:absolute;left:12px;right:12px;top:74px;bottom:74px;z-index:5;display:grid;place-items:center;pointer-events:none;overflow:hidden}
