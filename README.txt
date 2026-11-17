@@ -33,3 +33,15 @@ Important limitations:
 - Destructive actions ask for confirmation.
 - This front-end demo only changes the local preview. True Delete for everyone across devices,
   message retention, and conversation deletion require authenticated Supabase backend policies.
+
+
+YUNEX Chat Animations + Delete Icon Update
+- Replaces the whole-chat three-dot menu trigger with a clear trash/delete icon.
+- The trash icon still opens Clear chat and Delete chat actions with confirmations.
+- Preserves message-level Delete for me / Delete for everyone actions.
+- Adds a compact effects picker: Hug, Kiss, Love You, Miss You, Laugh, Cry and Horror.
+- Reuses the header Hug control to play the subtle Hug effect.
+- Effects are low-light, moderate-size, non-flashing and fade out smoothly.
+- Respects the device reduced-motion preference.
+- Front-end demo only: sending effects to the other participant requires Supabase realtime/backend integration.
+- Existing chat presence and delete-option demo changes are retained.

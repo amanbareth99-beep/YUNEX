@@ -74,6 +74,43 @@
   history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
   renderView('feed');
 
+
+  // Subtle local-demo chat effects. Realtime delivery requires backend integration.
+  const chatEffectPresets = {
+    hug: { symbol: '🤗', label: 'A warm hug' },
+    kiss: { symbol: '💋', label: 'A little kiss' },
+    love: { symbol: '💙', label: 'Love You' },
+    miss: { symbol: '🥺', label: 'Miss You' },
+    laugh: { symbol: '😊', label: 'That made me smile' },
+    cry: { symbol: '😢', label: 'Feeling emotional' },
+    horror: { symbol: '👻', label: 'Boo!' }
+  };
+  function showChatEffect(effectName) {
+    const preset = chatEffectPresets[effectName];
+    const layer = document.getElementById('chatEffectLayer');
+    if (!preset || !layer) return;
+    const tray = document.getElementById('chatEffectsTray');
+    const toggle = document.getElementById('chatEffectsToggle');
+    if (tray) tray.hidden = true;
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    layer.replaceChildren();
+    const card = document.createElement('div');
+    card.className = 'chat-effect-card';
+    const symbol = document.createElement('div');
+    symbol.className = 'chat-effect-symbol';
+    symbol.textContent = preset.symbol;
+    const caption = document.createElement('div');
+    caption.className = 'chat-effect-caption';
+    caption.textContent = preset.label;
+    card.append(symbol, caption);
+    layer.appendChild(card);
+    window.setTimeout(() => {
+      if (!card.isConnected) return;
+      card.classList.add('is-leaving');
+      window.setTimeout(() => card.remove(), 600);
+    }, 1500);
+  }
+
   // All internal navigation uses one delegated handler, including dynamically shown controls.
   document.addEventListener('click', event => {
     const profileButton = event.target.closest('.profile-open');
@@ -128,12 +165,21 @@
     }
 
     if (event.target.closest('#hugButton')) {
-      const bubble = document.createElement('div');
-      bubble.className = 'chat-bubble sent hug-message';
-      bubble.textContent = '🤗 Hug sent · demo';
-      addMessageMetaSafe(bubble);
-      document.getElementById('chatMessages').appendChild(bubble);
-      document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+      showChatEffect('hug');
+      return;
+    }
+    if (event.target.closest('#chatEffectsToggle')) {
+      const tray = document.getElementById('chatEffectsTray');
+      const toggle = document.getElementById('chatEffectsToggle');
+      if (tray && toggle) {
+        tray.hidden = !tray.hidden;
+        toggle.setAttribute('aria-expanded', String(!tray.hidden));
+      }
+      return;
+    }
+    const effectButton = event.target.closest('[data-chat-effect]');
+    if (effectButton) {
+      showChatEffect(effectButton.dataset.chatEffect);
       return;
     }
     if (event.target.closest('#gamesButton')) { document.getElementById('gamesOverlay').hidden = false; return; }

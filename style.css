@@ -178,3 +178,23 @@ body.chat-open .chat-compose button{height:46px!important;min-height:46px!import
 .message-actions-dialog .cancel-action{color:#8ebfff;text-align:center}
 .chat-bubble{position:relative;cursor:pointer}
 .chat-bubble:focus-visible{outline:2px solid #36d7ff;outline-offset:2px}
+
+
+/* YUNEX chat effects: subtle, low-light, non-flashing */
+.chat-compose{position:relative}
+.chat-effects-toggle{flex:0 0 42px;width:42px;height:42px;border:1px solid #31547a;border-radius:13px;background:#10243b;color:#8fdcff;font-size:22px;cursor:pointer}
+.chat-effects-toggle[aria-expanded="true"]{background:#17395a;box-shadow:0 0 0 1px #3b9cc955}
+.chat-effects-tray{display:flex;gap:7px;overflow-x:auto;padding:9px 10px;margin:0 0 8px;background:#0b1728;border:1px solid #203b5c;border-radius:14px;scrollbar-width:thin}
+.chat-effects-tray[hidden]{display:none}
+.chat-effects-tray button{flex:0 0 58px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 4px;border:1px solid #203b5c;border-radius:11px;background:#102139;color:#d7e8f8;font-size:20px;cursor:pointer}
+.chat-effects-tray button span{font-size:10px;color:#a9bfd7;white-space:nowrap}
+.chat-effect-layer{position:absolute;inset:54px 12px 72px;z-index:5;display:grid;place-items:center;pointer-events:none;overflow:hidden}
+.chat-effect-card{display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 20px;border:1px solid #31547a;border-radius:18px;background:#0a1729ef;color:#d8efff;box-shadow:0 8px 28px #0008;animation:yunexEffectIn .35s ease-out forwards}
+.chat-effect-symbol{font-size:48px;line-height:1.1;filter:saturate(.75);opacity:.88}
+.chat-effect-caption{font-size:13px;letter-spacing:.04em;color:#a9c9e8}
+.chat-effect-card.is-leaving{animation:yunexEffectOut .55s ease-in forwards}
+.chat-delete-trigger{display:grid;place-items:center}
+.chat-trash-icon{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@keyframes yunexEffectIn{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes yunexEffectOut{to{opacity:0;transform:translateY(-5px) scale(.97)}}
+@media(prefers-reduced-motion:reduce){.chat-effect-card,.chat-effect-card.is-leaving{animation:none;opacity:1}.chat-effect-card.is-leaving{opacity:0;transition:opacity .2s}}
