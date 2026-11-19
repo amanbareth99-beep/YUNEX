@@ -11,7 +11,7 @@
   <header class="topbar">
     <a class="brand" href="#" aria-label="YUNEX home"><span class="brand-mark">Y</span><span>YUNEX</span></a>
     <span class="tagline">CONNECT. CREATE. WIN.</span>
-    <button class="avatar" id="profileShortcut" aria-label="Open profile">A</button>
+    <button class="avatar" id="profileShortcut" data-profile-avatar="founder" aria-label="Open profile">A</button>
   </header>
 
   <main>
@@ -20,7 +20,7 @@
       <button class="tab" data-view="explore">⌕ <span>Explore</span></button>
       <button class="tab create-tab" data-view="upload">＋ <span>Create</span></button>
       <button class="tab" data-view="competition">♛ <span>Compete</span></button>
-      <button class="tab" data-view="profile">◉ <span>Profile</span></button>
+      <button class="tab profile-nav-tab" data-view="profile"><span class="profile-nav-avatar" data-profile-avatar="founder" aria-hidden="true">AB</span><span>Profile</span></button>
     </nav>
 
     <section id="feed" class="view active">
@@ -39,13 +39,13 @@
 
           <div class="section-heading"><div><p class="eyebrow">THE COMMUNITY</p><h2>For you</h2></div><span class="live-pill">● DEMO FEED</span></div>
       <article class="post panel">
-        <div class="post-head" role="group" aria-label="Post author profile"><button class="userpic profile-open" data-user="Riya Creates" data-handle="@riya_demo">RK</button><button class="post-user profile-open" data-user="Riya Creates" data-handle="@riya_demo"><b>Riya Creates</b><small>@riya_demo · 2h ago</small></button><button class="dots" aria-label="More">•••</button></div>
+        <div class="post-head" role="group" aria-label="Post author profile"><button class="userpic profile-open" data-profile-avatar="user:@riya_demo" data-user="Riya Creates" data-handle="@riya_demo">RK</button><button class="post-user profile-open" data-user="Riya Creates" data-handle="@riya_demo"><b>Riya Creates</b><small>@riya_demo · 2h ago</small></button><button class="dots" aria-label="More">•••</button></div>
         <div class="post-art art-one"><span>CREATE<br>WITHOUT<br>LIMITS.</span><small>YUNEX CREATOR SPOTLIGHT</small></div>
         <div class="post-actions"><button class="like-btn">♡ <span>Like</span></button><button>◌ <span>Comment</span></button><button>↗ <span>Share</span></button></div>
         <p class="caption"><b>Riya Creates</b> Every small step is part of a big journey. ✨</p>
       </article>
       <article class="post panel">
-        <div class="post-head"><button class="userpic blue profile-open" data-user="Arjun Singh" data-handle="@arjun_demo">AS</button><button class="post-user profile-open" data-user="Arjun Singh" data-handle="@arjun_demo"><b>Arjun Singh</b><small>@arjun_demo · 5h ago</small></button><button class="dots" aria-label="More">•••</button></div>
+        <div class="post-head"><button class="userpic blue profile-open" data-profile-avatar="user:@arjun_demo" data-user="Arjun Singh" data-handle="@arjun_demo">AS</button><button class="post-user profile-open" data-user="Arjun Singh" data-handle="@arjun_demo"><b>Arjun Singh</b><small>@arjun_demo · 5h ago</small></button><button class="dots" aria-label="More">•••</button></div>
         <div class="post-art art-two"><span>YOUR<br>STORY.<br>YOUR STAGE.</span><small>YUNEX COMMUNITY</small></div>
         <div class="post-actions"><button class="like-btn">♡ <span>Like</span></button><button>◌ <span>Comment</span></button><button>↗ <span>Share</span></button></div>
         <p class="caption"><b>Arjun Singh</b> Keep creating. Your audience is out there. 🚀</p>
@@ -84,10 +84,10 @@
     <section id="profile" class="view founder-profile-view">
       <div class="founder-profile-panel panel">
         <div class="founder-profile-top">
-          <div class="founder-photo-wrap"><div class="founder-avatar founder-photo" id="founderPhoto">AB</div><label class="photo-edit" for="founderPhotoInput" aria-label="Change profile photo">✎</label><input id="founderPhotoInput" type="file" accept="image/*" hidden></div>
+          <div class="founder-photo-wrap"><div class="founder-avatar founder-photo" id="founderPhoto" data-profile-avatar="founder">AB</div><label class="photo-edit" for="founderPhotoInput" aria-label="Change profile photo">✎</label><input id="founderPhotoInput" type="file" accept="image/*" hidden></div>
           <button class="secondary edit-profile-btn" id="editFounderProfile">Edit profile</button>
         </div>
-        <div class="founder-identity"><h2 id="founderName">Aman Bareth</h2><span class="founder-verified" title="Verified YUNEX Founder" aria-label="Verified YUNEX Founder"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 7.2 11l4.8-7 4.8 7L21 7.5l-2 11H5L3 7.5Z"/><path d="M5 21h14"/></svg></span><p id="founderHandle" class="founder-handle">@amanbareth</p><span class="founder-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 7.2 11l4.8-7 4.8 7L21 7.5l-2 11H5L3 7.5Z"/><path d="M5 21h14"/></svg> YUNEX FOUNDER</span></div>
+        <div class="founder-identity"><h2 id="founderName">Aman Bareth</h2><span class="founder-verified" title="Founder profile">✦</span><p id="founderHandle" class="founder-handle">@amanbareth</p><span class="founder-badge"><span class="founder-badge-crown" aria-hidden="true">♛</span><span>YUNEX FOUNDER</span></span></div>
         <p class="founder-bio" id="founderBio">Building YUNEX — a place to connect, create and win. 🚀</p>
         <div class="founder-id-row"><span>YUNEX ID</span><b id="founderId">Will be assigned after secure account setup</b></div>
         <div class="stats founder-stats"><div><b>0</b><small>Posts</small></div><div><b>0</b><small>Followers</small></div><div><b>0</b><small>Following</small></div></div>
@@ -115,20 +115,20 @@
       </div></div>
       <div class="founder-edit-overlay" id="photoAdjustOverlay" hidden><div class="founder-edit-dialog photo-adjust-dialog" role="dialog" aria-modal="true" aria-labelledby="photoAdjustTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PROFILE PHOTO</p><h3 id="photoAdjustTitle">Adjust your photo</h3></div><button type="button" class="games-close" id="closePhotoAdjust" aria-label="Close">×</button></div>
-        <div class="photo-adjust-preview"><img id="photoAdjustPreview" alt="Profile photo crop preview"></div><label>Zoom<input id="photoZoom" type="range" min="1" max="3" step="0.05" value="1"></label><label>Horizontal position<input id="photoPositionX" type="range" min="0" max="100" value="50"></label><label>Vertical position<input id="photoPositionY" type="range" min="0" max="100" value="50"></label><button type="button" class="primary full" id="savePhotoAdjust">Use this photo</button>
+        <div class="photo-adjust-preview"><img id="photoAdjustPreview" alt="Profile photo crop preview"></div><p class="photo-gesture-hint">Drag with one finger to position · Pinch with two fingers to zoom and rotate 360°</p><button type="button" class="primary full" id="savePhotoAdjust">Use this photo</button>
       </div></div>
       <div class="founder-photo-lightbox" id="founderPhotoLightbox" hidden><img id="founderPhotoLarge" alt="Expanded profile photo"><span>Tap anywhere to close</span></div>
     </section>
 
     <section id="demoProfile" class="view">
-      <div class="panel profile-card demo-user-card"><div class="founder-avatar" id="demoAvatar">R</div><h2 id="demoName">Riya Creates</h2><p class="muted" id="demoHandle">@riya_demo</p><div class="stats"><div><b>12</b><small>Posts</small></div><div><b id="demoFollowers">245</b><small>Followers</small></div><div><b>180</b><small>Following</small></div></div><div class="profile-actions"><button class="primary" id="followDemo">Follow</button><button class="secondary" id="messageDemo">Message</button></div><p class="tiny muted">Demo creator profile. Follow and chat are local previews only.</p></div>
+      <div class="panel profile-card demo-user-card"><div class="founder-avatar" id="demoAvatar" data-profile-avatar="user:@riya_demo">R</div><h2 id="demoName">Riya Creates</h2><p class="muted" id="demoHandle">@riya_demo</p><div class="stats"><div><b>12</b><small>Posts</small></div><div><b id="demoFollowers">245</b><small>Followers</small></div><div><b>180</b><small>Following</small></div></div><div class="profile-actions"><button class="primary" id="followDemo">Follow</button><button class="secondary" id="messageDemo">Message</button></div><p class="tiny muted">Demo creator profile. Follow and chat are local previews only.</p></div>
     </section>
 
     <section id="chat" class="view chat-screen" aria-label="Chat">
       <div class="chat-shell">
         <header class="chat-top-fixed">
           <div class="chat-heading">
-            <div class="founder-avatar small-avatar" id="chatAvatar">R</div>
+            <div class="founder-avatar small-avatar" id="chatAvatar" data-profile-avatar="user:@riya_demo">R</div>
             <div class="chat-person"><b id="chatName">Riya Creates</b><small class="muted">YUNEX chat · demo</small></div>
           </div>
           <div class="chat-tools">
