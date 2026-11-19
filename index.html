@@ -106,6 +106,18 @@
           <button class="primary full" type="submit">Save changes</button>
         </form>
       </div>
+      <div class="founder-edit-overlay" id="founderDatesOverlay" hidden><div class="founder-edit-dialog founder-dates-dialog" role="dialog" aria-modal="true" aria-labelledby="founderDatesTitle">
+        <div class="founder-edit-head"><div><p class="eyebrow">PRIVATE PROFILE DETAILS</p><h3 id="founderDatesTitle">Birthday &amp; Special Days</h3></div><button type="button" class="games-close" id="closeFounderDates" aria-label="Close">×</button></div>
+        <label>Birthday date<input id="founderBirthday" type="date"></label><label class="founder-toggle-row"><input id="founderBirthdayAlerts" type="checkbox"> Allow birthday notifications to followers / following</label>
+        <p class="tiny muted">Your full birth date stays private. Follower notifications require the YUNEX notification backend.</p><div class="founder-special-divider"></div><h4>My Special Days</h4>
+        <label>Special day name<input id="specialDayTitle" maxlength="40" placeholder="e.g. Business launch day"></label><div class="founder-date-grid"><label>Date<input id="specialDayDate" type="date"></label><label>Reminder time<input id="specialDayTime" type="time" value="09:00"></label></div>
+        <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button><div id="specialDaysList" class="special-days-list"></div><p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p><button type="button" class="primary full" id="saveFounderDates">Save birthday settings</button>
+      </div></div>
+      <div class="founder-edit-overlay" id="photoAdjustOverlay" hidden><div class="founder-edit-dialog photo-adjust-dialog" role="dialog" aria-modal="true" aria-labelledby="photoAdjustTitle">
+        <div class="founder-edit-head"><div><p class="eyebrow">PROFILE PHOTO</p><h3 id="photoAdjustTitle">Adjust your photo</h3></div><button type="button" class="games-close" id="closePhotoAdjust" aria-label="Close">×</button></div>
+        <div class="photo-adjust-preview"><img id="photoAdjustPreview" alt="Profile photo crop preview"></div><label>Zoom<input id="photoZoom" type="range" min="1" max="3" step="0.05" value="1"></label><label>Horizontal position<input id="photoPositionX" type="range" min="0" max="100" value="50"></label><label>Vertical position<input id="photoPositionY" type="range" min="0" max="100" value="50"></label><button type="button" class="primary full" id="savePhotoAdjust">Use this photo</button>
+      </div></div>
+      <div class="founder-photo-lightbox" id="founderPhotoLightbox" hidden><img id="founderPhotoLarge" alt="Expanded profile photo"><span>Tap anywhere to close</span></div>
     </section>
 
     <section id="demoProfile" class="view">

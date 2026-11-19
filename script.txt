@@ -281,30 +281,24 @@
     paintFounderProfile();
     founderEditOverlay.hidden = true;
   });
-  const founderPhotoInput = document.getElementById('founderPhotoInput');
-  if (founderPhotoInput) founderPhotoInput.addEventListener('change', () => {
-    const file = founderPhotoInput.files && founderPhotoInput.files[0];
-    if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const photo = document.getElementById('founderPhoto');
-      photo.textContent = '';
-      const img = document.createElement('img');
-      img.src = reader.result;
-      img.alt = 'Founder profile photo';
-      photo.appendChild(img);
-      try { localStorage.setItem('yunexFounderPhoto', reader.result); } catch (_) {}
-    };
-    reader.readAsDataURL(file);
-  });
-  try {
-    const savedPhoto = localStorage.getItem('yunexFounderPhoto');
-    if (savedPhoto) {
-      const photo = document.getElementById('founderPhoto');
-      photo.textContent = '';
-      const img = document.createElement('img'); img.src = savedPhoto; img.alt = 'Founder profile photo'; photo.appendChild(img);
-    }
-  } catch (_) {}
+  const founderPhotoInput=document.getElementById('founderPhotoInput'),photoAdjustOverlay=document.getElementById('photoAdjustOverlay'),photoAdjustPreview=document.getElementById('photoAdjustPreview');
+  let pendingPhotoData='',photoTransform={zoom:1,x:50,y:50};
+  function paintPhotoPreview(){if(photoAdjustPreview){photoAdjustPreview.style.objectPosition=`${photoTransform.x}% ${photoTransform.y}%`;photoAdjustPreview.style.transform=`scale(${photoTransform.zoom})`;}}
+  function applyFounderPhoto(data,t=photoTransform){const photo=document.getElementById('founderPhoto');if(!photo)return;photo.innerHTML='';const img=document.createElement('img');img.src=data;img.alt='Founder profile photo';img.style.objectPosition=`${t.x}% ${t.y}%`;img.style.transform=`scale(${t.zoom})`;photo.appendChild(img);try{localStorage.setItem('yunexFounderPhoto',data);localStorage.setItem('yunexFounderPhotoTransform',JSON.stringify(t));}catch(_){}}
+  if(founderPhotoInput)founderPhotoInput.addEventListener('change',()=>{const file=founderPhotoInput.files&&founderPhotoInput.files[0];if(!file||!file.type.startsWith('image/'))return;const reader=new FileReader();reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;[['photoZoom',1],['photoPositionX',50],['photoPositionY',50]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});paintPhotoPreview();if(photoAdjustOverlay)photoAdjustOverlay.hidden=false;};reader.readAsDataURL(file);founderPhotoInput.value='';});
+  ['photoZoom','photoPositionX','photoPositionY'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',()=>{photoTransform={zoom:Number(document.getElementById('photoZoom').value),x:Number(document.getElementById('photoPositionX').value),y:Number(document.getElementById('photoPositionY').value)};paintPhotoPreview();});});
+  const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;pendingPhotoData='';});
+  if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;pendingPhotoData='';}});
+  const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',()=>{if(pendingPhotoData)applyFounderPhoto(pendingPhotoData,photoTransform);pendingPhotoData='';photoAdjustOverlay.hidden=true;});
+  try{const saved=localStorage.getItem('yunexFounderPhoto');if(saved){try{photoTransform={...photoTransform,...JSON.parse(localStorage.getItem('yunexFounderPhotoTransform')||'{}')};}catch(_){}applyFounderPhoto(saved,photoTransform);}}catch(_){}
+  const founderPhoto=document.getElementById('founderPhoto'),photoLightbox=document.getElementById('founderPhotoLightbox'),photoLarge=document.getElementById('founderPhotoLarge');let photoHoldTimer=null;
+  if(founderPhoto&&photoLightbox){founderPhoto.addEventListener('pointerdown',()=>{clearTimeout(photoHoldTimer);photoHoldTimer=setTimeout(()=>{const image=founderPhoto.querySelector('img');if(!image)return;photoLarge.src=image.src;photoLarge.style.objectPosition=image.style.objectPosition||'50% 50%';photoLarge.style.transform=image.style.transform||'scale(1)';photoLightbox.hidden=false;},2000);});['pointerup','pointerleave','pointercancel'].forEach(t=>founderPhoto.addEventListener(t,()=>clearTimeout(photoHoldTimer)));photoLightbox.addEventListener('click',()=>{photoLightbox.hidden=true;});}
+  const founderDatesOverlay=document.getElementById('founderDatesOverlay');let founderDates={birthday:'',birthdayAlerts:false,specialDays:[]};try{founderDates={...founderDates,...JSON.parse(localStorage.getItem('yunexFounderDates')||'{}')};}catch(_){}
+  function renderSpecialDays(){const list=document.getElementById('specialDaysList');if(!list)return;list.innerHTML='';founderDates.specialDays.forEach((d,i)=>{const row=document.createElement('div');row.className='special-day-item';const info=document.createElement('span');info.textContent=`${d.title} · ${d.date} · ${d.time}`;const rm=document.createElement('button');rm.type='button';rm.textContent='Remove';rm.addEventListener('click',()=>{founderDates.specialDays.splice(i,1);renderSpecialDays();});row.append(info,rm);list.appendChild(row);});}
+  function openFounderDates(){document.getElementById('founderBirthday').value=founderDates.birthday||'';document.getElementById('founderBirthdayAlerts').checked=!!founderDates.birthdayAlerts;renderSpecialDays();founderDatesOverlay.hidden=false;}
+  if(founderSettingsButton)founderSettingsButton.addEventListener('click',openFounderDates);const closeFounderDates=document.getElementById('closeFounderDates');if(closeFounderDates)closeFounderDates.addEventListener('click',()=>founderDatesOverlay.hidden=true);if(founderDatesOverlay)founderDatesOverlay.addEventListener('click',e=>{if(e.target===founderDatesOverlay)founderDatesOverlay.hidden=true;});
+  const addSpecialDay=document.getElementById('addSpecialDay');if(addSpecialDay)addSpecialDay.addEventListener('click',()=>{const title=document.getElementById('specialDayTitle').value.trim(),date=document.getElementById('specialDayDate').value,time=document.getElementById('specialDayTime').value||'09:00';if(!title||!date){alert('Special day name aur date dono bharo.');return;}founderDates.specialDays.push({title,date,time});document.getElementById('specialDayTitle').value='';document.getElementById('specialDayDate').value='';renderSpecialDays();});
+  const saveFounderDates=document.getElementById('saveFounderDates');if(saveFounderDates)saveFounderDates.addEventListener('click',()=>{founderDates.birthday=document.getElementById('founderBirthday').value;founderDates.birthdayAlerts=document.getElementById('founderBirthdayAlerts').checked;try{localStorage.setItem('yunexFounderDates',JSON.stringify(founderDates));}catch(_){}founderDatesOverlay.hidden=true;alert('Birthday aur Special Day settings is browser mein save ho gayi hain. Notifications backend connect hone ke baad active hongi.');});
   // Cover/banner feature intentionally removed from the Founder profile.
   try { localStorage.removeItem('yunexFounderCoverPhoto'); } catch (_) {}
 
