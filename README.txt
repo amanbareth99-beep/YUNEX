@@ -33,3 +33,18 @@ FOUNDER FULL-SCREEN ACCOUNT UPDATE
 - Gold YUNEX FOUNDER badge is unchanged.
 - Other user/demo profile design is not changed by this update.
 - This remains a frontend preview. Founder authentication, permissions, profile data sync and real uploaded cover-photo storage require the secure backend.
+
+
+FOUNDER PROFILE REFINEMENT (2026-11-19)
+- Removed the in-page Home button from the Founder account. Use the Android/browser Back button to return to the previous YUNEX screen.
+- Added a Profile heading above the cover.
+- Added a soft dark shadow behind the profile panel while the cover is tucked; the shadow fades away when the cover is expanded.
+- Other user profile design is unchanged.
+
+
+FOUNDER CLEAN COVER UPDATE:
+- Removed the Profile heading above the cover.
+- Removed YUNEX / CONNECT. CREATE. WIN. branding and OFFICIAL FOUNDER text from the cover.
+- Kept the profile photo overlapping the cover and retained the separate gold YUNEX FOUNDER badge under the username.
+- Replaced the swipe instruction text with a small down-arrow only.
+- Preserved cover expand/collapse behavior and the existing mobile back handling.

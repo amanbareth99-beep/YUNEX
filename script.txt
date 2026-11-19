@@ -76,8 +76,6 @@
   // Founder cover: pull down to reveal the full branded cover; swipe up to tuck it behind the profile.
   const founderView = document.getElementById('profile');
   const founderCover = document.getElementById('founderCover');
-  const founderBack = document.getElementById('founderProfileBack');
-  if (founderBack) founderBack.addEventListener('click', () => { if (history.state && history.state.view === 'profile') history.back(); else navigate('feed'); });
   if (founderCover && founderView) {
     let coverTouchStartY = 0;
     let coverTouchStartX = 0;

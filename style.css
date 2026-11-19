@@ -207,8 +207,7 @@ body.founder-account-open footer{display:none!important}
 body.founder-account-open main{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;height:100dvh;height:100svh;overflow:hidden}
 body.founder-account-open #profile.view.active{display:block!important;position:fixed;inset:0;z-index:20;width:100%;height:100dvh;height:100svh;max-width:none;margin:0;padding:0 0 env(safe-area-inset-bottom);overflow-y:auto;overscroll-behavior:contain;background:radial-gradient(ellipse at 80% 0%,#10284a 0%,transparent 42%),#070b14;scrollbar-width:none}
 body.founder-account-open #profile.view.active::-webkit-scrollbar{display:none}
-.founder-profile-back{position:absolute;z-index:8;top:calc(env(safe-area-inset-top) + 12px);left:16px;display:flex;align-items:center;gap:7px;padding:9px 13px;border:1px solid #7bbfff55;border-radius:30px;background:#061426b8;color:#eaf6ff;font-size:13px;font-weight:800;backdrop-filter:blur(12px)}
-.founder-profile-back:first-letter{font-size:22px;line-height:12px}
+.founder-page-title{position:relative;z-index:5;padding:calc(env(safe-area-inset-top) + 13px) 22px 10px;color:#f4f8ff;font-size:20px;font-weight:850;letter-spacing:.2px;text-shadow:0 2px 12px #000b;background:linear-gradient(180deg,rgba(3,8,16,.5),transparent)}
 body.founder-account-open .founder-profile-view{max-width:none!important;padding:0!important;margin:0!important}
 body.founder-account-open .founder-cover{height:158px!important;min-height:158px;position:relative!important;width:100%;border:0!important;border-radius:0 0 28px 28px!important;overflow:hidden;transition:height .42s cubic-bezier(.2,.75,.25,1),min-height .42s cubic-bezier(.2,.75,.25,1);touch-action:pan-y;cursor:pointer}
 body.founder-account-open .founder-profile-view.cover-expanded .founder-cover{height:310px!important;min-height:310px}
@@ -217,8 +216,18 @@ body.founder-account-open .founder-cover .cover-founder-label{bottom:18px!import
 .cover-swipe-hint{position:absolute;left:50%;bottom:13px;transform:translateX(-50%);font-size:9px;font-weight:800;letter-spacing:.5px;color:#b9e5ff;background:#06182bbd;border:1px solid #3b83b755;border-radius:30px;padding:6px 10px;white-space:nowrap;transition:opacity .2s}
 .founder-profile-view.cover-expanded .cover-swipe-hint{opacity:0;pointer-events:none}
 body.founder-account-open .founder-profile-panel{margin:-24px 0 0!important;padding:0 20px calc(26px + env(safe-area-inset-bottom))!important;border-radius:26px 26px 0 0!important;border:1px solid #1b3049!important;border-bottom:0!important;min-height:calc(100dvh - 120px);position:relative;z-index:2;background:linear-gradient(160deg,rgba(15,27,43,.97),rgba(7,15,26,.99) 70%)!important;backdrop-filter:blur(18px)}
+body.founder-account-open .founder-profile-panel::before{content:"";position:absolute;z-index:-1;left:0;right:0;top:-30px;height:58px;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.62),rgba(0,0,0,.22),transparent);filter:blur(9px);opacity:.9;transition:opacity .38s ease}
+body.founder-account-open .founder-profile-view.cover-expanded .founder-profile-panel::before{opacity:0}
 body.founder-account-open .founder-profile-top{margin-top:-48px!important}
 body.founder-account-open .founder-content-tabs{position:sticky;top:0;z-index:3}
 body.founder-account-open .founder-edit-overlay{position:fixed}
-@media(max-width:540px){body.founder-account-open .founder-cover{height:150px!important;min-height:150px;border-radius:0 0 24px 24px!important}body.founder-account-open .founder-profile-view.cover-expanded .founder-cover{height:285px!important;min-height:285px}body.founder-account-open .founder-profile-panel{padding-left:16px!important;padding-right:16px!important;margin-top:-22px!important}body.founder-account-open .founder-profile-top{margin-top:-43px!important}}
+@media(max-width:540px){body.founder-account-open .founder-page-title{padding-top:calc(env(safe-area-inset-top) + 12px);padding-bottom:9px;font-size:19px}body.founder-account-open .founder-cover{height:150px!important;min-height:150px;border-radius:0 0 24px 24px!important}body.founder-account-open .founder-profile-view.cover-expanded .founder-cover{height:285px!important;min-height:285px}body.founder-account-open .founder-profile-panel{padding-left:16px!important;padding-right:16px!important;margin-top:-22px!important}body.founder-account-open .founder-profile-top{margin-top:-43px!important}}
 
+
+
+/* Founder cover clean-up: photo remains the visual focus; arrow only. */
+body.founder-account-open .founder-page-title{display:none!important}
+body.founder-account-open .founder-cover .cover-brand,
+body.founder-account-open .founder-cover .cover-founder-label{display:none!important}
+body.founder-account-open .founder-cover .cover-swipe-hint{left:auto!important;right:20px!important;bottom:16px!important;transform:none!important;width:34px;height:34px;padding:0!important;display:grid;place-items:center;font-size:22px!important;line-height:1;color:#c7edff;background:rgba(4,18,32,.68);border:1px solid rgba(76,174,235,.35);border-radius:50%;box-shadow:0 4px 14px rgba(0,0,0,.25);white-space:normal}
+body.founder-account-open .founder-profile-view.cover-expanded .cover-swipe-hint{opacity:.55!important}
