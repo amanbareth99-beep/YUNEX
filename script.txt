@@ -74,88 +74,6 @@
   history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
   renderView('feed');
 
-
-  // Subtle local-demo chat effects. Realtime delivery requires backend integration.
-  const chatEffectPresets = {
-    hug: { symbol: '🤗', label: 'A warm hug' }
-  };
-  function showChatEffect(effectName) {
-    // The existing dedicated Hug button keeps its original lightweight preview behavior.
-    if (effectName !== 'hug') return showCartoonEffect(effectName);
-    const layer = document.getElementById('chatEffectLayer');
-    if (!layer) return;
-    const messageStream = document.getElementById('chatMessages');
-    if (messageStream) messageStream.appendChild(layer);
-    layer.replaceChildren();
-    const card = document.createElement('div');
-    card.className = 'chat-effect-card hug-effect-card';
-    const symbol = document.createElement('div'); symbol.className = 'chat-effect-symbol'; symbol.textContent = '🤗';
-    const caption = document.createElement('div'); caption.className = 'chat-effect-caption'; caption.textContent = 'A warm hug';
-    card.append(symbol, caption); layer.appendChild(card);
-    window.setTimeout(() => { if (card.isConnected) card.remove(); }, 1500);
-  }
-  const cartoonEffects = {
-    kiss: { title: 'A little kiss', face: '😘', other: '🥰', motion: 'kiss' },
-    love: { title: 'Love You', face: '💙', other: '💗', motion: 'love' },
-    miss: { title: 'Missing you', face: '🥺', other: '💌', motion: 'miss' },
-    laugh: { title: 'That’s hilarious!', face: '😄', other: '😂', motion: 'laugh' },
-    cry: { title: 'Feeling emotional', face: '🥹', other: '💧', motion: 'cry' },
-    horror: { title: 'Boo! A little spooky', face: '👻', other: '✨', motion: 'horror' }
-  };
-  function showCartoonEffect(name) {
-    const preset = cartoonEffects[name], layer = document.getElementById('chatEffectLayer');
-    if (!preset || !layer) return;
-    const messageStream = document.getElementById('chatMessages');
-    if (messageStream) messageStream.appendChild(layer);
-    layer.replaceChildren();
-    if (name === 'kiss') {
-      const image = document.createElement('img');
-      image.className = 'yunex-kiss-gif';
-      image.src = 'assets/chat-animations/kiss-3d-transparent.gif';
-      image.alt = 'Cute 3D cartoon couple sharing a kiss';
-      layer.replaceChildren(image);
-      window.setTimeout(() => { if (image.isConnected) image.remove(); }, 2000);
-      return;
-    }
-    const scene = document.createElement('div'); scene.className = `yunex-cartoon-scene scene-${preset.motion}`;
-    scene.setAttribute('role','status'); scene.setAttribute('aria-label',preset.title);
-    const glow = document.createElement('div'); glow.className = 'cartoon-glow';
-    const characterA = document.createElement('div'); characterA.className = 'cartoon-character character-a';
-    const faceA = document.createElement('span'); faceA.className = 'cartoon-face'; faceA.textContent = preset.face;
-    const characterB = document.createElement('div'); characterB.className = 'cartoon-character character-b';
-    const faceB = document.createElement('span'); faceB.className = 'cartoon-face'; faceB.textContent = preset.other;
-    const title = document.createElement('div'); title.className = 'cartoon-caption'; title.textContent = preset.title;
-    characterA.appendChild(faceA); characterB.appendChild(faceB); scene.append(glow,characterA,characterB,title); layer.appendChild(scene);
-    window.setTimeout(() => { if (scene.isConnected) scene.classList.add('cartoon-leave'); }, 1550);
-    window.setTimeout(() => { if (scene.isConnected) scene.remove(); }, 2000);
-  }
-  function detectChatAnimation(message) {
-    const raw = String(message || '').normalize('NFKC').toLowerCase();
-    const text = raw.replace(/[“”"'`]/g,' ').replace(/[^\p{L}\p{N}\s\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,' ').replace(/\s+/g,' ').trim();
-    if (!text) return null;
-    // Avoid triggering on explicit negation or when the user is merely discussing a keyword.
-    const negated = /\b(dont|don't|do not|never|mat|nahi|nahin|not|without|stop)\b/i;
-    const quotedMention = /\b(word|meaning|spelling|example|type|typing|likh|matlab)\b/i;
-    const rules = [
-      ['kiss', /\b(kiss|kissi|kisi|kisse|kissing|muah|mwah|umaah|chumma)\b|चुम्मा|किस्सी|किस्स?ी|किस दे|किस देना|चूमना|चूम लो/i],
-      ['love', /\b(i love you|love u|luv u|love you|luv you|i luv you|pyaar karta|pyaar karti|pyar karta|pyar karti)\b|तुमसे प्यार|लव यू|प्यार करता|प्यार करती/i],
-      ['miss', /\b(i miss you|miss u|missing you|miss you|miss u so much|yaad aa rahi|yaad aa raha|teri yaad|tumhari yaad|yaad kar raha|yaad kar rahi)\b|याद आ रही|याद आ रहा|तुम्हारी याद|तेरी याद|मिस कर रहा|मिस कर रही|😞|🙁|☹️/i],
-      ['laugh', /\b(haha+|hehe+|hihi+|lol|lmao|rofl|hasi aa gai|hasi aa gayi|hasna|hans raha|hans rahi)\b|हाहाहा|हा हा|हंसी आ गई|हँसी आ गई|मजेदार है|😂|🤣|😅/i],
-      ['cry', /\b(cry|crying|tears|ro raha hu|ro rahi hu|rona aa raha|about to cry)\b|रोना आ रहा|रो रही हूँ|रो रहा हूँ|आँसू आ रहे|आंसू आ रहे|😭|😢|🥺/i],
-      ['horror', /\b(ghost|horror|scared|afraid|dar lag|darr lag|bhoot|bhut|dar gaya|dar gayi)\b|डर लग रहा|डर गया|डर गई|भूत|डरावना|👻/i]
-    ];
-    for (const [effect, pattern] of rules) {
-      const match = pattern.test(text);
-      if (!match) continue;
-      const matchedPart = text.match(pattern)?.[0] || '';
-      const before = text.slice(Math.max(0,text.indexOf(matchedPart)-28), text.indexOf(matchedPart));
-      if (negated.test(before) || (quotedMention.test(before) && !/\b(i|me|you|tum|mujhe|mujhko|please|plz)\b/i.test(before))) continue;
-      return effect;
-    }
-    return null;
-  }
-
-
   // All internal navigation uses one delegated handler, including dynamically shown controls.
   document.addEventListener('click', event => {
     const profileButton = event.target.closest('.profile-open');
@@ -210,7 +128,12 @@
     }
 
     if (event.target.closest('#hugButton')) {
-      showChatEffect('hug');
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble sent hug-message';
+      bubble.textContent = '🤗 Hug sent · demo';
+      addMessageMetaSafe(bubble);
+      document.getElementById('chatMessages').appendChild(bubble);
+      document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
       return;
     }
     if (event.target.closest('#gamesButton')) { document.getElementById('gamesOverlay').hidden = false; return; }
@@ -311,44 +234,96 @@
 
   // Chat status preview: all delivery/read states below are simulated locally.
   // Real Sent/Delivered/Seen receipts require authenticated Supabase messaging.
+  // Founder profile: editable local preview. Real identity/permissions remain server-controlled.
+  const founderDefaults = { name: 'Aman Bareth', handle: '@amanbareth', bio: 'Building YUNEX — a place to connect, create and win. 🚀' };
+  let founderProfile = { ...founderDefaults };
+  try {
+    const savedFounder = JSON.parse(localStorage.getItem('yunexFounderProfile') || 'null');
+    if (savedFounder && typeof savedFounder === 'object') founderProfile = { ...founderDefaults, ...savedFounder };
+  } catch (_) {}
+  const founderNameEl = document.getElementById('founderName');
+  const founderHandleEl = document.getElementById('founderHandle');
+  const founderBioEl = document.getElementById('founderBio');
+  const founderEditOverlay = document.getElementById('founderEditOverlay');
+  function paintFounderProfile() {
+    if (founderNameEl) founderNameEl.textContent = founderProfile.name;
+    if (founderHandleEl) founderHandleEl.textContent = founderProfile.handle.startsWith('@') ? founderProfile.handle : '@' + founderProfile.handle;
+    if (founderBioEl) founderBioEl.textContent = founderProfile.bio || 'Add a bio to introduce yourself.';
+    const avatar = document.getElementById('profileShortcut');
+    if (avatar && !avatar.querySelector('img')) avatar.textContent = founderProfile.name.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
+    const photo = document.getElementById('founderPhoto');
+    if (photo && !photo.querySelector('img')) photo.textContent = founderProfile.name.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
+  }
+  paintFounderProfile();
+  const editFounderButton = document.getElementById('editFounderProfile');
+  if (editFounderButton) editFounderButton.addEventListener('click', () => {
+    document.getElementById('editFounderName').value = founderProfile.name;
+    document.getElementById('editFounderHandle').value = founderProfile.handle.replace(/^@/, '');
+    document.getElementById('editFounderBio').value = founderProfile.bio;
+    founderEditOverlay.hidden = false;
+  });
+  const closeFounderEdit = document.getElementById('closeFounderEdit');
+  if (closeFounderEdit) closeFounderEdit.addEventListener('click', () => { founderEditOverlay.hidden = true; });
+  if (founderEditOverlay) founderEditOverlay.addEventListener('click', event => { if (event.target === founderEditOverlay) founderEditOverlay.hidden = true; });
+  const founderEditForm = document.getElementById('founderEditForm');
+  if (founderEditForm) founderEditForm.addEventListener('submit', event => {
+    event.preventDefault();
+    founderProfile = {
+      name: document.getElementById('editFounderName').value.trim() || founderDefaults.name,
+      handle: '@' + document.getElementById('editFounderHandle').value.trim().replace(/^@/, '').replace(/\s+/g, '').toLowerCase(),
+      bio: document.getElementById('editFounderBio').value.trim()
+    };
+    try { localStorage.setItem('yunexFounderProfile', JSON.stringify(founderProfile)); } catch (_) {}
+    paintFounderProfile();
+    founderEditOverlay.hidden = true;
+  });
+  const founderPhotoInput = document.getElementById('founderPhotoInput');
+  if (founderPhotoInput) founderPhotoInput.addEventListener('change', () => {
+    const file = founderPhotoInput.files && founderPhotoInput.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const photo = document.getElementById('founderPhoto');
+      photo.textContent = '';
+      const img = document.createElement('img');
+      img.src = reader.result;
+      img.alt = 'Founder profile photo';
+      photo.appendChild(img);
+      try { localStorage.setItem('yunexFounderPhoto', reader.result); } catch (_) {}
+    };
+    reader.readAsDataURL(file);
+  });
+  try {
+    const savedPhoto = localStorage.getItem('yunexFounderPhoto');
+    if (savedPhoto) {
+      const photo = document.getElementById('founderPhoto');
+      photo.textContent = '';
+      const img = document.createElement('img'); img.src = savedPhoto; img.alt = 'Founder profile photo'; photo.appendChild(img);
+    }
+  } catch (_) {}
+  document.querySelectorAll('[data-profile-tab]').forEach(tab => tab.addEventListener('click', () => {
+    document.querySelectorAll('[data-profile-tab]').forEach(item => item.classList.toggle('selected', item === tab));
+    const labels = { posts: ['No posts yet', 'Your photos and videos will appear here.'], reels: ['No reels yet', 'Your published videos will appear here.'], tagged: ['No tagged posts', 'Posts you are tagged in will appear here.'] };
+    const copy = labels[tab.dataset.profileTab];
+    document.getElementById('founderEmptyTitle').textContent = copy[0];
+    document.getElementById('founderEmptyText').textContent = copy[1];
+  }));
+  const shareFounderButton = document.getElementById('shareFounderProfile');
+  if (shareFounderButton) shareFounderButton.addEventListener('click', async () => {
+    const shareText = `${founderProfile.name} ${founderProfile.handle} · YUNEX Founder`;
+    try {
+      if (navigator.share) await navigator.share({ title: 'YUNEX Founder', text: shareText, url: location.href.split('#')[0] + '#profile' });
+      else if (navigator.clipboard) { await navigator.clipboard.writeText(shareText + ' · ' + location.href.split('#')[0] + '#profile'); shareFounderButton.textContent = 'Copied!'; }
+      else shareFounderButton.textContent = 'Share unavailable';
+    } catch (_) {}
+  });
+  const founderSettingsButton = document.getElementById('founderSettings');
+  if (founderSettingsButton) founderSettingsButton.addEventListener('click', () => { alert('Profile privacy and account settings will be connected in the Settings phase.'); });
+
   const chatForm = document.getElementById('chatForm');
   const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
-  const chatGalleryButton = document.getElementById('chatGalleryButton');
-  const chatGalleryInput = document.getElementById('chatGalleryInput');
-  const chatAttachmentPreview = document.getElementById('chatAttachmentPreview');
-  let pendingChatMedia = [];
-  function renderChatMediaPreview() {
-    if (!chatAttachmentPreview) return;
-    chatAttachmentPreview.replaceChildren();
-    chatAttachmentPreview.hidden = pendingChatMedia.length === 0;
-    pendingChatMedia.forEach((file,index) => {
-      const item = document.createElement('div'); item.className='chat-attachment-thumb';
-      const media = document.createElement(file.type.startsWith('video/') ? 'video' : 'img');
-      media.src = URL.createObjectURL(file); if (media.tagName === 'VIDEO') media.muted = true;
-      item.appendChild(media);
-      const remove = document.createElement('button'); remove.type='button'; remove.textContent='×'; remove.setAttribute('aria-label','Remove selected file');
-      remove.addEventListener('click',()=>{ pendingChatMedia.splice(index,1); renderChatMediaPreview(); });
-      item.appendChild(remove); chatAttachmentPreview.appendChild(item);
-    });
-  }
-  if (chatGalleryButton && chatGalleryInput) {
-    chatGalleryButton.addEventListener('click',()=>chatGalleryInput.click());
-    chatGalleryInput.addEventListener('change',()=>{
-      const selected = Array.from(chatGalleryInput.files || []).filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
-      pendingChatMedia = pendingChatMedia.concat(selected).slice(0,10);
-      renderChatMediaPreview(); chatGalleryInput.value='';
-    });
-  }
-  const chatPresence = document.getElementById('chatPresence');
-  const presenceLabel = chatPresence ? chatPresence.querySelector('.presence-label') : null;
-
-  function setChatPresence(isTyping) {
-    if (!chatPresence || !presenceLabel) return;
-    presenceLabel.textContent = isTyping ? 'Typing…' : 'Online';
-    chatPresence.classList.toggle('is-typing', isTyping);
-    chatPresence.classList.toggle('is-online', !isTyping);
-  }
+  const typingIndicator = document.getElementById('typingIndicator');
 
   function addMessageMetaSafe(bubble) {
     const meta = document.createElement('div'); meta.className = 'message-meta sent-meta';
@@ -384,34 +359,17 @@
   if (chatForm) chatForm.addEventListener('submit', event => {
     event.preventDefault();
     const value = chatInput.value.trim();
-    if (!value && pendingChatMedia.length === 0) return;
+    if (!value) return;
 
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble sent';
     const messageText = document.createElement('div');
     messageText.textContent = value;
-    if (value) bubble.appendChild(messageText);
-    pendingChatMedia.forEach(file => {
-      const media = document.createElement(file.type.startsWith('video/') ? 'video' : 'img');
-      media.className='chat-message-media'; media.src=URL.createObjectURL(file);
-      if (media.tagName === 'VIDEO') { media.controls=true; media.playsInline=true; }
-      media.alt = file.name; bubble.appendChild(media);
-    });
-    addMessageMeta(bubble, '✓ Sent · local demo', true);
-    const detectedEffect = detectChatAnimation(value);
-    pendingChatMedia = []; renderChatMediaPreview();
+    bubble.appendChild(messageText);
+    addMessageMeta(bubble, '✓ Sent · demo', true);
     chatMessages.appendChild(bubble);
-    if (detectedEffect) showCartoonEffect(detectedEffect);
     chatInput.value = '';
     chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Keep the composer focused after Send so Android can type the next message immediately.
-    window.setTimeout(() => {
-      if (document.getElementById('chat')?.classList.contains('active')) {
-        try { chatInput.focus({ preventScroll: true }); } catch (_) { chatInput.focus(); }
-        if (typeof syncVisibleViewport === 'function') syncVisibleViewport();
-      }
-    }, 60);
 
     // Simulated state changes are deliberately labeled DEMO, not real receipts.
     const status = bubble.querySelector('.message-status');
@@ -422,19 +380,20 @@
       if (status) status.textContent = '✓✓ Seen · demo';
     }, 2300);
 
-    // Demo presence appears under the chat partner's name, not in the message list.
-    setChatPresence(true);
-    window.setTimeout(() => {
-      const reply = document.createElement('div');
-      reply.className = 'chat-bubble received';
-      const replyText = document.createElement('div');
-      replyText.textContent = 'Local demo reply. Media/messages are not delivered to another account yet. 👋';
-      reply.appendChild(replyText);
-      addMessageMeta(reply, '', false);
-      chatMessages.appendChild(reply);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      setChatPresence(false);
-    }, 1400);
+    if (typingIndicator) {
+      typingIndicator.hidden = false;
+      window.setTimeout(() => {
+        if (typingIndicator) typingIndicator.hidden = true;
+        const reply = document.createElement('div');
+        reply.className = 'chat-bubble received';
+        const replyText = document.createElement('div');
+        replyText.textContent = 'Message received in this local preview. 👋';
+        reply.appendChild(replyText);
+        addMessageMeta(reply, '', false);
+        chatMessages.appendChild(reply);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 1400);
+    }
   });
 
 
@@ -473,91 +432,6 @@
     e.preventDefault(); const input = document.getElementById('wordInput'); const word = input.value.trim();
     if (!word) return; wordItems.push(word); document.getElementById('wordChain').textContent = wordItems.join(' · '); input.value = '';
   });
-
-  // Chat deletion controls are local-demo interactions. A real multi-device
-  // delete-for-everyone action must be enforced by the authenticated backend.
-  const chatMenuTrigger = document.getElementById('chatMenuTrigger');
-  const chatOptionsMenu = document.getElementById('chatOptionsMenu');
-  const messageActionsOverlay = document.getElementById('messageActionsOverlay');
-  const messageActionsPreview = document.getElementById('messageActionsPreview');
-  let activeMessageBubble = null;
-
-  function closeChatMenus() {
-    if (chatOptionsMenu) chatOptionsMenu.hidden = true;
-    if (messageActionsOverlay) messageActionsOverlay.hidden = true;
-    activeMessageBubble = null;
-  }
-  if (chatMenuTrigger && chatOptionsMenu) {
-    chatMenuTrigger.addEventListener('click', () => {
-      chatOptionsMenu.hidden = !chatOptionsMenu.hidden;
-    });
-  }
-  if (chatMessages && messageActionsOverlay) {
-    chatMessages.addEventListener('click', event => {
-      const bubble = event.target.closest('.chat-bubble');
-      if (!bubble) return;
-      activeMessageBubble = bubble;
-      const textNode = bubble.querySelector(':scope > div');
-      const message = textNode ? textNode.textContent : 'Selected message';
-      messageActionsPreview.textContent = message.length > 120 ? message.slice(0, 117) + '…' : message;
-      messageActionsOverlay.hidden = false;
-    });
-    chatMessages.addEventListener('contextmenu', event => {
-      const bubble = event.target.closest('.chat-bubble');
-      if (!bubble) return;
-      event.preventDefault();
-      activeMessageBubble = bubble;
-      const textNode = bubble.querySelector(':scope > div');
-      messageActionsPreview.textContent = textNode ? textNode.textContent : 'Selected message';
-      messageActionsOverlay.hidden = false;
-    });
-  }
-  document.querySelectorAll('[data-message-action]').forEach(button => {
-    button.addEventListener('click', () => {
-      const action = button.dataset.messageAction;
-      if (action === 'cancel') { closeChatMenus(); return; }
-      if (!activeMessageBubble) { closeChatMenus(); return; }
-      const label = action === 'everyone' ? 'Delete this message for everyone?' : 'Delete this message for you?';
-      if (window.confirm(label)) {
-        if (action === 'everyone') {
-          const replacement = document.createElement('div');
-          replacement.className = 'chat-bubble deleted-message';
-          replacement.textContent = 'This message was deleted';
-          activeMessageBubble.replaceWith(replacement);
-        } else {
-          activeMessageBubble.remove();
-        }
-      }
-      closeChatMenus();
-    });
-  });
-  document.querySelectorAll('[data-chat-action]').forEach(button => {
-    button.addEventListener('click', () => {
-      const action = button.dataset.chatAction;
-      if (action === 'clear') {
-        if (window.confirm('Clear all messages from this chat on your side?')) {
-          chatMessages.replaceChildren();
-        }
-      } else if (action === 'delete') {
-        if (window.confirm('Delete this chat from your chat list? This demo will clear the conversation and return to Profile.')) {
-          chatMessages.replaceChildren();
-          closeChatMenus();
-          renderView('profile');
-          return;
-        }
-      }
-      closeChatMenus();
-    });
-  });
-  if (messageActionsOverlay) {
-    messageActionsOverlay.addEventListener('click', event => {
-      if (event.target === messageActionsOverlay) closeChatMenus();
-    });
-  }
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') closeChatMenus();
-  });
-
   selectGame('ttt');
 
 })();
