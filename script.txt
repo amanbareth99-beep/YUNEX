@@ -20,6 +20,9 @@
     document.body.classList.toggle('section-open', id !== 'feed');
     document.body.classList.toggle('registration-open', id === 'account');
     document.body.classList.toggle('chat-open', id === 'chat');
+    document.body.classList.toggle('founder-account-open', id === 'profile');
+    const profileView = document.getElementById('profile');
+    if (profileView && id !== 'profile') profileView.classList.remove('cover-expanded');
     document.querySelectorAll('main > .view.active .back-home, main > .view.active .back-button, main > .view.active .back-btn, main > .view.active [data-action="back"]').forEach(button => button.remove());
     if (id === 'chat') { syncVisibleViewport(); const box = document.getElementById('chatMessages'); if (box) requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; }); }
     else window.scrollTo(0, 0);
@@ -68,6 +71,21 @@
     if (!document.getElementById(id) || id === currentView) return;
     history.pushState({ yunex: true, view: id }, '', '#' + id);
     renderView(id);
+  }
+
+  // Founder cover: pull down to reveal the full branded cover; swipe up to tuck it behind the profile.
+  const founderView = document.getElementById('profile');
+  const founderCover = document.getElementById('founderCover');
+  const founderBack = document.getElementById('founderProfileBack');
+  if (founderBack) founderBack.addEventListener('click', () => { if (history.state && history.state.view === 'profile') history.back(); else navigate('feed'); });
+  if (founderCover && founderView) {
+    let coverTouchStartY = 0;
+    let coverTouchStartX = 0;
+    founderCover.addEventListener('touchstart', event => { const t=event.touches[0]; coverTouchStartY=t.clientY; coverTouchStartX=t.clientX; }, {passive:true});
+    founderCover.addEventListener('touchend', event => { const t=event.changedTouches[0]; const dy=t.clientY-coverTouchStartY; const dx=Math.abs(t.clientX-coverTouchStartX); if (Math.abs(dy)>32 && Math.abs(dy)>dx) founderView.classList.toggle('cover-expanded', dy>0); }, {passive:true});
+    const toggleCover = () => founderView.classList.toggle('cover-expanded');
+    founderCover.addEventListener('click', toggleCover);
+    founderCover.addEventListener('keydown', event => { if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCover();} });
   }
 
   // Start with a clean Home Feed history entry.

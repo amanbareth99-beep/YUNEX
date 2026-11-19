@@ -25,3 +25,11 @@ Important limitations:
 
 Deployment:
 Upload index.html, style.css, and script.js to the repository root, replacing the matching files. index.html loads script.js (not script.txt).
+
+
+FOUNDER FULL-SCREEN ACCOUNT UPDATE
+- Founder profile opens as a full-screen mobile account page. Global top bar, main tabs and footer are hidden while this page is open.
+- The branded YUNEX cover sits behind the profile; only part is shown at first. Swipe down on the cover to expand it, swipe up to collapse it. Tap/keyboard activate also toggles.
+- Gold YUNEX FOUNDER badge is unchanged.
+- Other user/demo profile design is not changed by this update.
+- This remains a frontend preview. Founder authentication, permissions, profile data sync and real uploaded cover-photo storage require the secure backend.
