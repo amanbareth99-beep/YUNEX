@@ -273,11 +273,9 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 #founderPhotoLightbox img{width:min(82vw,420px);height:min(82vw,420px);object-fit:cover;border-radius:50%;border:5px solid #219dff;box-shadow:0 0 0 7px #12253b,0 18px 60px #000b;}
 
 /* Founder-only premium gold crown and photo navigation */
-.founder-badge{display:inline-flex!important;align-items:center;gap:9px;white-space:nowrap;padding:10px 16px!important;min-height:42px}
-.founder-badge-crown{color:#ffd76a!important;font-size:25px;line-height:1;text-shadow:0 1px 0 #fff0a6,0 0 12px #e7b84a99}
-.profile-nav-tab{display:flex!important;align-items:center;gap:7px}
-.profile-nav-avatar{width:24px;height:24px;flex:0 0 24px;border-radius:50%;display:inline-grid;place-items:center;overflow:hidden;border:1px solid #299cff;background:#12365e;color:#fff;font-size:8px;font-weight:800;position:relative}
-.profile-nav-avatar>.profile-avatar-image{width:100%!important;height:100%!important;object-fit:cover!important;border-radius:50%!important;position:absolute;inset:0}
+.founder-badge{display:inline-flex!important;align-items:center;gap:8px;white-space:nowrap;padding:7px 13px!important;min-height:36px!important}
+.founder-badge-crown{display:block;width:21px;height:16px;flex:0 0 21px;color:#f5c64e!important;filter:drop-shadow(0 1px 2px #e8ad35aa)}
+.profile-nav-tab{display:flex!important;align-items:center;justify-content:center;gap:0}
 .photo-adjust-dialog input[type=range]{display:none!important}
 .photo-gesture-hint{font-size:12px;line-height:1.5;color:#9dbbd5;text-align:center;margin:0 0 16px}
 .photo-adjust-preview{touch-action:none!important;cursor:grab}
