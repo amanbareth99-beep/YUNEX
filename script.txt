@@ -8,6 +8,33 @@
   let exitWarningAt = 0;
   let chatKeyboardHistoryEntry = false;
 
+  // One avatar renderer is shared by every place a profile appears.
+  function profilePhotoKey(key) { return key === 'founder' ? 'yunexFounderPhoto' : `yunexProfilePhoto:${key.replace(/^user:/, '')}`; }
+  function renderProfileAvatar(element, key, fallbackText) {
+    if (!element || !key) return;
+    let photo = '';
+    try { photo = localStorage.getItem(profilePhotoKey(key)) || (key === 'founder' ? localStorage.getItem('yunexFounderPhoto') : ''); } catch (_) {}
+    element.classList.add('has-profile-photo');
+    let img = element.querySelector(':scope > img.profile-avatar-image');
+    if (photo) {
+      if (!img) { element.textContent = ''; img = document.createElement('img'); img.className = 'profile-avatar-image'; img.alt = 'Profile photo'; element.appendChild(img); }
+      if (img.src !== photo) img.src = photo;
+      element.setAttribute('data-photo-loaded', 'true');
+    } else {
+      if (img) img.remove();
+      if (fallbackText && !element.textContent.trim()) element.textContent = fallbackText;
+      element.removeAttribute('data-photo-loaded');
+    }
+  }
+  function refreshAllProfileAvatars() {
+    document.querySelectorAll('[data-profile-avatar]').forEach(el => {
+      const key = el.dataset.profileAvatar;
+      const fallback = el.dataset.user ? el.dataset.user.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase() : (key === 'founder' ? 'AB' : (el.textContent || '?'));
+      renderProfileAvatar(el, key, fallback);
+    });
+  }
+  refreshAllProfileAvatars();
+
   function renderView(id) {
     if (!document.getElementById(id)) id = 'feed';
     currentView = id;
@@ -88,10 +115,13 @@
       };
       document.getElementById('demoName').textContent = activeDemoUser.name;
       document.getElementById('demoHandle').textContent = activeDemoUser.handle;
-      document.getElementById('demoAvatar').textContent =
-        activeDemoUser.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
-      document.getElementById('chatName').textContent = activeDemoUser.name;
+      const avatarKey = `user:${activeDemoUser.handle}`;
+      document.getElementById('demoAvatar').dataset.profileAvatar = avatarKey;
+      document.getElementById('chatAvatar').dataset.profileAvatar = avatarKey;
+      document.getElementById('demoAvatar').textContent = activeDemoUser.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
       document.getElementById('chatAvatar').textContent = activeDemoUser.name[0].toUpperCase();
+      refreshAllProfileAvatars();
+      document.getElementById('chatName').textContent = activeDemoUser.name;
       const follow = document.getElementById('followDemo');
       follow.textContent = 'Follow';
       follow.classList.remove('following');
@@ -126,7 +156,9 @@
 
     if (event.target.closest('#messageDemo')) {
       document.getElementById('chatName').textContent = activeDemoUser.name;
+      document.getElementById('chatAvatar').dataset.profileAvatar = `user:${activeDemoUser.handle}`;
       document.getElementById('chatAvatar').textContent = activeDemoUser.name[0].toUpperCase();
+      refreshAllProfileAvatars();
       navigate('chat');
       return;
     }
@@ -285,15 +317,38 @@
   const founderPhotoInput=document.getElementById('founderPhotoInput'),photoAdjustOverlay=document.getElementById('photoAdjustOverlay'),photoAdjustPreview=document.getElementById('photoAdjustPreview');
   let pendingPhotoData='',photoTransform={zoom:1,x:50,y:50};
   function paintPhotoPreview(){if(photoAdjustPreview){photoAdjustPreview.style.objectPosition=`${photoTransform.x}% ${photoTransform.y}%`;photoAdjustPreview.style.transform=`scale(${photoTransform.zoom})`;}}
-  function applyFounderPhoto(data,t=photoTransform){const photo=document.getElementById('founderPhoto');if(!photo)return;photo.innerHTML='';const img=document.createElement('img');img.src=data;img.alt='Founder profile photo';img.style.objectPosition=`${t.x}% ${t.y}%`;img.style.transform=`scale(${t.zoom})`;photo.appendChild(img);try{localStorage.setItem('yunexFounderPhoto',data);localStorage.setItem('yunexFounderPhotoTransform',JSON.stringify(t));}catch(_){}}
-  if(founderPhotoInput)founderPhotoInput.addEventListener('change',()=>{const file=founderPhotoInput.files&&founderPhotoInput.files[0];if(!file||!file.type.startsWith('image/'))return;const reader=new FileReader();reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;[['photoZoom',1],['photoPositionX',50],['photoPositionY',50]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});paintPhotoPreview();if(photoAdjustOverlay)photoAdjustOverlay.hidden=false;};reader.readAsDataURL(file);founderPhotoInput.value='';});
+  function applyFounderPhoto(data,t=photoTransform){
+    const photo=document.getElementById('founderPhoto'); if(!photo)return;
+    photo.innerHTML=''; const img=document.createElement('img'); img.className='profile-avatar-image'; img.src=data; img.alt='Founder profile photo';
+    img.style.objectPosition=`${t.x}% ${t.y}%`; img.style.transform=`scale(${t.zoom})`; photo.appendChild(img);
+    try{localStorage.setItem('yunexFounderPhoto',data);localStorage.setItem('yunexFounderPhotoTransform',JSON.stringify(t));}catch(_){}
+    refreshAllProfileAvatars();
+  }
+  if(founderPhotoInput)founderPhotoInput.addEventListener('change',()=>{
+    const file=founderPhotoInput.files&&founderPhotoInput.files[0]; if(!file||!file.type.startsWith('image/'))return;
+    const reader=new FileReader(); reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;[['photoZoom',1],['photoPositionX',50],['photoPositionY',50]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});paintPhotoPreview();if(photoAdjustOverlay)photoAdjustOverlay.hidden=false;}; reader.readAsDataURL(file); founderPhotoInput.value='';
+  });
   ['photoZoom','photoPositionX','photoPositionY'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',()=>{photoTransform={zoom:Number(document.getElementById('photoZoom').value),x:Number(document.getElementById('photoPositionX').value),y:Number(document.getElementById('photoPositionY').value)};paintPhotoPreview();});});
+  // Direct finger manipulation: drag to pan and pinch with two fingers to zoom.
+  const adjustStage=document.querySelector('.photo-adjust-preview'); let cropPointers=new Map(),pinchStart=0,pinchZoom=1,dragStart=null;
+  if(adjustStage){
+    adjustStage.style.touchAction='none';
+    adjustStage.addEventListener('pointerdown',e=>{e.preventDefault();adjustStage.setPointerCapture(e.pointerId);cropPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(cropPointers.size===1)dragStart={x:e.clientX,y:e.clientY,px:photoTransform.x,py:photoTransform.y};if(cropPointers.size===2){const pts=[...cropPointers.values()];pinchStart=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);pinchZoom=photoTransform.zoom;dragStart=null;}});
+    adjustStage.addEventListener('pointermove',e=>{if(!cropPointers.has(e.pointerId))return;cropPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(cropPointers.size>=2){const pts=[...cropPointers.values()];const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);if(pinchStart>0)photoTransform.zoom=Math.max(1,Math.min(3,pinchZoom*dist/pinchStart));}else if(dragStart){const rect=adjustStage.getBoundingClientRect();photoTransform.x=Math.max(0,Math.min(100,dragStart.px+(e.clientX-dragStart.x)/rect.width*100));photoTransform.y=Math.max(0,Math.min(100,dragStart.py+(e.clientY-dragStart.y)/rect.height*100));}const z=document.getElementById('photoZoom'),x=document.getElementById('photoPositionX'),y=document.getElementById('photoPositionY');if(z)z.value=photoTransform.zoom;if(x)x.value=photoTransform.x;if(y)y.value=photoTransform.y;paintPhotoPreview();});
+    const stop=e=>{cropPointers.delete(e.pointerId);if(cropPointers.size<2)pinchStart=0;if(cropPointers.size===0)dragStart=null;};['pointerup','pointercancel','lostpointercapture'].forEach(t=>adjustStage.addEventListener(t,stop));
+  }
   const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;pendingPhotoData='';});
   if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;pendingPhotoData='';}});
   const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',()=>{if(pendingPhotoData)applyFounderPhoto(pendingPhotoData,photoTransform);pendingPhotoData='';photoAdjustOverlay.hidden=true;});
   try{const saved=localStorage.getItem('yunexFounderPhoto');if(saved){try{photoTransform={...photoTransform,...JSON.parse(localStorage.getItem('yunexFounderPhotoTransform')||'{}')};}catch(_){}applyFounderPhoto(saved,photoTransform);}}catch(_){}
-  const founderPhoto=document.getElementById('founderPhoto'),photoLightbox=document.getElementById('founderPhotoLightbox'),photoLarge=document.getElementById('founderPhotoLarge');let photoHoldTimer=null;
-  if(founderPhoto&&photoLightbox){founderPhoto.addEventListener('pointerdown',()=>{clearTimeout(photoHoldTimer);photoHoldTimer=setTimeout(()=>{const image=founderPhoto.querySelector('img');if(!image)return;photoLarge.src=image.src;photoLarge.style.objectPosition=image.style.objectPosition||'50% 50%';photoLarge.style.transform=image.style.transform||'scale(1)';photoLightbox.hidden=false;},2000);});['pointerup','pointerleave','pointercancel'].forEach(t=>founderPhoto.addEventListener(t,()=>clearTimeout(photoHoldTimer)));photoLightbox.addEventListener('click',()=>{photoLightbox.hidden=true;});}
+  const founderPhoto=document.getElementById('founderPhoto'),photoLightbox=document.getElementById('founderPhotoLightbox'),photoLarge=document.getElementById('founderPhotoLarge');let photoHoldTimer=null,photoHoldFired=false;
+  if(founderPhoto&&photoLightbox){
+    founderPhoto.addEventListener('contextmenu',e=>e.preventDefault());
+    founderPhoto.addEventListener('dragstart',e=>e.preventDefault());
+    founderPhoto.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;photoHoldFired=false;clearTimeout(photoHoldTimer);photoHoldTimer=setTimeout(()=>{const image=founderPhoto.querySelector('img');if(!image)return;photoHoldFired=true;photoLarge.src=image.src;photoLarge.style.objectPosition=image.style.objectPosition||'50% 50%';photoLarge.style.transform='none';photoLightbox.hidden=false;},2000);});
+    ['pointerup','pointerleave','pointercancel'].forEach(t=>founderPhoto.addEventListener(t,()=>clearTimeout(photoHoldTimer)));
+    photoLightbox.addEventListener('click',()=>{photoLightbox.hidden=true;});photoLightbox.addEventListener('contextmenu',e=>e.preventDefault());
+  }
   const founderDatesOverlay=document.getElementById('founderDatesOverlay');let founderDates={birthday:'',birthdayAlerts:false,specialDays:[]};try{founderDates={...founderDates,...JSON.parse(localStorage.getItem('yunexFounderDates')||'{}')};}catch(_){}
   function renderSpecialDays(){const list=document.getElementById('specialDaysList');if(!list)return;list.innerHTML='';founderDates.specialDays.forEach((d,i)=>{const row=document.createElement('div');row.className='special-day-item';const info=document.createElement('span');info.textContent=`${d.title} · ${d.date} · ${d.time}`;const rm=document.createElement('button');rm.type='button';rm.textContent='Remove';rm.addEventListener('click',()=>{founderDates.specialDays.splice(i,1);renderSpecialDays();});row.append(info,rm);list.appendChild(row);});}
   function openFounderDates(){document.getElementById('founderBirthday').value=founderDates.birthday||'';document.getElementById('founderBirthdayAlerts').checked=!!founderDates.birthdayAlerts;renderSpecialDays();founderDatesOverlay.hidden=false;}

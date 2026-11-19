@@ -51,3 +51,12 @@ FOUNDER CLEAN COVER UPDATE:
 
 
 FOUNDER PROFILE UPDATE: The cover/banner feature, cover photo upload, cover text editor, and swipe-to-expand behavior have been removed. Founder profile now starts directly with the profile photo.
+
+
+GLOBAL PROFILE PHOTO UPDATE
+- Founder profile photo now appears in every Founder avatar location (top header shortcut and Founder profile), using the same saved image.
+- Avatar elements for other accounts are keyed separately so their own profile image can be shown when one exists; one user's image is never substituted for another user's account.
+- Founder photo long-press opens a clean full-screen circular preview; browser context menu and image drag are suppressed on that photo.
+- Photo adjustment supports direct finger drag to reposition and two-finger pinch to zoom, alongside the existing sliders.
+- The profile photo remains clipped inside the circular blue border.
+- This remains a local browser preview; cross-device/account photo sync requires the secure backend and per-user storage.

@@ -256,3 +256,18 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 .photo-adjust-preview{width:210px;height:210px;margin:8px auto 20px;border-radius:50%;overflow:hidden;border:4px solid #219dff;box-shadow:0 0 0 5px #10233a,0 10px 32px #0008;background:#081321}.photo-adjust-preview img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:center}.photo-adjust-dialog input[type=range]{width:100%;accent-color:#168bff;margin-top:9px}
 .founder-toggle-row{display:flex!important;align-items:center;gap:10px}.founder-toggle-row input{width:18px;height:18px;accent-color:#168bff}.founder-special-divider{height:1px;background:#263b54;margin:18px 0}.founder-dates-dialog h4{margin:8px 0;color:#e8f4ff}.founder-date-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.founder-dates-dialog input[type=date],.founder-dates-dialog input[type=time]{width:100%;box-sizing:border-box;background:#091321;border:1px solid #29435f;color:#eef7ff;border-radius:10px;padding:11px;margin-top:7px}
 .special-days-list{display:grid;gap:8px;margin:12px 0}.special-day-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border:1px solid #29435f;border-radius:10px;background:#0b1929;color:#dceeff;font-size:12px}.special-day-item button{border:0;background:transparent;color:#77cfff;font-weight:800}.founder-photo-lightbox[hidden]{display:none}.founder-photo-lightbox{position:fixed;inset:0;z-index:2500;background:rgba(2,6,12,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;backdrop-filter:blur(10px);cursor:pointer}.founder-photo-lightbox img{width:min(78vw,390px);height:min(78vw,390px);border-radius:50%;object-fit:cover;border:5px solid #209cff;box-shadow:0 0 0 8px rgba(27,115,190,.18),0 18px 70px #000}.founder-photo-lightbox span{font-size:12px;color:#b7cce2}@media(max-width:540px){.founder-dates-dialog{max-height:88dvh}.photo-adjust-preview{width:190px;height:190px}}
+
+/* Shared profile photos: the same account image appears at every avatar location. */
+[data-profile-avatar]{overflow:hidden;position:relative;}
+[data-profile-avatar]>.profile-avatar-image{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;border-radius:inherit!important;margin:0!important;position:absolute;inset:0;}
+#profileShortcut{border-radius:50%!important;padding:0!important;}
+#profileShortcut>.profile-avatar-image{border-radius:50%!important;}
+.userpic[data-profile-avatar]{border-radius:50%!important;padding:0!important;}
+.founder-avatar.founder-photo{border-radius:50%!important;overflow:hidden!important;}
+.founder-avatar.founder-photo>.profile-avatar-image{border-radius:50%!important;object-fit:cover!important;}
+.founder-photo-wrap{flex:0 0 auto;}
+.photo-adjust-preview{touch-action:none!important;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden!important;border-radius:50%!important;}
+.photo-adjust-preview img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;pointer-events:none;user-select:none;-webkit-user-drag:none;transform-origin:center center;}
+#founderPhoto,#founderPhoto img,#founderPhotoLightbox,#founderPhotoLightbox img{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;}
+#founderPhoto{touch-action:pan-y;}
+#founderPhotoLightbox img{width:min(82vw,420px);height:min(82vw,420px);object-fit:cover;border-radius:50%;border:5px solid #219dff;box-shadow:0 0 0 7px #12253b,0 18px 60px #000b;}
