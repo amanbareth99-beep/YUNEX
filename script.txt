@@ -73,18 +73,6 @@
     renderView(id);
   }
 
-  // Founder cover: pull down to reveal the full branded cover; swipe up to tuck it behind the profile.
-  const founderView = document.getElementById('profile');
-  const founderCover = document.getElementById('founderCover');
-  if (founderCover && founderView) {
-    let coverTouchStartY = 0;
-    let coverTouchStartX = 0;
-    founderCover.addEventListener('touchstart', event => { const t=event.touches[0]; coverTouchStartY=t.clientY; coverTouchStartX=t.clientX; }, {passive:true});
-    founderCover.addEventListener('touchend', event => { const t=event.changedTouches[0]; const dy=t.clientY-coverTouchStartY; const dx=Math.abs(t.clientX-coverTouchStartX); if (Math.abs(dy)>32 && Math.abs(dy)>dx) founderView.classList.toggle('cover-expanded', dy>0); }, {passive:true});
-    const toggleCover = () => founderView.classList.toggle('cover-expanded');
-    founderCover.addEventListener('click', toggleCover);
-    founderCover.addEventListener('keydown', event => { if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCover();} });
-  }
 
   // Start with a clean Home Feed history entry.
   history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
@@ -317,6 +305,9 @@
       const img = document.createElement('img'); img.src = savedPhoto; img.alt = 'Founder profile photo'; photo.appendChild(img);
     }
   } catch (_) {}
+  // Cover/banner feature intentionally removed from the Founder profile.
+  try { localStorage.removeItem('yunexFounderCoverPhoto'); } catch (_) {}
+
   document.querySelectorAll('[data-profile-tab]').forEach(tab => tab.addEventListener('click', () => {
     document.querySelectorAll('[data-profile-tab]').forEach(item => item.classList.toggle('selected', item === tab));
     const labels = { posts: ['No posts yet', 'Your photos and videos will appear here.'], reels: ['No reels yet', 'Your published videos will appear here.'], tagged: ['No tagged posts', 'Posts you are tagged in will appear here.'] };

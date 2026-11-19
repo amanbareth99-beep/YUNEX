@@ -231,3 +231,23 @@ body.founder-account-open .founder-cover .cover-brand,
 body.founder-account-open .founder-cover .cover-founder-label{display:none!important}
 body.founder-account-open .founder-cover .cover-swipe-hint{left:auto!important;right:20px!important;bottom:16px!important;transform:none!important;width:34px;height:34px;padding:0!important;display:grid;place-items:center;font-size:22px!important;line-height:1;color:#c7edff;background:rgba(4,18,32,.68);border:1px solid rgba(76,174,235,.35);border-radius:50%;box-shadow:0 4px 14px rgba(0,0,0,.25);white-space:normal}
 body.founder-account-open .founder-profile-view.cover-expanded .cover-swipe-hint{opacity:.55!important}
+
+
+/* Founder cover editor controls and user-added cover content */
+.founder-cover{background-size:cover!important;background-position:center!important}
+.founder-cover.has-custom-cover .cover-orbit{opacity:.32}
+.founder-cover-user-content{position:absolute;z-index:2;left:22px;right:22px;top:50%;transform:translateY(-50%);color:#f4f9ff;font-size:clamp(16px,4vw,25px);font-weight:800;line-height:1.25;white-space:pre-wrap;overflow-wrap:anywhere;text-shadow:0 2px 12px rgba(0,0,0,.8);pointer-events:none}
+.founder-cover-user-content[hidden]{display:none}
+.cover-edit-section{margin:14px 0;padding:13px;border:1px solid #244767;border-radius:13px;background:#0a1524}
+.cover-edit-section h4{margin:0 0 10px;color:#d8edff;font-size:13px}
+.cover-file-label{display:block!important;padding:11px 12px;border:1px solid #2c6795;border-radius:10px;background:#10263c;color:#bde7ff!important;text-align:center;cursor:pointer}
+.cover-file-label input{display:block!important;width:100%;margin-top:8px!important;color:#cfeaff;font-size:11px}
+.cover-edit-section button{margin-top:9px}
+
+
+/* Founder profile without cover/banner: full-screen account begins with the profile photo. */
+body.founder-account-open .founder-profile-view{padding:calc(env(safe-area-inset-top) + 14px) 0 calc(24px + env(safe-area-inset-bottom))!important}
+body.founder-account-open .founder-profile-panel{margin:0!important;padding:0 20px calc(26px + env(safe-area-inset-bottom))!important;border-radius:0!important;border:0!important;min-height:100dvh;box-shadow:none!important;background:linear-gradient(160deg,#111d2d 0%,#0b1421 65%,#070d17 100%)!important;backdrop-filter:none!important}
+body.founder-account-open .founder-profile-panel::before{display:none!important}
+body.founder-account-open .founder-profile-top{margin-top:0!important;min-height:112px!important;padding-top:4px!important}
+@media(max-width:540px){body.founder-account-open .founder-profile-panel{padding-left:16px!important;padding-right:16px!important}body.founder-account-open .founder-profile-top{margin-top:0!important}}

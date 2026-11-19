@@ -48,3 +48,6 @@ FOUNDER CLEAN COVER UPDATE:
 - Kept the profile photo overlapping the cover and retained the separate gold YUNEX FOUNDER badge under the username.
 - Replaced the swipe instruction text with a small down-arrow only.
 - Preserved cover expand/collapse behavior and the existing mobile back handling.
+
+
+FOUNDER PROFILE UPDATE: The cover/banner feature, cover photo upload, cover text editor, and swipe-to-expand behavior have been removed. Founder profile now starts directly with the profile photo.
