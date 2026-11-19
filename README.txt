@@ -51,5 +51,3 @@ FOUNDER CLEAN COVER UPDATE:
 
 
 FOUNDER PROFILE UPDATE: The cover/banner feature, cover photo upload, cover text editor, and swipe-to-expand behavior have been removed. Founder profile now starts directly with the profile photo.
-
-Founder update: Birthday date + follower alert preference, private Special Days with date/time, circular profile photo adjustment (zoom/position), and 2-second long-press enlarged photo preview. Browser-local preview only; backend notifications and cross-device sync remain pending.

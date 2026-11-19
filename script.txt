@@ -281,6 +281,7 @@
     paintFounderProfile();
     founderEditOverlay.hidden = true;
   });
+  const founderSettingsButton = document.getElementById('founderSettings');
   const founderPhotoInput=document.getElementById('founderPhotoInput'),photoAdjustOverlay=document.getElementById('photoAdjustOverlay'),photoAdjustPreview=document.getElementById('photoAdjustPreview');
   let pendingPhotoData='',photoTransform={zoom:1,x:50,y:50};
   function paintPhotoPreview(){if(photoAdjustPreview){photoAdjustPreview.style.objectPosition=`${photoTransform.x}% ${photoTransform.y}%`;photoAdjustPreview.style.transform=`scale(${photoTransform.zoom})`;}}
@@ -293,7 +294,6 @@
   try{const saved=localStorage.getItem('yunexFounderPhoto');if(saved){try{photoTransform={...photoTransform,...JSON.parse(localStorage.getItem('yunexFounderPhotoTransform')||'{}')};}catch(_){}applyFounderPhoto(saved,photoTransform);}}catch(_){}
   const founderPhoto=document.getElementById('founderPhoto'),photoLightbox=document.getElementById('founderPhotoLightbox'),photoLarge=document.getElementById('founderPhotoLarge');let photoHoldTimer=null;
   if(founderPhoto&&photoLightbox){founderPhoto.addEventListener('pointerdown',()=>{clearTimeout(photoHoldTimer);photoHoldTimer=setTimeout(()=>{const image=founderPhoto.querySelector('img');if(!image)return;photoLarge.src=image.src;photoLarge.style.objectPosition=image.style.objectPosition||'50% 50%';photoLarge.style.transform=image.style.transform||'scale(1)';photoLightbox.hidden=false;},2000);});['pointerup','pointerleave','pointercancel'].forEach(t=>founderPhoto.addEventListener(t,()=>clearTimeout(photoHoldTimer)));photoLightbox.addEventListener('click',()=>{photoLightbox.hidden=true;});}
-  const founderSettingsButton = document.getElementById('founderSettings');
   const founderDatesOverlay=document.getElementById('founderDatesOverlay');let founderDates={birthday:'',birthdayAlerts:false,specialDays:[]};try{founderDates={...founderDates,...JSON.parse(localStorage.getItem('yunexFounderDates')||'{}')};}catch(_){}
   function renderSpecialDays(){const list=document.getElementById('specialDaysList');if(!list)return;list.innerHTML='';founderDates.specialDays.forEach((d,i)=>{const row=document.createElement('div');row.className='special-day-item';const info=document.createElement('span');info.textContent=`${d.title} · ${d.date} · ${d.time}`;const rm=document.createElement('button');rm.type='button';rm.textContent='Remove';rm.addEventListener('click',()=>{founderDates.specialDays.splice(i,1);renderSpecialDays();});row.append(info,rm);list.appendChild(row);});}
   function openFounderDates(){document.getElementById('founderBirthday').value=founderDates.birthday||'';document.getElementById('founderBirthdayAlerts').checked=!!founderDates.birthdayAlerts;renderSpecialDays();founderDatesOverlay.hidden=false;}
