@@ -20,7 +20,7 @@
       <button class="tab" data-view="explore">⌕ <span>Explore</span></button>
       <button class="tab create-tab" data-view="upload">＋ <span>Create</span></button>
       <button class="tab" data-view="competition">♛ <span>Compete</span></button>
-      <button class="tab profile-nav-tab" data-view="profile"><span>Profile</span></button>
+      <button class="tab profile-nav-tab" data-view="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.5-4 3.2-6 7.5-6s7 2 7.5 6"/></svg><span>Profile</span></button>
     </nav>
 
     <section id="feed" class="view active">
@@ -91,7 +91,7 @@
         <p class="founder-bio" id="founderBio">Building YUNEX — a place to connect, create and win. 🚀</p>
         <div class="founder-id-row"><span>YUNEX ID</span><b id="founderId">Will be assigned after secure account setup</b></div>
         <div class="stats founder-stats"><div><b>0</b><small>Posts</small></div><div><b>0</b><small>Followers</small></div><div><b>0</b><small>Following</small></div></div>
-        <div class="founder-profile-actions"><button class="primary" id="shareFounderProfile">Share profile</button><button class="secondary" id="founderSettings">Profile settings</button></div>
+        <div class="founder-profile-actions"><button class="primary" id="shareFounderProfile">Share profile</button><button class="secondary" id="founderSettings">Profile settings</button><button class="secondary" id="brandCollabFounder">Brand Collaboration</button></div>
         <div class="founder-content-tabs"><button class="selected" data-profile-tab="posts">Posts</button><button data-profile-tab="reels">Reels</button><button data-profile-tab="tagged">Tagged</button></div>
         <div class="founder-empty-state"><div class="empty-grid-icon">▦</div><b id="founderEmptyTitle">No posts yet</b><p id="founderEmptyText">Your photos and videos will appear here.</p></div>
         <p class="notice founder-notice">Founder identity and permissions must be verified by the secure backend before launch. This screen is a front-end profile preview.</p>
@@ -109,9 +109,9 @@
       <div class="founder-edit-overlay" id="founderDatesOverlay" hidden><div class="founder-edit-dialog founder-dates-dialog" role="dialog" aria-modal="true" aria-labelledby="founderDatesTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PRIVATE PROFILE DETAILS</p><h3 id="founderDatesTitle">Birthday &amp; Special Days</h3></div><button type="button" class="games-close" id="closeFounderDates" aria-label="Close">×</button></div>
         <label>Birthday date<input id="founderBirthday" type="date"></label><label class="founder-toggle-row"><input id="founderBirthdayAlerts" type="checkbox"> Allow birthday notifications to followers / following</label>
-        <p class="tiny muted">Your full birth date stays private. Follower notifications require the YUNEX notification backend.</p><div class="founder-special-divider"></div><h4>My Special Days</h4>
+        <p class="tiny muted">Your full birth date stays private. Follower notifications require the YUNEX notification backend.</p><div class="founder-special-divider"></div><h4>Account privacy</h4><label class="founder-toggle-row"><input id="privateAccountToggle" type="checkbox"> Private account</label><label class="founder-toggle-row"><input id="manualTagApproval" type="checkbox" checked> Manually approve tagged posts</label><p class="tiny muted">Private account par naye followers ko approval chahiye. Existing followers remain. Ye preview settings is browser mein save hongi; backend policy launch se pehle connect hogi.</p><div class="founder-special-divider"></div><h4>My Special Days</h4>
         <label>Special day name<input id="specialDayTitle" maxlength="40" placeholder="e.g. Business launch day"></label><div class="founder-date-grid"><label>Date<input id="specialDayDate" type="date"></label><label>Reminder time<input id="specialDayTime" type="time" value="09:00"></label></div>
-        <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button><div id="specialDaysList" class="special-days-list"></div><p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p><button type="button" class="primary full" id="saveFounderDates">Save birthday settings</button>
+        <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button><div id="specialDaysList" class="special-days-list"></div><p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p><button type="button" class="primary full" id="saveFounderDates">Save settings</button>
       </div></div>
       <div class="founder-edit-overlay" id="photoAdjustOverlay" hidden><div class="founder-edit-dialog photo-adjust-dialog" role="dialog" aria-modal="true" aria-labelledby="photoAdjustTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PROFILE PHOTO</p><h3 id="photoAdjustTitle">Adjust your photo</h3></div><button type="button" class="games-close" id="closePhotoAdjust" aria-label="Close">×</button></div>
@@ -121,7 +121,7 @@
     </section>
 
     <section id="demoProfile" class="view">
-      <div class="panel profile-card demo-user-card"><div class="founder-avatar" id="demoAvatar" data-profile-avatar="user:@riya_demo">R</div><h2 id="demoName">Riya Creates</h2><p class="muted" id="demoHandle">@riya_demo</p><div class="stats"><div><b>12</b><small>Posts</small></div><div><b id="demoFollowers">245</b><small>Followers</small></div><div><b>180</b><small>Following</small></div></div><div class="profile-actions"><button class="primary" id="followDemo">Follow</button><button class="secondary" id="messageDemo">Message</button></div><p class="tiny muted">Demo creator profile. Follow and chat are local previews only.</p></div>
+      <div class="panel profile-card demo-user-card"><div class="founder-avatar" id="demoAvatar" data-profile-avatar="user:@riya_demo">R</div><h2 id="demoName">Riya Creates</h2><p class="muted" id="demoHandle">@riya_demo</p><div class="stats"><div><b>12</b><small>Posts</small></div><div><b id="demoFollowers">245</b><small>Followers</small></div><div><b>180</b><small>Following</small></div></div><div class="profile-actions"><button class="primary" id="followDemo">Follow</button><button class="secondary" id="messageDemo">Message</button><button class="secondary" id="brandCollabDemo">Brand Collaboration</button></div><div class="founder-content-tabs demo-content-tabs"><button class="selected" data-demo-profile-tab="posts">▦ Posts</button><button data-demo-profile-tab="reels">▶ Reels</button><button data-demo-profile-tab="tagged">◎ Tagged</button></div><div class="founder-empty-state demo-empty-state"><div class="empty-grid-icon">▦</div><b id="demoEmptyTitle">Posts</b><p id="demoEmptyText">Creator photos and posts will appear here.</p></div><p class="tiny muted">Demo creator profile. Follow, chat and collaboration are local previews only.</p></div>
     </section>
 
     <section id="chat" class="view chat-screen" aria-label="Chat">

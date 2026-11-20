@@ -395,10 +395,10 @@
   }
   const founderDatesOverlay=document.getElementById('founderDatesOverlay');let founderDates={birthday:'',birthdayAlerts:false,specialDays:[]};try{founderDates={...founderDates,...JSON.parse(localStorage.getItem('yunexFounderDates')||'{}')};}catch(_){}
   function renderSpecialDays(){const list=document.getElementById('specialDaysList');if(!list)return;list.innerHTML='';founderDates.specialDays.forEach((d,i)=>{const row=document.createElement('div');row.className='special-day-item';const info=document.createElement('span');info.textContent=`${d.title} · ${d.date} · ${d.time}`;const rm=document.createElement('button');rm.type='button';rm.textContent='Remove';rm.addEventListener('click',()=>{founderDates.specialDays.splice(i,1);renderSpecialDays();});row.append(info,rm);list.appendChild(row);});}
-  function openFounderDates(){document.getElementById('founderBirthday').value=founderDates.birthday||'';document.getElementById('founderBirthdayAlerts').checked=!!founderDates.birthdayAlerts;renderSpecialDays();founderDatesOverlay.hidden=false;}
+  function openFounderDates(){document.getElementById('founderBirthday').value=founderDates.birthday||'';document.getElementById('founderBirthdayAlerts').checked=!!founderDates.birthdayAlerts;const privacy=JSON.parse(localStorage.getItem('yunexAccountPrivacy')||'{}');document.getElementById('privateAccountToggle').checked=!!privacy.isPrivate;document.getElementById('manualTagApproval').checked=privacy.manualTagApproval!==false;renderSpecialDays();founderDatesOverlay.hidden=false;}
   if(founderSettingsButton)founderSettingsButton.addEventListener('click',openFounderDates);const closeFounderDates=document.getElementById('closeFounderDates');if(closeFounderDates)closeFounderDates.addEventListener('click',()=>founderDatesOverlay.hidden=true);if(founderDatesOverlay)founderDatesOverlay.addEventListener('click',e=>{if(e.target===founderDatesOverlay)founderDatesOverlay.hidden=true;});
   const addSpecialDay=document.getElementById('addSpecialDay');if(addSpecialDay)addSpecialDay.addEventListener('click',()=>{const title=document.getElementById('specialDayTitle').value.trim(),date=document.getElementById('specialDayDate').value,time=document.getElementById('specialDayTime').value||'09:00';if(!title||!date){alert('Special day name aur date dono bharo.');return;}founderDates.specialDays.push({title,date,time});document.getElementById('specialDayTitle').value='';document.getElementById('specialDayDate').value='';renderSpecialDays();});
-  const saveFounderDates=document.getElementById('saveFounderDates');if(saveFounderDates)saveFounderDates.addEventListener('click',()=>{founderDates.birthday=document.getElementById('founderBirthday').value;founderDates.birthdayAlerts=document.getElementById('founderBirthdayAlerts').checked;try{localStorage.setItem('yunexFounderDates',JSON.stringify(founderDates));}catch(_){}founderDatesOverlay.hidden=true;alert('Birthday aur Special Day settings is browser mein save ho gayi hain. Notifications backend connect hone ke baad active hongi.');});
+  const saveFounderDates=document.getElementById('saveFounderDates');if(saveFounderDates)saveFounderDates.addEventListener('click',()=>{founderDates.birthday=document.getElementById('founderBirthday').value;founderDates.birthdayAlerts=document.getElementById('founderBirthdayAlerts').checked;const privacy={isPrivate:document.getElementById('privateAccountToggle').checked,manualTagApproval:document.getElementById('manualTagApproval').checked};try{localStorage.setItem('yunexFounderDates',JSON.stringify(founderDates));localStorage.setItem('yunexAccountPrivacy',JSON.stringify(privacy));}catch(_){}founderDatesOverlay.hidden=true;alert('Profile settings is browser preview mein save ho gayi hain. Secure privacy enforcement ke liye backend/RLS connect karna zaroori hai.');});
   // Cover/banner feature intentionally removed from the Founder profile.
   try { localStorage.removeItem('yunexFounderCoverPhoto'); } catch (_) {}
 
@@ -409,6 +409,15 @@
     document.getElementById('founderEmptyTitle').textContent = copy[0];
     document.getElementById('founderEmptyText').textContent = copy[1];
   }));
+
+  const collabMessage = 'Brand Collaboration preview: creators aur brands campaign details, deliverables, promotion fee aur timeline share kar sakenge. Requests aur verified-brand checks Admin/backend se connect honge.';
+  ['brandCollabFounder','brandCollabDemo'].forEach(id=>{const btn=document.getElementById(id);if(btn)btn.addEventListener('click',()=>alert(collabMessage));});
+  document.querySelectorAll('[data-demo-profile-tab]').forEach(tab=>tab.addEventListener('click',()=>{
+    document.querySelectorAll('[data-demo-profile-tab]').forEach(item=>item.classList.toggle('selected',item===tab));
+    const copy={posts:['Posts','Creator photos and posts will appear here.'],reels:['Reels','Published short videos will appear here.'],tagged:['Tagged','Posts this creator is tagged in will appear here.']}[tab.dataset.demoProfileTab];
+    document.getElementById('demoEmptyTitle').textContent=copy[0];document.getElementById('demoEmptyText').textContent=copy[1];
+  }));
+
   const shareFounderButton = document.getElementById('shareFounderProfile');
   if (shareFounderButton) shareFounderButton.addEventListener('click', async () => {
     const shareText = `${founderProfile.name} ${founderProfile.handle} · YUNEX Founder`;

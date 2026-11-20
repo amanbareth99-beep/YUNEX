@@ -281,3 +281,17 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 .photo-adjust-preview{touch-action:none!important;cursor:grab}
 .photo-adjust-preview:active{cursor:grabbing}
 .photo-adjust-preview img{will-change:transform}
+
+
+/* Consolidated Account/Profile update: outline profile nav + creator tabs */
+.profile-nav-tab svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.profile-nav-tab{flex-direction:column!important;gap:3px!important}
+.founder-profile-actions{grid-template-columns:1fr 1fr!important}
+.founder-profile-actions #brandCollabFounder{grid-column:1/-1}
+.demo-user-card .profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.demo-user-card #brandCollabDemo{grid-column:1/-1}
+.demo-content-tabs{margin:22px -25px 0!important}
+.demo-empty-state{min-height:145px!important}
+.founder-toggle-row{display:flex!important;align-items:center;gap:10px;color:#d5e6f7!important;font-size:12px!important}
+.founder-toggle-row input{width:17px!important;height:17px!important;margin:0!important;accent-color:#168bff}
+@media(max-width:540px){.profile-nav-tab svg{width:18px;height:18px}.founder-profile-actions{grid-template-columns:1fr 1fr!important}}
