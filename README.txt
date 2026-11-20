@@ -1,12 +1,28 @@
-YUNEX Founder Profile – Crown + Global Avatar + 360 Gesture Update
+YUNEX FRONT-END PROTOTYPE (DEMO ONLY)
 
-Included:
-- Gold crown symbol in the YUNEX FOUNDER badge (Founder profile only).
-- Founder photo is used in the top-right account shortcut and Profile navigation icon.
-- Removed the three photo adjustment sliders.
-- One-finger drag pans the photo.
-- Two-finger pinch zooms and rotates the photo continuously through 360 degrees.
-- Circular crop preview and circular avatar clipping retained.
+Files:
+- index.html
+- style.css
+- script.js
+- README.txt
 
-Upload index.html, style.css, script.js and README.txt to the repository root, replacing the matching files.
-This remains a local browser prototype: photo persistence is browser-local until backend storage/account sync is connected.
+2026-11-16 Mobile correction:
+- Chat header remains fixed and only the message list scrolls.
+- Composer is held at the bottom of the visible mobile viewport; the Android keyboard viewport resize is handled through VisualViewport.
+- Composer uses a compact fixed-height row without extra bottom safe-area padding that could leave a gap.
+- Hug icon is a custom two-person embrace with a small electric-blue heart, white outline, and no emoji glyph.
+- Hug and Games controls remain side-by-side.
+- Legacy visible Back controls are removed from active section views; device/browser Back navigation remains.
+- Full-screen sections hide global navigation and footer.
+
+Important limitations:
+- This is still a local front-end demo. Authentication, database, real-time cross-device messages, delivery receipts, Virtual Hug requests, and synchronized multiplayer games require secure Supabase integration.
+- Do not enter real passwords or private information in this prototype.
+- Never put a Supabase service_role key in frontend files.
+
+
+2026-11-16 Chat presence update:
+- The chat partner status is shown under their name in the fixed header.
+- The local demo switches Online -> Typing... while a simulated reply is pending, then returns to Online.
+- The separate typing bubble has been removed from the message list.
+- Presence is a local preview only; real online presence and remote typing require Supabase Realtime.

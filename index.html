@@ -11,7 +11,7 @@
   <header class="topbar">
     <a class="brand" href="#" aria-label="YUNEX home"><span class="brand-mark">Y</span><span>YUNEX</span></a>
     <span class="tagline">CONNECT. CREATE. WIN.</span>
-    <button class="avatar" id="profileShortcut" data-profile-avatar="founder" aria-label="Open profile">A</button>
+    <button class="avatar" id="profileShortcut" aria-label="Open profile">A</button>
   </header>
 
   <main>
@@ -20,7 +20,7 @@
       <button class="tab" data-view="explore">⌕ <span>Explore</span></button>
       <button class="tab create-tab" data-view="upload">＋ <span>Create</span></button>
       <button class="tab" data-view="competition">♛ <span>Compete</span></button>
-      <button class="tab profile-nav-tab" data-view="profile"><span>Profile</span></button>
+      <button class="tab" data-view="profile">◉ <span>Profile</span></button>
     </nav>
 
     <section id="feed" class="view active">
@@ -39,13 +39,13 @@
 
           <div class="section-heading"><div><p class="eyebrow">THE COMMUNITY</p><h2>For you</h2></div><span class="live-pill">● DEMO FEED</span></div>
       <article class="post panel">
-        <div class="post-head" role="group" aria-label="Post author profile"><button class="userpic profile-open" data-profile-avatar="user:@riya_demo" data-user="Riya Creates" data-handle="@riya_demo">RK</button><button class="post-user profile-open" data-user="Riya Creates" data-handle="@riya_demo"><b>Riya Creates</b><small>@riya_demo · 2h ago</small></button><button class="dots" aria-label="More">•••</button></div>
+        <div class="post-head" role="group" aria-label="Post author profile"><button class="userpic profile-open" data-user="Riya Creates" data-handle="@riya_demo">RK</button><button class="post-user profile-open" data-user="Riya Creates" data-handle="@riya_demo"><b>Riya Creates</b><small>@riya_demo · 2h ago</small></button><button class="dots" aria-label="More">•••</button></div>
         <div class="post-art art-one"><span>CREATE<br>WITHOUT<br>LIMITS.</span><small>YUNEX CREATOR SPOTLIGHT</small></div>
         <div class="post-actions"><button class="like-btn">♡ <span>Like</span></button><button>◌ <span>Comment</span></button><button>↗ <span>Share</span></button></div>
         <p class="caption"><b>Riya Creates</b> Every small step is part of a big journey. ✨</p>
       </article>
       <article class="post panel">
-        <div class="post-head"><button class="userpic blue profile-open" data-profile-avatar="user:@arjun_demo" data-user="Arjun Singh" data-handle="@arjun_demo">AS</button><button class="post-user profile-open" data-user="Arjun Singh" data-handle="@arjun_demo"><b>Arjun Singh</b><small>@arjun_demo · 5h ago</small></button><button class="dots" aria-label="More">•••</button></div>
+        <div class="post-head"><button class="userpic blue profile-open" data-user="Arjun Singh" data-handle="@arjun_demo">AS</button><button class="post-user profile-open" data-user="Arjun Singh" data-handle="@arjun_demo"><b>Arjun Singh</b><small>@arjun_demo · 5h ago</small></button><button class="dots" aria-label="More">•••</button></div>
         <div class="post-art art-two"><span>YOUR<br>STORY.<br>YOUR STAGE.</span><small>YUNEX COMMUNITY</small></div>
         <div class="post-actions"><button class="like-btn">♡ <span>Like</span></button><button>◌ <span>Comment</span></button><button>↗ <span>Share</span></button></div>
         <p class="caption"><b>Arjun Singh</b> Keep creating. Your audience is out there. 🚀</p>
@@ -81,55 +81,21 @@
       <p class="tiny muted">Competition fees, entry deadlines, dates, prizes and rules will be managed by Founder/Admin after required legal and payment checks.</p>
     </section>
 
-    <section id="profile" class="view founder-profile-view">
-      <div class="founder-profile-panel panel">
-        <div class="founder-profile-top">
-          <div class="founder-photo-wrap"><div class="founder-avatar founder-photo" id="founderPhoto" data-profile-avatar="founder">AB</div><label class="photo-edit" for="founderPhotoInput" aria-label="Change profile photo">✎</label><input id="founderPhotoInput" type="file" accept="image/*" hidden></div>
-          <button class="secondary edit-profile-btn" id="editFounderProfile">Edit profile</button>
-        </div>
-        <div class="founder-identity"><h2 id="founderName">Aman Bareth</h2><span class="founder-verified" title="Founder profile">✦</span><p id="founderHandle" class="founder-handle">@amanbareth</p><span class="founder-badge"><svg class="founder-badge-crown" viewBox="0 0 24 18" aria-hidden="true" focusable="false"><path d="M2 4.2 6.7 8 11.9 1.8 17.2 8 22 4.2 20 15.8H4L2 4.2Z" fill="currentColor" stroke="#fff0ad" stroke-width=".7" stroke-linejoin="round"/><path d="M4.1 16.8h15.8" stroke="#fff0ad" stroke-width="1.2" stroke-linecap="round"/></svg><span>YUNEX FOUNDER</span></span></div>
-        <p class="founder-bio" id="founderBio">Building YUNEX — a place to connect, create and win. 🚀</p>
-        <div class="founder-id-row"><span>YUNEX ID</span><b id="founderId">Will be assigned after secure account setup</b></div>
-        <div class="stats founder-stats"><div><b>0</b><small>Posts</small></div><div><b>0</b><small>Followers</small></div><div><b>0</b><small>Following</small></div></div>
-        <div class="founder-profile-actions"><button class="primary" id="shareFounderProfile">Share profile</button><button class="secondary" id="founderSettings">Profile settings</button></div>
-        <div class="founder-content-tabs"><button class="selected" data-profile-tab="posts">Posts</button><button data-profile-tab="reels">Reels</button><button data-profile-tab="tagged">Tagged</button></div>
-        <div class="founder-empty-state"><div class="empty-grid-icon">▦</div><b id="founderEmptyTitle">No posts yet</b><p id="founderEmptyText">Your photos and videos will appear here.</p></div>
-        <p class="notice founder-notice">Founder identity and permissions must be verified by the secure backend before launch. This screen is a front-end profile preview.</p>
-      </div>
-      <div class="founder-edit-overlay" id="founderEditOverlay" hidden>
-        <form class="founder-edit-dialog" id="founderEditForm" aria-labelledby="founderEditTitle">
-          <div class="founder-edit-head"><div><p class="eyebrow">YOUR IDENTITY</p><h3 id="founderEditTitle">Edit Founder Profile</h3></div><button type="button" class="games-close" id="closeFounderEdit" aria-label="Close">×</button></div>
-          <label>Full name<input id="editFounderName" maxlength="40" required></label>
-          <label>Username<input id="editFounderHandle" maxlength="24" required></label>
-          <label>Bio<textarea id="editFounderBio" rows="3" maxlength="160" placeholder="Tell people about yourself…"></textarea></label>
-          <p class="tiny muted">Profile changes are saved in this browser preview only. Secure account sync will be connected with the backend later.</p>
-          <button class="primary full" type="submit">Save changes</button>
-        </form>
-      </div>
-      <div class="founder-edit-overlay" id="founderDatesOverlay" hidden><div class="founder-edit-dialog founder-dates-dialog" role="dialog" aria-modal="true" aria-labelledby="founderDatesTitle">
-        <div class="founder-edit-head"><div><p class="eyebrow">PRIVATE PROFILE DETAILS</p><h3 id="founderDatesTitle">Birthday &amp; Special Days</h3></div><button type="button" class="games-close" id="closeFounderDates" aria-label="Close">×</button></div>
-        <label>Birthday date<input id="founderBirthday" type="date"></label><label class="founder-toggle-row"><input id="founderBirthdayAlerts" type="checkbox"> Allow birthday notifications to followers / following</label>
-        <p class="tiny muted">Your full birth date stays private. Follower notifications require the YUNEX notification backend.</p><div class="founder-special-divider"></div><h4>My Special Days</h4>
-        <label>Special day name<input id="specialDayTitle" maxlength="40" placeholder="e.g. Business launch day"></label><div class="founder-date-grid"><label>Date<input id="specialDayDate" type="date"></label><label>Reminder time<input id="specialDayTime" type="time" value="09:00"></label></div>
-        <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button><div id="specialDaysList" class="special-days-list"></div><p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p><button type="button" class="primary full" id="saveFounderDates">Save birthday settings</button>
-      </div></div>
-      <div class="founder-edit-overlay" id="photoAdjustOverlay" hidden><div class="founder-edit-dialog photo-adjust-dialog" role="dialog" aria-modal="true" aria-labelledby="photoAdjustTitle">
-        <div class="founder-edit-head"><div><p class="eyebrow">PROFILE PHOTO</p><h3 id="photoAdjustTitle">Adjust your photo</h3></div><button type="button" class="games-close" id="closePhotoAdjust" aria-label="Close">×</button></div>
-        <div class="photo-adjust-preview"><img id="photoAdjustPreview" alt="Profile photo crop preview"></div><p class="photo-gesture-hint">Drag with one finger to position · Pinch with two fingers to zoom and rotate 360°</p><button type="button" class="primary full" id="savePhotoAdjust">Use this photo</button>
-      </div></div>
-      <div class="founder-photo-lightbox" id="founderPhotoLightbox" hidden><img id="founderPhotoLarge" alt="Expanded profile photo"><span>Tap anywhere to close</span></div>
+    <section id="profile" class="view">
+      <p class="eyebrow">YOUR YUNEX SPACE</p><h2>Profile</h2>
+      <div class="panel profile-card"><div class="founder-avatar">A</div><h3>YUNEX Founder</h3><p class="muted">@founder_demo · Preview profile</p><span class="founder-badge">✦ YUNEX FOUNDER</span><div class="stats"><div><b>0</b><small>Posts</small></div><div><b>0</b><small>Followers</small></div><div><b>0</b><small>Following</small></div></div><p class="notice">This is a visual preview. Founder identity and permissions must be assigned securely by the backend before launch.</p></div>
     </section>
 
     <section id="demoProfile" class="view">
-      <div class="panel profile-card demo-user-card"><div class="founder-avatar" id="demoAvatar" data-profile-avatar="user:@riya_demo">R</div><h2 id="demoName">Riya Creates</h2><p class="muted" id="demoHandle">@riya_demo</p><div class="stats"><div><b>12</b><small>Posts</small></div><div><b id="demoFollowers">245</b><small>Followers</small></div><div><b>180</b><small>Following</small></div></div><div class="profile-actions"><button class="primary" id="followDemo">Follow</button><button class="secondary" id="messageDemo">Message</button></div><p class="tiny muted">Demo creator profile. Follow and chat are local previews only.</p></div>
+      <div class="panel profile-card demo-user-card"><div class="founder-avatar" id="demoAvatar">R</div><h2 id="demoName">Riya Creates</h2><p class="muted" id="demoHandle">@riya_demo</p><div class="stats"><div><b>12</b><small>Posts</small></div><div><b id="demoFollowers">245</b><small>Followers</small></div><div><b>180</b><small>Following</small></div></div><div class="profile-actions"><button class="primary" id="followDemo">Follow</button><button class="secondary" id="messageDemo">Message</button></div><p class="tiny muted">Demo creator profile. Follow and chat are local previews only.</p></div>
     </section>
 
     <section id="chat" class="view chat-screen" aria-label="Chat">
       <div class="chat-shell">
         <header class="chat-top-fixed">
           <div class="chat-heading">
-            <div class="founder-avatar small-avatar" id="chatAvatar" data-profile-avatar="user:@riya_demo">R</div>
-            <div class="chat-person"><b id="chatName">Riya Creates</b><small class="muted">YUNEX chat · demo</small></div>
+            <div class="founder-avatar small-avatar" id="chatAvatar">R</div>
+            <div class="chat-person"><b id="chatName">Riya Creates</b><small id="chatPresence" class="chat-presence is-online"><span class="presence-dot" aria-hidden="true"></span><span class="presence-label">Online</span></small></div>
           </div>
           <div class="chat-tools">
             <button class="chat-tool hug-tool" id="hugButton" type="button" aria-label="Send a hug" title="Send a hug">
@@ -138,7 +104,7 @@
             <button class="chat-tool games-tool" id="gamesButton" type="button" aria-label="Games" title="Games"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 17h16a8 8 0 0 1 7.7 10l-1.4 5.2a4 4 0 0 1-6.5 2l-4.1-3.4h-8.4l-4.1 3.4a4 4 0 0 1-6.5-2L7.3 27A8 8 0 0 1 15 17Z"/><path d="M16 23v8m-4-4h8m11-2h.1m5 5h.1"/></svg></button>
           </div>
         </header>
-        <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div><div id="typingIndicator" class="typing-indicator" hidden><span></span><span></span><span></span> Riya is typing…</div></div>
+        <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div></div>
         <form id="chatForm" class="chat-compose"><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
       </div>
     </section>

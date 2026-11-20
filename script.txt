@@ -8,33 +8,6 @@
   let exitWarningAt = 0;
   let chatKeyboardHistoryEntry = false;
 
-  // One avatar renderer is shared by every place a profile appears.
-  function profilePhotoKey(key) { return key === 'founder' ? 'yunexFounderPhoto' : `yunexProfilePhoto:${key.replace(/^user:/, '')}`; }
-  function renderProfileAvatar(element, key, fallbackText) {
-    if (!element || !key) return;
-    let photo = '';
-    try { photo = localStorage.getItem(profilePhotoKey(key)) || (key === 'founder' ? localStorage.getItem('yunexFounderPhoto') : ''); } catch (_) {}
-    element.classList.add('has-profile-photo');
-    let img = element.querySelector(':scope > img.profile-avatar-image');
-    if (photo) {
-      if (!img) { element.textContent = ''; img = document.createElement('img'); img.className = 'profile-avatar-image'; img.alt = 'Profile photo'; element.appendChild(img); }
-      if (img.src !== photo) img.src = photo;
-      element.setAttribute('data-photo-loaded', 'true');
-    } else {
-      if (img) img.remove();
-      if (fallbackText && !element.textContent.trim()) element.textContent = fallbackText;
-      element.removeAttribute('data-photo-loaded');
-    }
-  }
-  function refreshAllProfileAvatars() {
-    document.querySelectorAll('[data-profile-avatar]').forEach(el => {
-      const key = el.dataset.profileAvatar;
-      const fallback = el.dataset.user ? el.dataset.user.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase() : (key === 'founder' ? 'AB' : (el.textContent || '?'));
-      renderProfileAvatar(el, key, fallback);
-    });
-  }
-  refreshAllProfileAvatars();
-
   function renderView(id) {
     if (!document.getElementById(id)) id = 'feed';
     currentView = id;
@@ -47,9 +20,6 @@
     document.body.classList.toggle('section-open', id !== 'feed');
     document.body.classList.toggle('registration-open', id === 'account');
     document.body.classList.toggle('chat-open', id === 'chat');
-    document.body.classList.toggle('founder-account-open', id === 'profile');
-    const profileView = document.getElementById('profile');
-    if (profileView && id !== 'profile') profileView.classList.remove('cover-expanded');
     document.querySelectorAll('main > .view.active .back-home, main > .view.active .back-button, main > .view.active .back-btn, main > .view.active [data-action="back"]').forEach(button => button.remove());
     if (id === 'chat') { syncVisibleViewport(); const box = document.getElementById('chatMessages'); if (box) requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; }); }
     else window.scrollTo(0, 0);
@@ -100,7 +70,6 @@
     renderView(id);
   }
 
-
   // Start with a clean Home Feed history entry.
   history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
   renderView('feed');
@@ -115,13 +84,10 @@
       };
       document.getElementById('demoName').textContent = activeDemoUser.name;
       document.getElementById('demoHandle').textContent = activeDemoUser.handle;
-      const avatarKey = `user:${activeDemoUser.handle}`;
-      document.getElementById('demoAvatar').dataset.profileAvatar = avatarKey;
-      document.getElementById('chatAvatar').dataset.profileAvatar = avatarKey;
-      document.getElementById('demoAvatar').textContent = activeDemoUser.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
-      document.getElementById('chatAvatar').textContent = activeDemoUser.name[0].toUpperCase();
-      refreshAllProfileAvatars();
+      document.getElementById('demoAvatar').textContent =
+        activeDemoUser.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
       document.getElementById('chatName').textContent = activeDemoUser.name;
+      document.getElementById('chatAvatar').textContent = activeDemoUser.name[0].toUpperCase();
       const follow = document.getElementById('followDemo');
       follow.textContent = 'Follow';
       follow.classList.remove('following');
@@ -156,9 +122,7 @@
 
     if (event.target.closest('#messageDemo')) {
       document.getElementById('chatName').textContent = activeDemoUser.name;
-      document.getElementById('chatAvatar').dataset.profileAvatar = `user:${activeDemoUser.handle}`;
       document.getElementById('chatAvatar').textContent = activeDemoUser.name[0].toUpperCase();
-      refreshAllProfileAvatars();
       navigate('chat');
       return;
     }
@@ -270,159 +234,18 @@
 
   // Chat status preview: all delivery/read states below are simulated locally.
   // Real Sent/Delivered/Seen receipts require authenticated Supabase messaging.
-  // Founder profile: editable local preview. Real identity/permissions remain server-controlled.
-  const founderDefaults = { name: 'Aman Bareth', handle: '@amanbareth', bio: 'Building YUNEX — a place to connect, create and win. 🚀' };
-  let founderProfile = { ...founderDefaults };
-  try {
-    const savedFounder = JSON.parse(localStorage.getItem('yunexFounderProfile') || 'null');
-    if (savedFounder && typeof savedFounder === 'object') founderProfile = { ...founderDefaults, ...savedFounder };
-  } catch (_) {}
-  const founderNameEl = document.getElementById('founderName');
-  const founderHandleEl = document.getElementById('founderHandle');
-  const founderBioEl = document.getElementById('founderBio');
-  const founderEditOverlay = document.getElementById('founderEditOverlay');
-  function paintFounderProfile() {
-    if (founderNameEl) founderNameEl.textContent = founderProfile.name;
-    if (founderHandleEl) founderHandleEl.textContent = founderProfile.handle.startsWith('@') ? founderProfile.handle : '@' + founderProfile.handle;
-    if (founderBioEl) founderBioEl.textContent = founderProfile.bio || 'Add a bio to introduce yourself.';
-    const avatar = document.getElementById('profileShortcut');
-    if (avatar && !avatar.querySelector('img')) avatar.textContent = founderProfile.name.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
-    const photo = document.getElementById('founderPhoto');
-    if (photo && !photo.querySelector('img')) photo.textContent = founderProfile.name.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
-  }
-  paintFounderProfile();
-  const editFounderButton = document.getElementById('editFounderProfile');
-  if (editFounderButton) editFounderButton.addEventListener('click', () => {
-    document.getElementById('editFounderName').value = founderProfile.name;
-    document.getElementById('editFounderHandle').value = founderProfile.handle.replace(/^@/, '');
-    document.getElementById('editFounderBio').value = founderProfile.bio;
-    founderEditOverlay.hidden = false;
-  });
-  const closeFounderEdit = document.getElementById('closeFounderEdit');
-  if (closeFounderEdit) closeFounderEdit.addEventListener('click', () => { founderEditOverlay.hidden = true; });
-  if (founderEditOverlay) founderEditOverlay.addEventListener('click', event => { if (event.target === founderEditOverlay) founderEditOverlay.hidden = true; });
-  const founderEditForm = document.getElementById('founderEditForm');
-  if (founderEditForm) founderEditForm.addEventListener('submit', event => {
-    event.preventDefault();
-    founderProfile = {
-      name: document.getElementById('editFounderName').value.trim() || founderDefaults.name,
-      handle: '@' + document.getElementById('editFounderHandle').value.trim().replace(/^@/, '').replace(/\s+/g, '').toLowerCase(),
-      bio: document.getElementById('editFounderBio').value.trim()
-    };
-    try { localStorage.setItem('yunexFounderProfile', JSON.stringify(founderProfile)); } catch (_) {}
-    paintFounderProfile();
-    founderEditOverlay.hidden = true;
-  });
-  const founderSettingsButton = document.getElementById('founderSettings');
-  const founderPhotoInput=document.getElementById('founderPhotoInput'),photoAdjustOverlay=document.getElementById('photoAdjustOverlay'),photoAdjustPreview=document.getElementById('photoAdjustPreview');
-  let pendingPhotoData='',photoTransform={zoom:1,x:50,y:50};
-
-  function paintPhotoPreview(){
-    if(photoAdjustPreview){
-      photoAdjustPreview.style.objectPosition=`${photoTransform.x}% ${photoTransform.y}%`;
-      photoAdjustPreview.style.transform=`scale(${photoTransform.zoom}) rotate(${photoTransform.rotation||0}deg)`;
-    }
-  }
-  function applyFounderPhoto(data,t=photoTransform){
-    const photo=document.getElementById('founderPhoto'); if(!photo)return;
-    photo.innerHTML=''; const img=document.createElement('img'); img.className='profile-avatar-image'; img.src=data; img.alt='Founder profile photo';
-    img.style.objectPosition=`${t.x}% ${t.y}%`; img.style.transform=`scale(${t.zoom}) rotate(${t.rotation||0}deg)`; photo.appendChild(img);
-    try{localStorage.setItem('yunexFounderPhoto',data);localStorage.setItem('yunexFounderPhotoTransform',JSON.stringify(t));}catch(_){}
-    refreshAllProfileAvatars();
-    const headerAvatar=document.getElementById('profileShortcut');
-    if(headerAvatar) renderProfileAvatar(headerAvatar,'founder','AB');
-    const profileNavAvatar=document.querySelector('.profile-nav-avatar');
-    if(profileNavAvatar) renderProfileAvatar(profileNavAvatar,'founder','AB');
-  }
-  if(founderPhotoInput)founderPhotoInput.addEventListener('change',()=>{
-    const file=founderPhotoInput.files&&founderPhotoInput.files[0]; if(!file||!file.type.startsWith('image/'))return;
-    const reader=new FileReader(); reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50,rotation:0};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;paintPhotoPreview();if(photoAdjustOverlay)photoAdjustOverlay.hidden=false;}; reader.readAsDataURL(file); founderPhotoInput.value='';
-  });
-  // Direct manipulation: one-finger pan; two-finger pinch zoom + full 360-degree rotation.
-  const adjustStage=document.querySelector('.photo-adjust-preview');
-  let cropPointers=new Map(),gestureStart=null;
-  const pointDistance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-  const pointAngle=(a,b)=>Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;
-  if(adjustStage){
-    adjustStage.style.touchAction='none';
-    adjustStage.addEventListener('contextmenu',e=>e.preventDefault());
-    adjustStage.addEventListener('pointerdown',e=>{
-      e.preventDefault(); adjustStage.setPointerCapture(e.pointerId);
-      cropPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-      if(cropPointers.size===1) gestureStart={mode:'pan',x:e.clientX,y:e.clientY,px:photoTransform.x,py:photoTransform.y};
-      if(cropPointers.size===2){
-        const pts=[...cropPointers.values()];
-        gestureStart={mode:'pinch',distance:pointDistance(pts[0],pts[1]),angle:pointAngle(pts[0],pts[1]),zoom:photoTransform.zoom,rotation:photoTransform.rotation||0};
-      }
-    });
-    adjustStage.addEventListener('pointermove',e=>{
-      if(!cropPointers.has(e.pointerId))return;
-      cropPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-      const pts=[...cropPointers.values()];
-      if(pts.length>=2 && gestureStart && gestureStart.mode==='pinch'){
-        const dist=pointDistance(pts[0],pts[1]);
-        const angle=pointAngle(pts[0],pts[1]);
-        photoTransform.zoom=Math.max(1,Math.min(4,gestureStart.zoom*(dist/Math.max(1,gestureStart.distance))));
-        let delta=angle-gestureStart.angle;
-        if(delta>180)delta-=360; if(delta<-180)delta+=360;
-        photoTransform.rotation=((gestureStart.rotation+delta)%360+360)%360;
-      } else if(pts.length===1 && gestureStart && gestureStart.mode==='pan'){
-        const rect=adjustStage.getBoundingClientRect();
-        photoTransform.x=Math.max(0,Math.min(100,gestureStart.px+(e.clientX-gestureStart.x)/rect.width*100));
-        photoTransform.y=Math.max(0,Math.min(100,gestureStart.py+(e.clientY-gestureStart.y)/rect.height*100));
-      }
-      paintPhotoPreview();
-    });
-    const stop=e=>{
-      cropPointers.delete(e.pointerId);
-      if(cropPointers.size===1){const p=[...cropPointers.values()][0];gestureStart={mode:'pan',x:p.x,y:p.y,px:photoTransform.x,py:photoTransform.y};}
-      else if(cropPointers.size===0)gestureStart=null;
-      else if(cropPointers.size===2){const pts=[...cropPointers.values()];gestureStart={mode:'pinch',distance:pointDistance(pts[0],pts[1]),angle:pointAngle(pts[0],pts[1]),zoom:photoTransform.zoom,rotation:photoTransform.rotation||0};}
-    };
-    ['pointerup','pointercancel','lostpointercapture'].forEach(t=>adjustStage.addEventListener(t,stop));
-  }
-  const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;pendingPhotoData='';});
-  if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;pendingPhotoData='';}});
-  const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',()=>{if(pendingPhotoData)applyFounderPhoto(pendingPhotoData,photoTransform);pendingPhotoData='';photoAdjustOverlay.hidden=true;});
-  try{const saved=localStorage.getItem('yunexFounderPhoto');if(saved){try{photoTransform={...photoTransform,...JSON.parse(localStorage.getItem('yunexFounderPhotoTransform')||'{}')};}catch(_){}applyFounderPhoto(saved,photoTransform);}}catch(_){}
-  const founderPhoto=document.getElementById('founderPhoto'),photoLightbox=document.getElementById('founderPhotoLightbox'),photoLarge=document.getElementById('founderPhotoLarge');let photoHoldTimer=null,photoHoldFired=false;
-  if(founderPhoto&&photoLightbox){
-    founderPhoto.addEventListener('contextmenu',e=>e.preventDefault());
-    founderPhoto.addEventListener('dragstart',e=>e.preventDefault());
-    founderPhoto.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;photoHoldFired=false;clearTimeout(photoHoldTimer);photoHoldTimer=setTimeout(()=>{const image=founderPhoto.querySelector('img');if(!image)return;photoHoldFired=true;photoLarge.src=image.src;photoLarge.style.objectPosition=image.style.objectPosition||'50% 50%';photoLarge.style.transform='none';photoLightbox.hidden=false;},2000);});
-    ['pointerup','pointerleave','pointercancel'].forEach(t=>founderPhoto.addEventListener(t,()=>clearTimeout(photoHoldTimer)));
-    photoLightbox.addEventListener('click',()=>{photoLightbox.hidden=true;});photoLightbox.addEventListener('contextmenu',e=>e.preventDefault());
-  }
-  const founderDatesOverlay=document.getElementById('founderDatesOverlay');let founderDates={birthday:'',birthdayAlerts:false,specialDays:[]};try{founderDates={...founderDates,...JSON.parse(localStorage.getItem('yunexFounderDates')||'{}')};}catch(_){}
-  function renderSpecialDays(){const list=document.getElementById('specialDaysList');if(!list)return;list.innerHTML='';founderDates.specialDays.forEach((d,i)=>{const row=document.createElement('div');row.className='special-day-item';const info=document.createElement('span');info.textContent=`${d.title} · ${d.date} · ${d.time}`;const rm=document.createElement('button');rm.type='button';rm.textContent='Remove';rm.addEventListener('click',()=>{founderDates.specialDays.splice(i,1);renderSpecialDays();});row.append(info,rm);list.appendChild(row);});}
-  function openFounderDates(){document.getElementById('founderBirthday').value=founderDates.birthday||'';document.getElementById('founderBirthdayAlerts').checked=!!founderDates.birthdayAlerts;renderSpecialDays();founderDatesOverlay.hidden=false;}
-  if(founderSettingsButton)founderSettingsButton.addEventListener('click',openFounderDates);const closeFounderDates=document.getElementById('closeFounderDates');if(closeFounderDates)closeFounderDates.addEventListener('click',()=>founderDatesOverlay.hidden=true);if(founderDatesOverlay)founderDatesOverlay.addEventListener('click',e=>{if(e.target===founderDatesOverlay)founderDatesOverlay.hidden=true;});
-  const addSpecialDay=document.getElementById('addSpecialDay');if(addSpecialDay)addSpecialDay.addEventListener('click',()=>{const title=document.getElementById('specialDayTitle').value.trim(),date=document.getElementById('specialDayDate').value,time=document.getElementById('specialDayTime').value||'09:00';if(!title||!date){alert('Special day name aur date dono bharo.');return;}founderDates.specialDays.push({title,date,time});document.getElementById('specialDayTitle').value='';document.getElementById('specialDayDate').value='';renderSpecialDays();});
-  const saveFounderDates=document.getElementById('saveFounderDates');if(saveFounderDates)saveFounderDates.addEventListener('click',()=>{founderDates.birthday=document.getElementById('founderBirthday').value;founderDates.birthdayAlerts=document.getElementById('founderBirthdayAlerts').checked;try{localStorage.setItem('yunexFounderDates',JSON.stringify(founderDates));}catch(_){}founderDatesOverlay.hidden=true;alert('Birthday aur Special Day settings is browser mein save ho gayi hain. Notifications backend connect hone ke baad active hongi.');});
-  // Cover/banner feature intentionally removed from the Founder profile.
-  try { localStorage.removeItem('yunexFounderCoverPhoto'); } catch (_) {}
-
-  document.querySelectorAll('[data-profile-tab]').forEach(tab => tab.addEventListener('click', () => {
-    document.querySelectorAll('[data-profile-tab]').forEach(item => item.classList.toggle('selected', item === tab));
-    const labels = { posts: ['No posts yet', 'Your photos and videos will appear here.'], reels: ['No reels yet', 'Your published videos will appear here.'], tagged: ['No tagged posts', 'Posts you are tagged in will appear here.'] };
-    const copy = labels[tab.dataset.profileTab];
-    document.getElementById('founderEmptyTitle').textContent = copy[0];
-    document.getElementById('founderEmptyText').textContent = copy[1];
-  }));
-  const shareFounderButton = document.getElementById('shareFounderProfile');
-  if (shareFounderButton) shareFounderButton.addEventListener('click', async () => {
-    const shareText = `${founderProfile.name} ${founderProfile.handle} · YUNEX Founder`;
-    try {
-      if (navigator.share) await navigator.share({ title: 'YUNEX Founder', text: shareText, url: location.href.split('#')[0] + '#profile' });
-      else if (navigator.clipboard) { await navigator.clipboard.writeText(shareText + ' · ' + location.href.split('#')[0] + '#profile'); shareFounderButton.textContent = 'Copied!'; }
-      else shareFounderButton.textContent = 'Share unavailable';
-    } catch (_) {}
-  });
-
   const chatForm = document.getElementById('chatForm');
   const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
-  const typingIndicator = document.getElementById('typingIndicator');
+  const chatPresence = document.getElementById('chatPresence');
+  const presenceLabel = chatPresence ? chatPresence.querySelector('.presence-label') : null;
+
+  function setChatPresence(isTyping) {
+    if (!chatPresence || !presenceLabel) return;
+    presenceLabel.textContent = isTyping ? 'Typing…' : 'Online';
+    chatPresence.classList.toggle('is-typing', isTyping);
+    chatPresence.classList.toggle('is-online', !isTyping);
+  }
 
   function addMessageMetaSafe(bubble) {
     const meta = document.createElement('div'); meta.className = 'message-meta sent-meta';
@@ -479,20 +302,19 @@
       if (status) status.textContent = '✓✓ Seen · demo';
     }, 2300);
 
-    if (typingIndicator) {
-      typingIndicator.hidden = false;
-      window.setTimeout(() => {
-        if (typingIndicator) typingIndicator.hidden = true;
-        const reply = document.createElement('div');
-        reply.className = 'chat-bubble received';
-        const replyText = document.createElement('div');
-        replyText.textContent = 'Message received in this local preview. 👋';
-        reply.appendChild(replyText);
-        addMessageMeta(reply, '', false);
-        chatMessages.appendChild(reply);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }, 1400);
-    }
+    // Demo presence appears under the chat partner's name, not in the message list.
+    setChatPresence(true);
+    window.setTimeout(() => {
+      const reply = document.createElement('div');
+      reply.className = 'chat-bubble received';
+      const replyText = document.createElement('div');
+      replyText.textContent = 'Message received in this local preview. 👋';
+      reply.appendChild(replyText);
+      addMessageMeta(reply, '', false);
+      chatMessages.appendChild(reply);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      setChatPresence(false);
+    }, 1400);
   });
 
 
