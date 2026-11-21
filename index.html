@@ -140,24 +140,31 @@
           </div>
         </header>
         <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div></div>
-        <form id="chatForm" class="chat-compose"><button class="chat-gallery-button" id="chatGalleryButton" type="button" aria-label="Open gallery" title="Attach photo or video"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button><input id="chatGalleryInput" type="file" accept="image/*,video/*" hidden><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
+        <div class="reaction-tray" id="reactionTray" hidden aria-label="Animated chat reactions"><button type="button" data-reaction="kiss">💋<span>Kiss</span></button><button type="button" data-reaction="love">💗<span>Love You</span></button><button type="button" data-reaction="miss">💔<span>Miss You</span></button><button type="button" data-reaction="laugh">😂<span>Laugh</span></button><button type="button" data-reaction="cry">😭<span>Cry</span></button><button type="button" data-reaction="horror">👻<span>Horror</span></button></div><form id="chatForm" class="chat-compose"><button class="chat-gallery-button" id="chatGalleryButton" type="button" aria-label="Open gallery" title="Attach photo or video"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button><input id="chatGalleryInput" type="file" accept="image/*,video/*" hidden><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
       </div>
     </section>
 
     <section id="account" class="view registration-screen">
       <p class="eyebrow">JOIN THE COMMUNITY</p><h2>Create your account</h2>
-      <div class="panel form-panel">
-        <label>Full name<input placeholder="Enter your name"></label>
-        <label>Username<input placeholder="Choose a username"></label>
-        <label>Email or mobile number<input placeholder="Enter email or mobile"></label>
-        <label>Password<input type="password" placeholder="Create a password"></label>
-        <label class="check-row"><input type="checkbox" id="celebrityCheck"> Are you a Celebrity?</label>
-        <p class="tiny muted">Selecting this only requests verification. It does not grant a Celebrity badge.</p>
-        <button class="primary full" id="demoRegister">Preview registration</button>
-        <p class="notice">Authentication is not connected yet. Do not enter a real password in this prototype.</p>
-      </div>
+      <form class="panel form-panel yunex-register-form" id="yunexRegisterForm" novalidate>
+        <label>Mobile number (10 digits)<input id="regMobile" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" minlength="10" pattern="[0-9]{10}" placeholder="Enter 10-digit mobile number" required></label>
+        <label>Password<div class="password-wrap"><input id="regPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Create password (min. 8 characters)" required><button class="password-eye" type="button" data-toggle-password="regPassword" aria-label="Show password">◉</button></div></label>
+        <label>Confirm password<div class="password-wrap"><input id="regConfirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Enter password again" required><button class="password-eye" type="button" data-toggle-password="regConfirmPassword" aria-label="Show confirm password">◉</button></div></label>
+        <label>Username<input id="regUsername" type="text" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_.]{3,24}" placeholder="Choose a username" required></label>
+        <fieldset class="gender-private"><legend>Gender <span>· Private, never shown on your public profile</span></legend>
+          <label class="choice-pill"><input type="radio" name="regGender" value="male" required> Male</label>
+          <label class="choice-pill"><input type="radio" name="regGender" value="female" required> Female</label>
+          <small>Used only to choose the matching Hug animation in chat.</small>
+        </fieldset>
+        <label class="check-row celebrity-row"><input type="checkbox" id="celebrityCheck"> Are you a Celebrity?</label>
+        <p class="tiny muted">If you select Yes, a request will be sent for Admin review. A Celebrity badge is added only by the Admin after checking your ID.</p>
+        <button class="primary full" id="demoRegister" type="submit">Create account preview</button>
+        <p id="registrationFeedback" class="notice" role="status">Front-end preview only: Supabase account creation is not connected yet. Do not use a real password here.</p>
+      </form>
     </section>
   </main>
+
+  <div class="hug-overlay" id="hugOverlay" hidden><section class="hug-dialog" role="dialog" aria-modal="true" aria-labelledby="hugTitle"><h2 id="hugTitle">🤗 Hug request</h2><p id="hugRequestText">A friend sent you a hug request.</p><div class="hug-preview" id="hugPreview" aria-hidden="true">🧑‍🤝‍🧑</div><div class="hug-actions"><button class="secondary" id="declineHug" type="button">Decline</button><button class="primary" id="acceptHug" type="button">Accept Hug</button></div><p class="tiny muted">Local preview only. A real request/accept event needs the YUNEX messaging backend.</p></section></div>
 
   <div class="games-overlay" id="gamesOverlay" hidden>
     <section class="games-dialog" role="dialog" aria-modal="true" aria-labelledby="gamesTitle">

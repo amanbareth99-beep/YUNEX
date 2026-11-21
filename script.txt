@@ -174,14 +174,22 @@
     }
 
     if (event.target.closest('#hugButton')) {
-      const bubble = document.createElement('div');
-      bubble.className = 'chat-bubble sent hug-message';
-      bubble.textContent = '🤗 Hug sent · demo';
-      addMessageMetaSafe(bubble);
-      document.getElementById('chatMessages').appendChild(bubble);
-      document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-      return;
+      const overlay = document.getElementById('hugOverlay');
+      document.getElementById('hugRequestText').textContent = `You sent a Hug request to ${activeDemoUser.name}. Accept it in this local preview to see the animation.`;
+      document.getElementById('hugPreview').textContent = '🤗';
+      overlay.hidden = false; overlay.dataset.direction = 'outgoing'; return;
     }
+    if (event.target.closest('#declineHug')) { document.getElementById('hugOverlay').hidden = true; return; }
+    if (event.target.closest('#acceptHug')) {
+      const overlay = document.getElementById('hugOverlay'); overlay.hidden = true;
+      const gender = (() => { try { return JSON.parse(localStorage.getItem('yunexRegistrationPreview') || '{}').gender || 'female'; } catch (_) { return 'female'; } })();
+      const otherGender = 'female'; // Demo recipient profile has no verified private gender data.
+      const pair = gender === 'male' && otherGender === 'male' ? '👦🏻🤗👦🏽' : gender === 'female' && otherGender === 'female' ? '👧🏻🤗👧🏽' : '👦🏻🤗👧🏻';
+      appendAnimatedReaction('hug', 'Hug', pair); return;
+    }
+    const reactionButton = event.target.closest('[data-reaction]');
+    if (reactionButton) { appendAnimatedReaction(reactionButton.dataset.reaction, reactionButton.innerText.trim(), reactionButton.querySelector('span')?.textContent || 'Reaction'); document.getElementById('reactionTray').hidden = true; return; }
+    if (event.target.closest('#reactionToggle')) { const tray = document.getElementById('reactionTray'); tray.hidden = !tray.hidden; return; }
     if (event.target.closest('#gamesButton')) { document.getElementById('gamesOverlay').hidden = false; return; }
     if (event.target.closest('#closeGames')) { document.getElementById('gamesOverlay').hidden = true; return; }
     const gameChoice = event.target.closest('.game-choice');
@@ -267,9 +275,43 @@
       : 'Choose a photo or video first to preview it.';
   });
 
-  const demoRegister = document.getElementById('demoRegister');
-  if (demoRegister) demoRegister.addEventListener('click', () => {
-    alert('YUNEX registration screen preview only. Backend authentication is not connected yet. Do not enter real credentials.');
+  // Registration validation preview. Passwords are validated in memory only and never saved.
+  const registrationForm = document.getElementById('yunexRegisterForm');
+  const registrationFeedback = document.getElementById('registrationFeedback');
+  document.querySelectorAll('[data-toggle-password]').forEach(button => button.addEventListener('click', () => {
+    const field = document.getElementById(button.dataset.togglePassword); if (!field) return;
+    field.type = field.type === 'password' ? 'text' : 'password';
+    button.setAttribute('aria-label', field.type === 'password' ? 'Show password' : 'Hide password');
+    button.textContent = field.type === 'password' ? '◉' : '◎';
+  }));
+  const mobileField = document.getElementById('regMobile');
+  if (mobileField) mobileField.addEventListener('input', () => { mobileField.value = mobileField.value.replace(/\D/g, '').slice(0, 10); });
+  if (registrationForm) registrationForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const mobile = document.getElementById('regMobile').value;
+    const pass = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regConfirmPassword').value;
+    const username = document.getElementById('regUsername').value.trim();
+    const gender = registrationForm.querySelector('input[name="regGender"]:checked');
+    const celebrity = document.getElementById('celebrityCheck').checked;
+    let message = '';
+    if (!/^[0-9]{10}$/.test(mobile)) message = 'Mobile number exactly 10 digits ka hona chahiye.';
+    else if (pass.length < 8) message = 'Password kam se kam 8 characters ka hona chahiye.';
+    else if (pass !== confirm) message = 'Password aur Confirm Password match nahi karte.';
+    else if (!/^[A-Za-z0-9_.]{3,24}$/.test(username)) message = 'Username 3–24 characters ka ho; letters, numbers, _ aur . allowed hain.';
+    else if (!gender) message = 'Please Male ya Female select karein.';
+    if (message) { registrationFeedback.textContent = message; registrationFeedback.classList.add('validation-error'); return; }
+    registrationFeedback.classList.remove('validation-error');
+    // Only non-secret preview details are retained locally. No password or mobile is persisted.
+    try {
+      localStorage.setItem('yunexRegistrationPreview', JSON.stringify({ username, gender: gender.value, celebrityRequest: celebrity, status: 'preview-only' }));
+      if (celebrity) {
+        const requests = JSON.parse(localStorage.getItem('yunexCelebrityRequests') || '[]');
+        requests.push({ username, createdAt: new Date().toISOString(), status: 'pending' });
+        localStorage.setItem('yunexCelebrityRequests', JSON.stringify(requests));
+      }
+    } catch (_) {}
+    registrationFeedback.textContent = celebrity ? 'Form valid. Celebrity request preview added as Pending on this device. No real account or Admin notification was created.' : 'Form valid. Registration preview complete. No real account was created because Supabase authentication is not connected.';
   });
 
   document.querySelectorAll('.category-grid button').forEach(button => {
@@ -277,6 +319,20 @@
       document.getElementById('exploreSearch').value = button.innerText.replace(/[^\w\s]/g, '').trim();
     });
   });
+
+  function appendAnimatedReaction(kind, label, art) {
+    const box = document.createElement('div'); box.className = 'chat-bubble sent yunex-reaction reaction-' + kind;
+    const visual = document.createElement('div'); visual.className = 'reaction-art'; visual.textContent = art || ({kiss:'💋',love:'💞',miss:'💔',laugh:'😂',cry:'😭',horror:'👻'}[kind] || '💗');
+    const caption = document.createElement('b'); caption.textContent = label;
+    box.append(visual, caption); addMessageMetaSafe(box);
+    const messages = document.getElementById('chatMessages'); messages.appendChild(box); messages.scrollTop = messages.scrollHeight;
+  }
+  // Reactions launcher is added beside the existing chat input without disturbing send/gallery behavior.
+  const chatFormForReaction = document.getElementById('chatForm');
+  if (chatFormForReaction && !document.getElementById('reactionToggle')) {
+    const toggle = document.createElement('button'); toggle.type = 'button'; toggle.id = 'reactionToggle'; toggle.className = 'chat-reaction-toggle'; toggle.setAttribute('aria-label','Open animated reactions'); toggle.textContent = '☺';
+    chatFormForReaction.insertBefore(toggle, chatFormForReaction.firstChild);
+  }
 
   // Chat status preview: all delivery/read states below are simulated locally.
   // Real Sent/Delivered/Seen receipts require authenticated Supabase messaging.
