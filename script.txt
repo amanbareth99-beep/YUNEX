@@ -433,7 +433,27 @@
   const chatForm = document.getElementById('chatForm');
   const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
-  const typingIndicator = document.getElementById('typingIndicator');
+  const presenceStatus = document.getElementById('chatPresenceStatus');
+  const presenceText = document.getElementById('chatPresenceText');
+  const deleteChatButton = document.getElementById('deleteChatButton');
+
+  function setChatPresence(isTyping) {
+    if (!presenceStatus || !presenceText) return;
+    presenceText.textContent = isTyping ? 'Typing…' : 'Online';
+    presenceStatus.classList.toggle('is-typing', !!isTyping);
+    presenceStatus.setAttribute('aria-label', isTyping ? 'Typing' : 'Online');
+  }
+
+  if (deleteChatButton) deleteChatButton.addEventListener('click', () => {
+    if (!chatMessages || !window.confirm('Delete all messages in this chat?')) return;
+    chatMessages.replaceChildren();
+    const empty = document.createElement('div');
+    empty.className = 'chat-empty-state';
+    empty.textContent = 'This chat is empty.';
+    chatMessages.appendChild(empty);
+    setChatPresence(false);
+    if (chatInput) chatInput.focus({ preventScroll: true });
+  });
 
   function addMessageMetaSafe(bubble) {
     const meta = document.createElement('div'); meta.className = 'message-meta sent-meta';
@@ -499,20 +519,20 @@
       if (status) status.textContent = '✓✓ Seen · demo';
     }, 2300);
 
-    if (typingIndicator) {
-      typingIndicator.hidden = false;
-      window.setTimeout(() => {
-        if (typingIndicator) typingIndicator.hidden = true;
-        const reply = document.createElement('div');
-        reply.className = 'chat-bubble received';
-        const replyText = document.createElement('div');
-        replyText.textContent = 'Message received in this local preview. 👋';
-        reply.appendChild(replyText);
-        addMessageMeta(reply, '', false);
-        chatMessages.appendChild(reply);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }, 1400);
-    }
+    // Show Typing… in the same header line as Online, then restore Online.
+    setChatPresence(true);
+    window.setTimeout(() => {
+      const reply = document.createElement('div');
+      reply.className = 'chat-bubble received';
+      const replyText = document.createElement('div');
+      replyText.textContent = 'Message received in this local preview. 👋';
+      reply.appendChild(replyText);
+      addMessageMeta(reply, '', false);
+      chatMessages.appendChild(reply);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      setChatPresence(false);
+      if (chatInput) chatInput.focus({ preventScroll: true });
+    }, 1400);
   });
 
 

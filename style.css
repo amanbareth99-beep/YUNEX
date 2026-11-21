@@ -305,3 +305,10 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 /* Keep the profile outline and its label on one horizontal row. */
 .profile-nav-tab{flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:6px!important;white-space:nowrap}
 .profile-nav-tab span{display:inline!important}
+
+/* Header presence swaps Online/Typing in one fixed position; no chat bubble. */
+.chat-person .chat-online-status.is-typing{color:#65baff}
+.chat-online-status.is-typing .online-dot{background:#55b7ff;box-shadow:0 0 8px #55b7ff88;animation:yunexTyping 1s infinite ease-in-out}
+.delete-chat-tool{border-color:#6b4050;background:linear-gradient(145deg,#46202d,#1b1420)}
+.delete-chat-tool svg{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.chat-empty-state{align-self:center;margin:auto;color:#8294aa;font-size:13px;padding:20px}
