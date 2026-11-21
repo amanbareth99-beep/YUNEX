@@ -156,6 +156,8 @@
 
     if (event.target.closest('#messageDemo')) {
       document.getElementById('chatName').textContent = activeDemoUser.name;
+      const typingName = document.getElementById('typingName');
+      if (typingName) typingName.textContent = activeDemoUser.name.split(/\s+/)[0];
       document.getElementById('chatAvatar').dataset.profileAvatar = `user:${activeDemoUser.handle}`;
       document.getElementById('chatAvatar').textContent = activeDemoUser.name[0].toUpperCase();
       refreshAllProfileAvatars();
@@ -464,6 +466,14 @@
     if (welcome) addMessageMeta(welcome, '', false);
   }
 
+  const chatSendButton = chatForm ? chatForm.querySelector('button[type="submit"]') : null;
+  // Keep the mobile keyboard open when the Send control is tapped. Preventing
+  // the button from taking focus avoids the input blur that hides Android's keyboard.
+  if (chatSendButton) {
+    chatSendButton.addEventListener('pointerdown', event => event.preventDefault());
+    chatSendButton.addEventListener('mousedown', event => event.preventDefault());
+  }
+
   if (chatForm) chatForm.addEventListener('submit', event => {
     event.preventDefault();
     const value = chatInput.value.trim();
@@ -477,6 +487,7 @@
     addMessageMeta(bubble, '✓ Sent · demo', true);
     chatMessages.appendChild(bubble);
     chatInput.value = '';
+    chatInput.focus({ preventScroll: true });
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     // Simulated state changes are deliberately labeled DEMO, not real receipts.

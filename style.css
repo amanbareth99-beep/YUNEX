@@ -295,3 +295,13 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 .founder-toggle-row{display:flex!important;align-items:center;gap:10px;color:#d5e6f7!important;font-size:12px!important}
 .founder-toggle-row input{width:17px!important;height:17px!important;margin:0!important;accent-color:#168bff}
 @media(max-width:540px){.profile-nav-tab svg{width:18px;height:18px}.founder-profile-actions{grid-template-columns:1fr 1fr!important}}
+
+
+/* YUNEX chat presence label and keyboard-stable composer refinement */
+.chat-person .chat-online-status{display:flex;align-items:center;gap:5px;color:#55e69a;font-size:10px;font-weight:700;line-height:1.2}
+.chat-online-status .online-dot{width:7px;height:7px;border-radius:50%;background:#35df88;box-shadow:0 0 8px #35df8877;display:inline-block;flex:none}
+.chat-person{gap:3px!important}
+.chat-compose button[type="submit"]{touch-action:manipulation}
+/* Keep the profile outline and its label on one horizontal row. */
+.profile-nav-tab{flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:6px!important;white-space:nowrap}
+.profile-nav-tab span{display:inline!important}
