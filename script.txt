@@ -464,7 +464,36 @@
   const founderDatesOverlay=document.getElementById('founderDatesOverlay');let founderDates={birthday:'',birthdayAlerts:false,specialDays:[]};try{founderDates={...founderDates,...JSON.parse(localStorage.getItem('yunexFounderDates')||'{}')};}catch(_){}
   function renderSpecialDays(){const list=document.getElementById('specialDaysList');if(!list)return;list.innerHTML='';founderDates.specialDays.forEach((d,i)=>{const row=document.createElement('div');row.className='special-day-item';const info=document.createElement('span');info.textContent=`${d.title} · ${d.date} · ${d.time}`;const rm=document.createElement('button');rm.type='button';rm.textContent='Remove';rm.addEventListener('click',()=>{founderDates.specialDays.splice(i,1);renderSpecialDays();});row.append(info,rm);list.appendChild(row);});}
   function openFounderDates(){document.getElementById('founderBirthday').value=founderDates.birthday||'';document.getElementById('founderBirthdayAlerts').checked=!!founderDates.birthdayAlerts;const privacy=JSON.parse(localStorage.getItem('yunexAccountPrivacy')||'{}');document.getElementById('privateAccountToggle').checked=!!privacy.isPrivate;document.getElementById('manualTagApproval').checked=privacy.manualTagApproval!==false;renderSpecialDays();founderDatesOverlay.hidden=false;}
-  if(founderSettingsButton)founderSettingsButton.addEventListener('click',openFounderDates);const closeFounderDates=document.getElementById('closeFounderDates');if(closeFounderDates)closeFounderDates.addEventListener('click',()=>founderDatesOverlay.hidden=true);if(founderDatesOverlay)founderDatesOverlay.addEventListener('click',e=>{if(e.target===founderDatesOverlay)founderDatesOverlay.hidden=true;});
+  if(founderSettingsButton)founderSettingsButton.addEventListener('click',openFounderDates);
+  // Account contact fields are a prototype-only convenience. Never persist passwords here.
+  const founderAccountMobile=document.getElementById('founderAccountMobile');
+  const founderAccountEmail=document.getElementById('founderAccountEmail');
+  try {
+    const savedContact=JSON.parse(localStorage.getItem('yunexFounderContactPreview')||'null');
+    if(savedContact&&founderAccountMobile&&/^\d{10}$/.test(savedContact.mobile||''))founderAccountMobile.value=savedContact.mobile;
+    if(savedContact&&founderAccountEmail&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(savedContact.email||''))founderAccountEmail.value=savedContact.email;
+  } catch (_) {}
+  const saveFounderContact=document.getElementById('saveFounderContact');
+  if(saveFounderContact)saveFounderContact.addEventListener('click',()=>{
+    const mobile=(founderAccountMobile?.value||'').trim();
+    const email=(founderAccountEmail?.value||'').trim();
+    if(!/^\d{10}$/.test(mobile)){alert('Mobile number exactly 10 digits ka hona chahiye.');return;}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Valid email address enter karein.');return;}
+    try{localStorage.setItem('yunexFounderContactPreview',JSON.stringify({mobile,email}));}catch(_){alert('Is browser mein preview details save nahi ho paayi.');return;}
+    alert('Contact details is browser preview mein save ho gayi hain. Ye abhi login credentials update nahi karti; Supabase Auth connection pending hai.');
+  });
+  const changeFounderPassword=document.getElementById('changeFounderPassword');
+  if(changeFounderPassword)changeFounderPassword.addEventListener('click',()=>{
+    const pass=document.getElementById('founderNewPassword')?.value||'';
+    const confirm=document.getElementById('founderConfirmPassword')?.value||'';
+    if(!pass||!confirm){alert('Dono password fields bharein.');return;}
+    if(pass.length<8){alert('Password kam se kam 8 characters ka hona chahiye.');return;}
+    if(pass!==confirm){alert('Dono passwords match nahi kar rahe.');return;}
+    document.getElementById('founderNewPassword').value='';
+    document.getElementById('founderConfirmPassword').value='';
+    alert('Password browser mein save nahi kiya gaya. Actual password change ke liye secure Supabase Auth connection zaroori hai.');
+  });
+  const closeFounderDates=document.getElementById('closeFounderDates');if(closeFounderDates)closeFounderDates.addEventListener('click',()=>founderDatesOverlay.hidden=true);if(founderDatesOverlay)founderDatesOverlay.addEventListener('click',e=>{if(e.target===founderDatesOverlay)founderDatesOverlay.hidden=true;});
   const addSpecialDay=document.getElementById('addSpecialDay');if(addSpecialDay)addSpecialDay.addEventListener('click',()=>{const title=document.getElementById('specialDayTitle').value.trim(),date=document.getElementById('specialDayDate').value,time=document.getElementById('specialDayTime').value||'09:00';if(!title||!date){alert('Special day name aur date dono bharo.');return;}founderDates.specialDays.push({title,date,time});document.getElementById('specialDayTitle').value='';document.getElementById('specialDayDate').value='';renderSpecialDays();});
   const saveFounderDates=document.getElementById('saveFounderDates');if(saveFounderDates)saveFounderDates.addEventListener('click',()=>{founderDates.birthday=document.getElementById('founderBirthday').value;founderDates.birthdayAlerts=document.getElementById('founderBirthdayAlerts').checked;const privacy={isPrivate:document.getElementById('privateAccountToggle').checked,manualTagApproval:document.getElementById('manualTagApproval').checked};try{localStorage.setItem('yunexFounderDates',JSON.stringify(founderDates));localStorage.setItem('yunexAccountPrivacy',JSON.stringify(privacy));}catch(_){}founderDatesOverlay.hidden=true;alert('Profile settings is browser preview mein save ho gayi hain. Secure privacy enforcement ke liye backend/RLS connect karna zaroori hai.');});
   // Cover/banner feature intentionally removed from the Founder profile.
