@@ -379,3 +379,28 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
     color: #fff !important;
   }
 }
+
+/* YUNEX header refinement: brand tagline under the wordmark, account centered, notifications at right. */
+.topbar{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;align-items:center!important;gap:8px!important;height:76px!important;padding:0 16px!important}
+.brand{justify-self:start!important;display:flex!important;align-items:center!important;gap:9px!important;min-width:0}
+.brand-copy{display:flex;flex-direction:column;align-items:flex-start;gap:3px;line-height:1}
+.brand-copy>b{font-size:21px;letter-spacing:2px}
+.brand-copy .tagline{display:block;font-size:7px;letter-spacing:1.25px;white-space:nowrap}
+.top-account-name{justify-self:center;max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:800;color:#eaf5ff;text-align:center}
+.notification-shortcut{justify-self:end;position:relative;width:40px;height:40px;border:1px solid #2a78b9;border-radius:50%;background:#10243a;color:#c9edff;display:grid;place-items:center;padding:9px}
+.notification-shortcut svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.notification-indicator{position:absolute;right:7px;top:6px;width:7px;height:7px;border-radius:50%;background:#36d7ff;box-shadow:0 0 8px #36d7ff}
+@media(max-width:540px){.topbar{height:72px!important;padding:0 12px!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important}.brand-mark{width:32px;height:32px}.brand-copy>b{font-size:18px}.brand-copy .tagline{font-size:6px;letter-spacing:.9px}.top-account-name{font-size:11px;max-width:32vw}.notification-shortcut{width:36px;height:36px}}
+
+/* Keep the mobile navigation dock pinned to the true bottom edge while the feed scrolls. */
+@media(max-width:700px){
+  body:not(.chat-open):not(.registration-open) .tabs{position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;margin:0!important;transform:none!important;width:100%!important;min-height:76px!important;padding:8px 7px calc(8px + env(safe-area-inset-bottom,0px))!important;border-radius:16px 16px 0 0!important;z-index:5000!important}
+  body:not(.chat-open):not(.registration-open) main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+}
+
+/* Chat gallery attachment and heart-shaped Hug control. */
+.chat-compose .chat-gallery-button{width:42px;height:44px;flex:0 0 42px;display:grid;place-items:center;border:1px solid #294d70;border-radius:14px;background:#10243a;color:#70cfff;padding:9px;margin:0}
+.chat-compose .chat-gallery-button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chat-tool.hug-tool svg.hug-heart-icon{width:27px!important;height:27px!important;fill:#ff5b83!important;stroke:#fff!important;stroke-width:1.7!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.attachment-bubble img,.attachment-bubble video{display:block;max-width:min(65vw,260px);max-height:240px;border-radius:12px;object-fit:cover}
+@media(max-width:540px){.chat-compose .chat-gallery-button{width:40px;flex-basis:40px;height:44px;padding:8px}}

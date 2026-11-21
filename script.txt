@@ -287,12 +287,14 @@
     if (founderNameEl) founderNameEl.textContent = founderProfile.name;
     if (founderHandleEl) founderHandleEl.textContent = founderProfile.handle.startsWith('@') ? founderProfile.handle : '@' + founderProfile.handle;
     if (founderBioEl) founderBioEl.textContent = founderProfile.bio || 'Add a bio to introduce yourself.';
-    const avatar = document.getElementById('profileShortcut');
-    if (avatar && !avatar.querySelector('img')) avatar.textContent = founderProfile.name.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
+    const topName = document.getElementById('topAccountName');
+    if (topName) topName.textContent = founderProfile.name;
     const photo = document.getElementById('founderPhoto');
     if (photo && !photo.querySelector('img')) photo.textContent = founderProfile.name.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
   }
   paintFounderProfile();
+  const notificationsButton = document.getElementById('notificationsButton');
+  if (notificationsButton) notificationsButton.addEventListener('click', () => window.alert('You are all caught up. Notifications will appear here.'));
   const editFounderButton = document.getElementById('editFounderProfile');
   if (editFounderButton) editFounderButton.addEventListener('click', () => {
     document.getElementById('editFounderName').value = founderProfile.name;
@@ -436,6 +438,28 @@
   const presenceStatus = document.getElementById('chatPresenceStatus');
   const presenceText = document.getElementById('chatPresenceText');
   const deleteChatButton = document.getElementById('deleteChatButton');
+  const chatGalleryButton = document.getElementById('chatGalleryButton');
+  const chatGalleryInput = document.getElementById('chatGalleryInput');
+  if (chatGalleryButton && chatGalleryInput) {
+    chatGalleryButton.addEventListener('pointerdown', event => event.preventDefault());
+    chatGalleryButton.addEventListener('click', () => chatGalleryInput.click());
+    chatGalleryInput.addEventListener('change', () => {
+      const file = chatGalleryInput.files && chatGalleryInput.files[0];
+      if (!file || !chatMessages) return;
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble sent attachment-bubble';
+      if (file.type.startsWith('image/')) {
+        const img = document.createElement('img'); img.alt = file.name || 'Photo attachment'; img.src = URL.createObjectURL(file); bubble.appendChild(img);
+      } else if (file.type.startsWith('video/')) {
+        const video = document.createElement('video'); video.controls = true; video.src = URL.createObjectURL(file); bubble.appendChild(video);
+      } else { bubble.textContent = file.name; }
+      addMessageMetaSafe(bubble);
+      chatMessages.appendChild(bubble);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      chatGalleryInput.value = '';
+      if (chatInput) chatInput.focus({ preventScroll: true });
+    });
+  }
 
   function setChatPresence(isTyping) {
     if (!presenceStatus || !presenceText) return;

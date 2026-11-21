@@ -9,9 +9,9 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#" aria-label="YUNEX home"><span class="brand-mark">Y</span><span>YUNEX</span></a>
-    <span class="tagline">CONNECT. CREATE. WIN.</span>
-    <button class="avatar" id="profileShortcut" data-profile-avatar="founder" aria-label="Open profile">A</button>
+    <a class="brand" href="#" aria-label="YUNEX home"><span class="brand-mark">Y</span><span class="brand-copy"><b>YUNEX</b><small class="tagline">CONNECT. CREATE. WIN.</small></span></a>
+    <div class="top-account-name" id="topAccountName">Aman Bareth</div>
+    <button class="notification-shortcut" id="notificationsButton" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="notification-indicator" aria-hidden="true"></span></button>
   </header>
 
   <main>
@@ -133,14 +133,14 @@
           </div>
           <div class="chat-tools">
             <button class="chat-tool hug-tool" id="hugButton" type="button" aria-label="Send a hug" title="Send a hug">
-              <svg viewBox="0 0 48 48" role="img" aria-hidden="true" class="hug-people-icon"><circle cx="15" cy="12" r="5"/><circle cx="33" cy="12" r="5"/><path d="M6.5 34c.8-7.2 4-11 9-11 3.3 0 5.7 1.7 7.1 4.7M41.5 34c-.8-7.2-4-11-9-11-3.3 0-5.7 1.7-7.1 4.7"/><path d="M8 29c2.8 7.2 8.2 11 16 11s13.2-3.8 16-11"/><path class="hug-heart" d="M24 31s-5.8-3.6-5.8-7.2a3.5 3.5 0 0 1 5.8-2.5 3.5 3.5 0 0 1 5.8 2.5C29.8 27.4 24 31 24 31Z"/></svg>
+              <svg viewBox="0 0 48 48" role="img" aria-hidden="true" class="hug-heart-icon"><path d="M24 40S5.5 29.2 5.5 16.8C5.5 7.5 17.2 4.1 24 13c6.8-8.9 18.5-5.5 18.5 3.8C42.5 29.2 24 40 24 40Z"/></svg>
             </button>
             <button class="chat-tool delete-chat-tool" id="deleteChatButton" type="button" aria-label="Delete chat messages" title="Delete chat messages"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 14h28M19 14V9h10v5m5 0-1.5 25h-17L14 14m7 6v13m6-13v13"/></svg></button>
             <button class="chat-tool games-tool" id="gamesButton" type="button" aria-label="Games" title="Games"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 17h16a8 8 0 0 1 7.7 10l-1.4 5.2a4 4 0 0 1-6.5 2l-4.1-3.4h-8.4l-4.1 3.4a4 4 0 0 1-6.5-2L7.3 27A8 8 0 0 1 15 17Z"/><path d="M16 23v8m-4-4h8m11-2h.1m5 5h.1"/></svg></button>
           </div>
         </header>
         <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div></div>
-        <form id="chatForm" class="chat-compose"><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
+        <form id="chatForm" class="chat-compose"><button class="chat-gallery-button" id="chatGalleryButton" type="button" aria-label="Open gallery" title="Attach photo or video"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button><input id="chatGalleryInput" type="file" accept="image/*,video/*" hidden><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
       </div>
     </section>
 
