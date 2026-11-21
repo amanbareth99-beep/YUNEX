@@ -3,6 +3,24 @@
 
   const views = Array.from(document.querySelectorAll('.view'));
   const tabs = document.querySelector('.tabs');
+  // Keep the primary dock outside the scrolling <main> tree so mobile scroll
+  // containers/containing blocks cannot move it with feed content.
+  if (tabs && tabs.parentElement !== document.body) document.body.appendChild(tabs);
+
+  // Track the visible mobile viewport (browser chrome expanding/collapsing).
+  // The dock stays attached to the visible screen edge while the page scrolls.
+  const updateYunexDockViewport = () => {
+    const vv = window.visualViewport;
+    const gap = vv ? Math.max(0, window.innerHeight - (vv.height + vv.offsetTop)) : 0;
+    document.documentElement.style.setProperty('--yunex-visual-bottom-gap', `${gap}px`);
+  };
+  updateYunexDockViewport();
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateYunexDockViewport, { passive: true });
+    window.visualViewport.addEventListener('scroll', updateYunexDockViewport, { passive: true });
+  }
+  window.addEventListener('resize', updateYunexDockViewport, { passive: true });
+
   let currentView = 'feed';
   let activeDemoUser = { name: 'Riya Creates', handle: '@riya_demo' };
   let exitWarningAt = 0;
