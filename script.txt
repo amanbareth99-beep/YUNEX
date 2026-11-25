@@ -118,7 +118,7 @@
     const profileButton = event.target.closest('.profile-open');
     if (profileButton) {
       activeDemoUser = {
-        name: profileButton.dataset.user || 'YUNEX Creator',
+        name: profileButton.dataset.user || 'ABAROX Creator',
         handle: profileButton.dataset.handle || '@creator_demo'
       };
       document.getElementById('demoName').textContent = activeDemoUser.name;
@@ -296,7 +296,7 @@
       );
     }
   } catch (error) {
-    console.error('YUNEX Supabase initialization failed:', error);
+    console.error('ABAROX Supabase initialization failed:', error);
   }
 
   function setAuthFeedback(element, message, isError = false) {
@@ -333,13 +333,13 @@
     if (Object.keys(profilePatch).length) {
       // Update only known profile columns. Never write yunex_id: the database trigger owns it.
       const { error } = await yunexSupabase.from('profiles').update(profilePatch).eq('id', user.id);
-      if (error) console.warn('YUNEX profile sync was not completed:', error.message);
+      if (error) console.warn('ABAROX profile sync was not completed:', error.message);
     }
     if (typeof meta.phone_number === 'string' && /^[0-9]{10}$/.test(meta.phone_number)) {
       // user_private_details row is created by the existing database setup; update only its known phone column.
       const { error } = await yunexSupabase.from('user_private_details')
         .update({ phone_number: meta.phone_number }).eq('user_id', user.id);
-      if (error) console.warn('YUNEX private phone sync was not completed:', error.message);
+      if (error) console.warn('ABAROX private phone sync was not completed:', error.message);
     }
   }
 
@@ -348,16 +348,16 @@
   async function refreshYunexId(user) {
     const idElement = document.getElementById('founderId');
     if (!idElement) return;
-    if (!user || !yunexSupabase) { idElement.textContent = 'Login to view your YUNEX ID'; return; }
-    idElement.textContent = 'Loading YUNEX ID…';
+    if (!user || !yunexSupabase) { idElement.textContent = 'Login to view your Account ID'; return; }
+    idElement.textContent = 'Loading Account ID…';
     try {
       const { data, error } = await yunexSupabase.from('profiles')
         .select('yunex_id').eq('id', user.id).maybeSingle();
       if (error) throw error;
-      idElement.textContent = data?.yunex_id || 'YUNEX ID not available yet';
+      idElement.textContent = data?.yunex_id || 'Account ID not available yet';
     } catch (error) {
-      console.warn('Could not load YUNEX ID:', error.message);
-      idElement.textContent = 'YUNEX ID could not be loaded';
+      console.warn('Could not load Account ID:', error.message);
+      idElement.textContent = 'Account ID could not be loaded';
     }
   }
 
@@ -405,13 +405,13 @@
       const { data, error } = await yunexSupabase.from('profiles')
         .select('full_name, username, yunex_id').eq('id', user.id).maybeSingle();
       if (error) throw error;
-      const fullName = data?.full_name || user.user_metadata?.full_name || 'YUNEX User';
+      const fullName = data?.full_name || user.user_metadata?.full_name || 'ABAROX User';
       const username = data?.username || user.user_metadata?.username || '';
       if (nameEl) nameEl.textContent = fullName;
       if (handleEl) handleEl.textContent = username ? '@' + username.replace(/^@/, '') : '';
       if (bioEl) bioEl.textContent = 'Welcome to your profile.';
       const idEl = document.getElementById('founderId');
-      if (idEl) idEl.textContent = data?.yunex_id || 'YUNEX ID not available yet';
+      if (idEl) idEl.textContent = data?.yunex_id || 'Account ID not available yet';
       if (photo) renderProfileAvatar(photo, photoKey, fullName.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase());
       const title = document.querySelector('#profile .founder-notice');
       if (title) title.hidden = true;
@@ -428,7 +428,7 @@
     if (welcomePoster) welcomePoster.hidden = !!user;
     if (authSessionPanel) {
       authSessionPanel.hidden = !user;
-      if (user && authSessionText) authSessionText.textContent = `Signed in as ${user.email || 'YUNEX user'}.`;
+      if (user && authSessionText) authSessionText.textContent = `Signed in as ${user.email || 'ABAROX user'}.`;
     }
     refreshYunexId(user);
     loadCurrentAccountProfile(user);
@@ -504,12 +504,12 @@
       if (error) throw error;
 
       // Existing database trigger must generate yunex_id and the default role.
-      // The client deliberately does not insert profiles, roles, or YUNEX IDs.
+      // The client deliberately does not insert profiles, roles, or Account IDs.
       if (data?.session?.user) {
         await syncAuthenticatedProfile(data.session.user);
         renderAuthSession(data.session.user);
         enterHomeAfterAuth();
-        setAuthFeedback(registrationFeedback, 'Account create ho gaya! Welcome to YUNEX.');
+        setAuthFeedback(registrationFeedback, 'Account create ho gaya! Welcome to ABAROX.');
       } else {
         setAuthFeedback(registrationFeedback, 'Registration request successful. Email confirmation required ho sakta hai—apna inbox check karein. Confirmation ke baad isi email aur password se Login karein.');
       }
@@ -556,14 +556,14 @@
       if (error) throw error;
       await syncAuthenticatedProfile(data.user);
       renderAuthSession(data.user);
-      setAuthFeedback(loginFeedback, `Login successful. Welcome to YUNEX, ${data.user.user_metadata?.full_name || data.user.email}.`);
+      setAuthFeedback(loginFeedback, `Login successful. Welcome to ABAROX, ${data.user.user_metadata?.full_name || data.user.email}.`);
       document.getElementById('loginPassword').value = '';
       enterHomeAfterAuth();
     } catch (error) {
       setAuthFeedback(loginFeedback, error?.message || 'Login failed. Please check your email and password.', true);
     } finally {
       authActionBusy = false;
-      if (button) { button.disabled = false; button.textContent = 'Login to YUNEX'; }
+      if (button) { button.disabled = false; button.textContent = 'Login to ABAROX'; }
     }
   });
 
@@ -646,7 +646,7 @@
         if (!data?.length) { exploreResults.textContent = 'No matching username found.'; return; }
         data.forEach(profile => {
           const item = document.createElement('div'); item.className = 'explore-result-item';
-          const name = document.createElement('b'); name.textContent = profile.full_name || 'YUNEX User';
+          const name = document.createElement('b'); name.textContent = profile.full_name || 'ABAROX User';
           const username = document.createElement('span'); username.textContent = '@' + (profile.username || '');
           const id = document.createElement('small'); id.textContent = profile.yunex_id || 'ID unavailable';
           item.append(name, username, id); exploreResults.appendChild(item);
@@ -675,7 +675,7 @@
   // Chat status preview: all delivery/read states below are simulated locally.
   // Real Sent/Delivered/Seen receipts require authenticated Supabase messaging.
   // Founder profile: editable local preview. Real identity/permissions remain server-controlled.
-  const founderDefaults = { name: 'Aman Bareth', handle: '@amanbareth', bio: 'Building YUNEX — a place to connect, create and win. 🚀' };
+  const founderDefaults = { name: 'Aman Bareth', handle: '@amanbareth', bio: 'Building ABAROX — a place to connect, create and win. 🚀' };
   let founderProfile = { ...founderDefaults };
   try {
     const savedFounder = JSON.parse(localStorage.getItem('yunexFounderProfile') || 'null');
@@ -845,9 +845,9 @@
 
   const shareFounderButton = document.getElementById('shareFounderProfile');
   if (shareFounderButton) shareFounderButton.addEventListener('click', async () => {
-    const shareText = `${founderProfile.name} ${founderProfile.handle} · YUNEX Founder`;
+    const shareText = `${founderProfile.name} ${founderProfile.handle} · ABAROX Founder`;
     try {
-      if (navigator.share) await navigator.share({ title: 'YUNEX Founder', text: shareText, url: location.href.split('#')[0] + '#profile' });
+      if (navigator.share) await navigator.share({ title: 'ABAROX Founder', text: shareText, url: location.href.split('#')[0] + '#profile' });
       else if (navigator.clipboard) { await navigator.clipboard.writeText(shareText + ' · ' + location.href.split('#')[0] + '#profile'); shareFounderButton.textContent = 'Copied!'; }
       else shareFounderButton.textContent = 'Share unavailable';
     } catch (_) {}
@@ -986,7 +986,7 @@
   let selectedGame = 'ttt';
   let boardState = Array(9).fill('');
   let gameTurn = 'X';
-  let wordItems = ['YUNEX'];
+  let wordItems = ['ABAROX'];
   function selectGame(which) {
     selectedGame = which;
     document.querySelectorAll('.game-choice').forEach(b => b.classList.toggle('active', b.dataset.game === which));
@@ -997,7 +997,7 @@
   function resetGames() {
     boardState = Array(9).fill(''); gameTurn = 'X';
     document.querySelectorAll('[data-cell]').forEach(b => b.textContent = '');
-    wordItems = ['YUNEX']; document.getElementById('wordChain').textContent = wordItems.join(' · ');
+    wordItems = ['ABAROX']; document.getElementById('wordChain').textContent = wordItems.join(' · ');
     document.getElementById('gameStatus').textContent = 'Game reset · local preview';
   }
   function playCell(index) {
