@@ -489,6 +489,10 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 .text-button{display:block;margin:10px auto 0;padding:8px 12px;border:0;background:transparent;color:var(--accent,#58a6ff);font:inherit}
 .auth-mode-btn:disabled,.yunex-register-form button:disabled,.yunex-login-form button:disabled{opacity:.65;cursor:wait}
 
-/* Keep the guest welcome poster out of view until the saved auth session is checked. */
-body.auth-checking #feed .welcome{visibility:hidden}
-#feed .welcome[hidden]{display:none!important}
+
+/* Supabase creator search results */
+.explore-search-results { display:grid; gap:10px; margin:12px 0 18px; color:var(--muted, #777); font-size:14px; }
+.explore-result-item { display:grid; gap:3px; padding:12px 14px; border:1px solid var(--line, #ddd); border-radius:12px; background:var(--panel, #fff); color:var(--text, #222); }
+.explore-result-item span { color:var(--muted, #777); font-size:13px; }
+.explore-result-item small { color:var(--muted, #777); font-size:12px; }
+[hidden] { display:none !important; }

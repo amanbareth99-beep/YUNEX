@@ -304,33 +304,6 @@
     element.textContent = message;
     element.classList.toggle('validation-error', !!isError);
   }
-
-  function readableAuthError(error, action = 'registration') {
-    const raw = String(error?.message || '').trim();
-    const value = raw.toLowerCase();
-    if (!raw) return action === 'login'
-      ? 'Login nahi ho paya. Email aur password check karke dobara try karein.'
-      : 'Account create nahi ho paya. Details check karke dobara try karein.';
-    if (/already registered|user already exists|already been registered/.test(value))
-      return 'Is email se YUNEX account pehle se bana hua hai. Login karein ya Forgot password use karein.';
-    if (/invalid login credentials|invalid email or password/.test(value))
-      return 'Email ya password galat hai. Dono check karein, ya Forgot password use karein.';
-    if (/email not confirmed/.test(value))
-      return 'Email abhi confirm nahi hua hai. Inbox mein Supabase confirmation link kholkar phir Login karein.';
-    if (/password.*(weak|short)|weak password|at least 8 characters/.test(value))
-      return 'Password kam se kam 8 characters ka rakhein aur letters aur numbers dono use karein.';
-    if (/invalid email|email address.*invalid/.test(value))
-      return 'Email address sahi format mein enter karein.';
-    if (/rate limit|too many requests/.test(value))
-      return 'Bahut baar try ho chuka hai. Kuch der rukkar dobara koshish karein.';
-    if (/username must be|valid full name|full name is required/.test(value))
-      return raw;
-    if (/database error saving new user/.test(value))
-      return 'Account save nahi ho paya. Full name aur username check karein. Agar phir bhi error aaye, Founder ko Supabase Auth Logs check karne honge.';
-    if (/network|fetch failed|failed to fetch/.test(value))
-      return 'Internet connection check karein, phir dobara try karein.';
-    return raw;
-  }
   function setAuthMode(mode) {
     const registering = mode === 'register';
     if (registrationForm) registrationForm.hidden = !registering;
@@ -370,6 +343,8 @@
     }
   }
 
+  const FOUNDER_AUTH_ID = '84293736-9358-4c8d-ae27-48eda6e4cb1c';
+
   async function refreshYunexId(user) {
     const idElement = document.getElementById('founderId');
     if (!idElement) return;
@@ -386,8 +361,69 @@
     }
   }
 
+  async function loadCurrentAccountProfile(user) {
+    const nameEl = document.getElementById('founderName');
+    const handleEl = document.getElementById('founderHandle');
+    const bioEl = document.getElementById('founderBio');
+    const founderBadge = document.querySelector('#profile .founder-badge');
+    const verified = document.querySelector('#profile .founder-verified');
+    const editButton = document.getElementById('editFounderProfile');
+    const photoEdit = document.querySelector('#profile .photo-edit');
+    const settingsButton = document.getElementById('founderSettings');
+    const photoKey = user?.id === FOUNDER_AUTH_ID ? 'founder' : (user?.id ? `user:${user.id}` : '');
+    const photo = document.getElementById('founderPhoto');
+    if (!user) {
+      if (nameEl) nameEl.textContent = 'Login to view your profile';
+      if (handleEl) handleEl.textContent = '';
+      if (bioEl) bioEl.textContent = '';
+      if (founderBadge) founderBadge.hidden = true;
+      if (verified) verified.hidden = true;
+      if (editButton) editButton.hidden = true;
+      if (photoEdit) photoEdit.hidden = true;
+      if (settingsButton) settingsButton.hidden = true;
+      if (photo) { photo.dataset.profileAvatar = ''; photo.textContent = '?'; }
+      return;
+    }
+    const isFounder = user.id === FOUNDER_AUTH_ID;
+    if (founderBadge) founderBadge.hidden = !isFounder;
+    if (verified) verified.hidden = !isFounder;
+    if (editButton) editButton.hidden = !isFounder;
+    if (photoEdit) photoEdit.hidden = !isFounder;
+    if (settingsButton) settingsButton.hidden = !isFounder;
+    if (photo) photo.dataset.profileAvatar = photoKey;
+    if (isFounder) {
+      if (typeof founderProfile !== 'undefined') {
+        if (nameEl) nameEl.textContent = founderProfile.name;
+        if (handleEl) handleEl.textContent = founderProfile.handle;
+        if (bioEl) bioEl.textContent = founderProfile.bio;
+      }
+      if (photo) renderProfileAvatar(photo, 'founder', 'AB');
+      return;
+    }
+    if (!yunexSupabase) return;
+    try {
+      const { data, error } = await yunexSupabase.from('profiles')
+        .select('full_name, username, yunex_id').eq('id', user.id).maybeSingle();
+      if (error) throw error;
+      const fullName = data?.full_name || user.user_metadata?.full_name || 'YUNEX User';
+      const username = data?.username || user.user_metadata?.username || '';
+      if (nameEl) nameEl.textContent = fullName;
+      if (handleEl) handleEl.textContent = username ? '@' + username.replace(/^@/, '') : '';
+      if (bioEl) bioEl.textContent = 'Welcome to your profile.';
+      const idEl = document.getElementById('founderId');
+      if (idEl) idEl.textContent = data?.yunex_id || 'YUNEX ID not available yet';
+      if (photo) renderProfileAvatar(photo, photoKey, fullName.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase());
+      const title = document.querySelector('#profile .founder-notice');
+      if (title) title.hidden = true;
+    } catch (error) {
+      console.warn('Could not load this account profile:', error.message);
+      if (nameEl) nameEl.textContent = 'Profile could not be loaded';
+      if (handleEl) handleEl.textContent = '';
+      if (bioEl) bioEl.textContent = 'Check profiles table permissions (RLS) in Supabase.';
+    }
+  }
+
   function renderAuthSession(user) {
-    document.body.classList.remove('auth-checking');
     const welcomePoster = document.querySelector('#feed .welcome');
     if (welcomePoster) welcomePoster.hidden = !!user;
     if (authSessionPanel) {
@@ -395,6 +431,7 @@
       if (user && authSessionText) authSessionText.textContent = `Signed in as ${user.email || 'YUNEX user'}.`;
     }
     refreshYunexId(user);
+    loadCurrentAccountProfile(user);
   }
 
   function enterHomeAfterAuth() {
@@ -408,7 +445,6 @@
   if (!yunexSupabase) {
     setAuthFeedback(registrationFeedback, 'Supabase load nahi hua. Internet connection aur supabase-config.js check karein.', true);
     setAuthFeedback(loginFeedback, 'Supabase load nahi hua. Internet connection aur configuration check karein.', true);
-    renderAuthSession(null);
   } else {
     yunexSupabase.auth.getSession().then(({ data, error }) => {
       if (error) console.warn('Could not read YUNEX session:', error.message);
@@ -454,11 +490,13 @@
         email,
         password: pass,
         options: {
+          // Keep the existing GitHub Pages project path (/YUNEX/) in the confirmation redirect.
+          emailRedirectTo: new URL('./', window.location.href).toString(),
           data: {
             full_name: fullName,
             username,
             phone_number: mobile,
-            is_celebrity: celebrity,
+            celebrity_request: celebrity,
             // Gender is deliberately not sent to public profile metadata.
           }
         }
@@ -492,7 +530,7 @@
       document.getElementById('regPassword').value = '';
       document.getElementById('regConfirmPassword').value = '';
     } catch (error) {
-      const msg = readableAuthError(error, 'registration');
+      const msg = error?.message || 'Registration failed. Please try again.';
       setAuthFeedback(registrationFeedback, msg, true);
     } finally {
       authActionBusy = false;
@@ -522,7 +560,7 @@
       document.getElementById('loginPassword').value = '';
       enterHomeAfterAuth();
     } catch (error) {
-      setAuthFeedback(loginFeedback, readableAuthError(error, 'login'), true);
+      setAuthFeedback(loginFeedback, error?.message || 'Login failed. Please check your email and password.', true);
     } finally {
       authActionBusy = false;
       if (button) { button.disabled = false; button.textContent = 'Login to YUNEX'; }
@@ -549,6 +587,8 @@
   if (logoutButton) logoutButton.addEventListener('click', yunexLogout);
   const profileLogoutButton = document.getElementById('yunexProfileLogoutButton');
   if (profileLogoutButton) profileLogoutButton.addEventListener('click', yunexLogout);
+  const currentProfileLogout = document.getElementById('logoutCurrentProfile');
+  if (currentProfileLogout) currentProfileLogout.addEventListener('click', yunexLogout);
 
   const forgotPasswordButton = document.getElementById('forgotPasswordButton');
   if (forgotPasswordButton) forgotPasswordButton.addEventListener('click', async () => {
@@ -585,6 +625,37 @@
     button.addEventListener('click', () => {
       document.getElementById('exploreSearch').value = button.innerText.replace(/[^\w\s]/g, '').trim();
     });
+  });
+
+  // Public creator lookup: only public profile fields are requested.
+  const exploreSearch = document.getElementById('exploreSearch');
+  const exploreResults = document.getElementById('exploreSearchResults');
+  let exploreSearchTimer = null;
+  if (exploreSearch && exploreResults) exploreSearch.addEventListener('input', () => {
+    clearTimeout(exploreSearchTimer);
+    const term = exploreSearch.value.trim().replace(/^@/, '');
+    if (term.length < 2) { exploreResults.textContent = 'Search by username (at least 2 characters).'; return; }
+    exploreResults.textContent = 'Searching…';
+    exploreSearchTimer = setTimeout(async () => {
+      if (!yunexSupabase) { exploreResults.textContent = 'Search service is unavailable.'; return; }
+      try {
+        const { data, error } = await yunexSupabase.from('profiles')
+          .select('full_name, username, yunex_id').ilike('username', `%${term}%`).limit(20);
+        if (error) throw error;
+        exploreResults.replaceChildren();
+        if (!data?.length) { exploreResults.textContent = 'No matching username found.'; return; }
+        data.forEach(profile => {
+          const item = document.createElement('div'); item.className = 'explore-result-item';
+          const name = document.createElement('b'); name.textContent = profile.full_name || 'YUNEX User';
+          const username = document.createElement('span'); username.textContent = '@' + (profile.username || '');
+          const id = document.createElement('small'); id.textContent = profile.yunex_id || 'ID unavailable';
+          item.append(name, username, id); exploreResults.appendChild(item);
+        });
+      } catch (error) {
+        exploreResults.textContent = 'Search failed. Supabase profiles SELECT policy/RLS ko check karna hoga.';
+        console.warn('Explore username search failed:', error.message);
+      }
+    }, 350);
   });
 
   function appendAnimatedReaction(kind, label, art) {

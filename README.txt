@@ -34,3 +34,13 @@ Supabase Authentication integration package:
 - Celebrity request is sent as auth user metadata only; a real Admin queue/notification backend is not part of this auth patch.
 - Test with a non-Founder account first. Do not test Founder password change unless signed in as Founder.
 - Keep the publishable key client-side only; never add service_role or secret keys to the website.
+
+Profile/search/confirmation redirect patch (25 Nov 2026):
+- Current account profile now loads public full_name, username and yunex_id from the authenticated user's own profiles row (filtered by auth user UUID).
+- Founder crown/edit/settings controls are shown only for the configured Founder Auth UUID. Non-Founder accounts no longer inherit the Founder name, handle, bio, badge or Founder local photo.
+- Profile logout is available directly on the Profile screen for every signed-in account.
+- Explore username search queries only full_name, username and yunex_id from public profiles; it does not request email, phone or private details.
+- Signup confirmation redirect now resolves to the current GitHub Pages project root, preserving /YUNEX/ when deployed at https://amanbareth99-beep.github.io/YUNEX/.
+
+Supabase dashboard action still required for confirmation links:
+Add https://amanbareth99-beep.github.io/YUNEX/ to Authentication > URL Configuration > Redirect URLs (and keep the Site URL set appropriately). This file cannot change the Supabase dashboard allowlist. Public username search also requires an appropriate SELECT policy on profiles that exposes only intended public profile fields; if RLS denies the query, the UI will show a search/RLS message. Review the policy before launch.
