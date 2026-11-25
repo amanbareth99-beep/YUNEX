@@ -488,3 +488,7 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 .auth-session-panel{margin-top:14px;padding:14px;border:1px solid var(--line,#263447);border-radius:14px;background:rgba(12,20,32,.92)}
 .text-button{display:block;margin:10px auto 0;padding:8px 12px;border:0;background:transparent;color:var(--accent,#58a6ff);font:inherit}
 .auth-mode-btn:disabled,.yunex-register-form button:disabled,.yunex-login-form button:disabled{opacity:.65;cursor:wait}
+
+/* Keep the guest welcome poster out of view until the saved auth session is checked. */
+body.auth-checking #feed .welcome{visibility:hidden}
+#feed .welcome[hidden]{display:none!important}

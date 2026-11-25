@@ -7,7 +7,7 @@
   <title>YUNEX — Connect. Create. Win.</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="auth-checking">
   <header class="topbar">
     <a class="brand" href="#" aria-label="YUNEX home"><span class="brand-mark">Y</span><span class="brand-copy"><b>YUNEX</b><small class="tagline">CONNECT. CREATE. WIN.</small></span></a>
     <div class="top-account-name" id="topAccountName">Aman Bareth</div>
@@ -109,8 +109,6 @@
       <div class="founder-edit-overlay" id="founderDatesOverlay" hidden><div class="founder-edit-dialog founder-dates-dialog" role="dialog" aria-modal="true" aria-labelledby="founderDatesTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PRIVATE PROFILE DETAILS</p><h3 id="founderDatesTitle">Profile Settings</h3></div><button type="button" class="games-close" id="closeFounderDates" aria-label="Close">×</button></div>
         <div class="founder-special-divider"></div><h4>Account &amp; Security</h4>
-        <button type="button" class="secondary full" id="yunexProfileLogoutButton">Log out</button>
-        <p class="tiny muted" id="profileLogoutFeedback" role="status"></p>
         <p class="tiny muted">Founder contact details for the account setup. These fields are a local preview until Supabase Auth is connected.</p>
         <label>Mobile number<input id="founderAccountMobile" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" autocomplete="tel" value="9340869865"></label>
         <label>Email / Gmail<input id="founderAccountEmail" type="email" autocomplete="email" value="Amanbareth99@gmail.com"></label>
@@ -125,6 +123,9 @@
         <p class="tiny muted">Your full birth date stays private. Follower notifications require the YUNEX notification backend.</p><div class="founder-special-divider"></div><h4>Account privacy</h4><label class="founder-toggle-row"><input id="privateAccountToggle" type="checkbox"> Private account</label><label class="founder-toggle-row"><input id="manualTagApproval" type="checkbox" checked> Manually approve tagged posts</label><p class="tiny muted">Private account par naye followers ko approval chahiye. Existing followers remain. Ye preview settings is browser mein save hongi; backend policy launch se pehle connect hogi.</p><div class="founder-special-divider"></div><h4>My Special Days</h4>
         <label>Special day name<input id="specialDayTitle" maxlength="40" placeholder="e.g. Business launch day"></label><div class="founder-date-grid"><label>Date<input id="specialDayDate" type="date"></label><label>Reminder time<input id="specialDayTime" type="time" value="09:00"></label></div>
         <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button><div id="specialDaysList" class="special-days-list"></div><p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p><button type="button" class="primary full" id="saveFounderDates">Save settings</button>
+        <div class="founder-special-divider"></div><h4>Log out</h4>
+        <button type="button" class="secondary full" id="yunexProfileLogoutButton">Log out</button>
+        <p class="tiny muted" id="profileLogoutFeedback" role="status"></p>
       </div></div>
       <div class="founder-edit-overlay" id="photoAdjustOverlay" hidden><div class="founder-edit-dialog photo-adjust-dialog" role="dialog" aria-modal="true" aria-labelledby="photoAdjustTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PROFILE PHOTO</p><h3 id="photoAdjustTitle">Adjust your photo</h3></div><button type="button" class="games-close" id="closePhotoAdjust" aria-label="Close">×</button></div>

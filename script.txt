@@ -304,6 +304,33 @@
     element.textContent = message;
     element.classList.toggle('validation-error', !!isError);
   }
+
+  function readableAuthError(error, action = 'registration') {
+    const raw = String(error?.message || '').trim();
+    const value = raw.toLowerCase();
+    if (!raw) return action === 'login'
+      ? 'Login nahi ho paya. Email aur password check karke dobara try karein.'
+      : 'Account create nahi ho paya. Details check karke dobara try karein.';
+    if (/already registered|user already exists|already been registered/.test(value))
+      return 'Is email se YUNEX account pehle se bana hua hai. Login karein ya Forgot password use karein.';
+    if (/invalid login credentials|invalid email or password/.test(value))
+      return 'Email ya password galat hai. Dono check karein, ya Forgot password use karein.';
+    if (/email not confirmed/.test(value))
+      return 'Email abhi confirm nahi hua hai. Inbox mein Supabase confirmation link kholkar phir Login karein.';
+    if (/password.*(weak|short)|weak password|at least 8 characters/.test(value))
+      return 'Password kam se kam 8 characters ka rakhein aur letters aur numbers dono use karein.';
+    if (/invalid email|email address.*invalid/.test(value))
+      return 'Email address sahi format mein enter karein.';
+    if (/rate limit|too many requests/.test(value))
+      return 'Bahut baar try ho chuka hai. Kuch der rukkar dobara koshish karein.';
+    if (/username must be|valid full name|full name is required/.test(value))
+      return raw;
+    if (/database error saving new user/.test(value))
+      return 'Account save nahi ho paya. Full name aur username check karein. Agar phir bhi error aaye, Founder ko Supabase Auth Logs check karne honge.';
+    if (/network|fetch failed|failed to fetch/.test(value))
+      return 'Internet connection check karein, phir dobara try karein.';
+    return raw;
+  }
   function setAuthMode(mode) {
     const registering = mode === 'register';
     if (registrationForm) registrationForm.hidden = !registering;
@@ -360,6 +387,7 @@
   }
 
   function renderAuthSession(user) {
+    document.body.classList.remove('auth-checking');
     const welcomePoster = document.querySelector('#feed .welcome');
     if (welcomePoster) welcomePoster.hidden = !!user;
     if (authSessionPanel) {
@@ -380,6 +408,7 @@
   if (!yunexSupabase) {
     setAuthFeedback(registrationFeedback, 'Supabase load nahi hua. Internet connection aur supabase-config.js check karein.', true);
     setAuthFeedback(loginFeedback, 'Supabase load nahi hua. Internet connection aur configuration check karein.', true);
+    renderAuthSession(null);
   } else {
     yunexSupabase.auth.getSession().then(({ data, error }) => {
       if (error) console.warn('Could not read YUNEX session:', error.message);
@@ -429,7 +458,7 @@
             full_name: fullName,
             username,
             phone_number: mobile,
-            celebrity_request: celebrity,
+            is_celebrity: celebrity,
             // Gender is deliberately not sent to public profile metadata.
           }
         }
@@ -463,7 +492,7 @@
       document.getElementById('regPassword').value = '';
       document.getElementById('regConfirmPassword').value = '';
     } catch (error) {
-      const msg = error?.message || 'Registration failed. Please try again.';
+      const msg = readableAuthError(error, 'registration');
       setAuthFeedback(registrationFeedback, msg, true);
     } finally {
       authActionBusy = false;
@@ -493,7 +522,7 @@
       document.getElementById('loginPassword').value = '';
       enterHomeAfterAuth();
     } catch (error) {
-      setAuthFeedback(loginFeedback, error?.message || 'Login failed. Please check your email and password.', true);
+      setAuthFeedback(loginFeedback, readableAuthError(error, 'login'), true);
     } finally {
       authActionBusy = false;
       if (button) { button.disabled = false; button.textContent = 'Login to YUNEX'; }
