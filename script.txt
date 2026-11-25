@@ -343,13 +343,37 @@
     }
   }
 
+  async function refreshYunexId(user) {
+    const idElement = document.getElementById('founderId');
+    if (!idElement) return;
+    if (!user || !yunexSupabase) { idElement.textContent = 'Login to view your YUNEX ID'; return; }
+    idElement.textContent = 'Loading YUNEX ID…';
+    try {
+      const { data, error } = await yunexSupabase.from('profiles')
+        .select('yunex_id').eq('id', user.id).maybeSingle();
+      if (error) throw error;
+      idElement.textContent = data?.yunex_id || 'YUNEX ID not available yet';
+    } catch (error) {
+      console.warn('Could not load YUNEX ID:', error.message);
+      idElement.textContent = 'YUNEX ID could not be loaded';
+    }
+  }
+
   function renderAuthSession(user) {
-    if (!authSessionPanel) return;
-    if (user) {
-      authSessionPanel.hidden = false;
-      if (authSessionText) authSessionText.textContent = `Signed in as ${user.email || 'YUNEX user'}. Your YUNEX profile and role remain controlled by the database.`;
-    } else {
-      authSessionPanel.hidden = true;
+    const welcomePoster = document.querySelector('#feed .welcome');
+    if (welcomePoster) welcomePoster.hidden = !!user;
+    if (authSessionPanel) {
+      authSessionPanel.hidden = !user;
+      if (user && authSessionText) authSessionText.textContent = `Signed in as ${user.email || 'YUNEX user'}.`;
+    }
+    refreshYunexId(user);
+  }
+
+  function enterHomeAfterAuth() {
+    setAuthMode('register');
+    if (currentView !== 'feed') {
+      history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
+      renderView('feed');
     }
   }
 
@@ -359,10 +383,14 @@
   } else {
     yunexSupabase.auth.getSession().then(({ data, error }) => {
       if (error) console.warn('Could not read YUNEX session:', error.message);
-      renderAuthSession(data?.session?.user || null);
+      const user = data?.session?.user || null;
+      renderAuthSession(user);
+      if (user) enterHomeAfterAuth();
     });
     yunexSupabase.auth.onAuthStateChange((_event, session) => {
-      renderAuthSession(session?.user || null);
+      const user = session?.user || null;
+      renderAuthSession(user);
+      if (user) enterHomeAfterAuth();
     });
   }
 
@@ -413,7 +441,8 @@
       if (data?.session?.user) {
         await syncAuthenticatedProfile(data.session.user);
         renderAuthSession(data.session.user);
-        setAuthFeedback(registrationFeedback, 'Account create ho gaya! Database trigger se YUNEX ID generate honi chahiye. Ab Login karke profile check karein.');
+        enterHomeAfterAuth();
+        setAuthFeedback(registrationFeedback, 'Account create ho gaya! Welcome to YUNEX.');
       } else {
         setAuthFeedback(registrationFeedback, 'Registration request successful. Email confirmation required ho sakta hai—apna inbox check karein. Confirmation ke baad isi email aur password se Login karein.');
       }
@@ -462,6 +491,7 @@
       renderAuthSession(data.user);
       setAuthFeedback(loginFeedback, `Login successful. Welcome to YUNEX, ${data.user.user_metadata?.full_name || data.user.email}.`);
       document.getElementById('loginPassword').value = '';
+      enterHomeAfterAuth();
     } catch (error) {
       setAuthFeedback(loginFeedback, error?.message || 'Login failed. Please check your email and password.', true);
     } finally {
@@ -470,18 +500,26 @@
     }
   });
 
-  const logoutButton = document.getElementById('yunexLogoutButton');
-  if (logoutButton) logoutButton.addEventListener('click', async () => {
+  async function yunexLogout() {
     if (!yunexSupabase) return;
+    const feedback = document.getElementById('profileLogoutFeedback');
     const { error } = await yunexSupabase.auth.signOut();
     if (error) {
-      if (authSessionText) authSessionText.textContent = `Logout error: ${error.message}`;
+      if (feedback) feedback.textContent = `Logout error: ${error.message}`;
+      else if (authSessionText) authSessionText.textContent = `Logout error: ${error.message}`;
       return;
     }
     renderAuthSession(null);
+    const settingsOverlay = document.getElementById('founderDatesOverlay');
+    if (settingsOverlay) settingsOverlay.hidden = true;
     setAuthMode('login');
     setAuthFeedback(loginFeedback, 'You have been logged out.');
-  });
+    enterHomeAfterAuth();
+  }
+  const logoutButton = document.getElementById('yunexLogoutButton');
+  if (logoutButton) logoutButton.addEventListener('click', yunexLogout);
+  const profileLogoutButton = document.getElementById('yunexProfileLogoutButton');
+  if (profileLogoutButton) profileLogoutButton.addEventListener('click', yunexLogout);
 
   const forgotPasswordButton = document.getElementById('forgotPasswordButton');
   if (forgotPasswordButton) forgotPasswordButton.addEventListener('click', async () => {
