@@ -20,3 +20,17 @@ Founder Account Settings preview (this update):
 - Supabase Auth is not connected in this ZIP, so this does NOT create a real Founder login or change real account credentials.
 - Founder username @amanbareth and Founder Gold Crown remain unchanged.
 - Do not deploy as a production authentication system until Supabase Auth, secure server-side Founder role assignment, and verified contact-change flows are implemented.
+
+
+Supabase Authentication integration package:
+- Added Supabase JS v2 browser client and supabase-config.js using the project's URL and publishable key.
+- Registration now uses Email + Password and retains Full Name, Mobile Number, Username, private gender choice, and Celebrity request UI.
+- Login uses Email + Password; password reset email and authenticated password update are wired.
+- The client never creates or overwrites yunex_id or user_roles. Existing database triggers remain the source of YUNEX ID and role assignment.
+- Profile full_name/username and private_details.phone_number are updated only for an authenticated session, using the existing user row.
+- If Email Confirmation is enabled, signup may require email confirmation before the first login.
+- Phone OTP remains deferred; Phone Provider must stay disabled.
+- Private gender is intentionally not sent to public profile metadata. The existing browser-local preference remains a preview only until a verified private database column/policy is confirmed.
+- Celebrity request is sent as auth user metadata only; a real Admin queue/notification backend is not part of this auth patch.
+- Test with a non-Founder account first. Do not test Founder password change unless signed in as Founder.
+- Keep the publishable key client-side only; never add service_role or secret keys to the website.

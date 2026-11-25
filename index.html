@@ -157,7 +157,13 @@
 
     <section id="account" class="view registration-screen">
       <p class="eyebrow">JOIN THE COMMUNITY</p><h2>Create your account</h2>
+      <div class="auth-mode-switch" role="group" aria-label="Account access">
+        <button type="button" class="auth-mode-btn active" id="showRegisterMode">Create account</button>
+        <button type="button" class="auth-mode-btn" id="showLoginMode">Login</button>
+      </div>
       <form class="panel form-panel yunex-register-form" id="yunexRegisterForm" novalidate>
+        <label>Full name<input id="regFullName" type="text" autocomplete="name" maxlength="40" placeholder="Enter your full name" required></label>
+        <label>Email address<input id="regEmail" type="email" autocomplete="email" placeholder="Enter your email address" required></label>
         <label>Mobile number (10 digits)<input id="regMobile" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" minlength="10" pattern="[0-9]{10}" placeholder="Enter 10-digit mobile number" required></label>
         <label>Password<div class="password-wrap"><input id="regPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Create password (min. 8 characters)" required><button class="password-eye" type="button" data-toggle-password="regPassword" aria-label="Show password">◉</button></div></label>
         <label>Confirm password<div class="password-wrap"><input id="regConfirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Enter password again" required><button class="password-eye" type="button" data-toggle-password="regConfirmPassword" aria-label="Show confirm password">◉</button></div></label>
@@ -168,10 +174,21 @@
           <small>Used only to choose the matching Hug animation in chat.</small>
         </fieldset>
         <label class="check-row celebrity-row"><input type="checkbox" id="celebrityCheck"> Are you a Celebrity?</label>
-        <p class="tiny muted">If you select Yes, a request will be sent for Admin review. A Celebrity badge is added only by the Admin after checking your ID.</p>
-        <button class="primary full" id="demoRegister" type="submit">Create account preview</button>
-        <p id="registrationFeedback" class="notice" role="status">Front-end preview only: Supabase account creation is not connected yet. Do not use a real password here.</p>
+        <p class="tiny muted">Celebrity requests remain subject to Founder/Admin review. No badge is granted automatically.</p>
+        <button class="primary full" id="demoRegister" type="submit">Create account</button>
+        <p id="registrationFeedback" class="notice" role="status">Registration uses your email address and password. Phone OTP is deferred.</p>
       </form>
+      <form class="panel form-panel yunex-login-form" id="yunexLoginForm" novalidate hidden>
+        <label>Email address<input id="loginEmail" type="email" autocomplete="username" placeholder="Enter your registered email" required></label>
+        <label>Password<div class="password-wrap"><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password" required><button class="password-eye" type="button" data-toggle-password="loginPassword" aria-label="Show password">◉</button></div></label>
+        <button class="primary full" id="yunexLoginButton" type="submit">Login to YUNEX</button>
+        <p id="loginFeedback" class="notice" role="status">Founder and user accounts both sign in with their registered email and password.</p>
+        <button type="button" class="text-button" id="forgotPasswordButton">Forgot password?</button>
+      </form>
+      <div class="auth-session-panel" id="authSessionPanel" hidden>
+        <p id="authSessionText" class="notice" role="status"></p>
+        <button type="button" class="secondary full" id="yunexLogoutButton">Log out</button>
+      </div>
     </section>
   </main>
 
@@ -190,6 +207,8 @@
   </div>
 
   <footer>© 2026 YUNEX <span>Built to create something bigger.</span></footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
