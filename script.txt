@@ -275,19 +275,102 @@
       : 'Choose a photo or video first to preview it.';
   });
 
-  // Registration validation preview. Passwords are validated in memory only and never saved.
+  // Supabase Authentication integration. Existing non-auth YUNEX features remain unchanged.
   const registrationForm = document.getElementById('yunexRegisterForm');
+  const loginForm = document.getElementById('yunexLoginForm');
   const registrationFeedback = document.getElementById('registrationFeedback');
+  const loginFeedback = document.getElementById('loginFeedback');
+  const registerModeButton = document.getElementById('showRegisterMode');
+  const loginModeButton = document.getElementById('showLoginMode');
+  const authSessionPanel = document.getElementById('authSessionPanel');
+  const authSessionText = document.getElementById('authSessionText');
+  let yunexSupabase = null;
+  let authActionBusy = false;
+
+  try {
+    if (window.supabase?.createClient && window.YUNEX_SUPABASE_URL && window.YUNEX_SUPABASE_PUBLISHABLE_KEY) {
+      yunexSupabase = window.supabase.createClient(
+        window.YUNEX_SUPABASE_URL,
+        window.YUNEX_SUPABASE_PUBLISHABLE_KEY,
+        { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+      );
+    }
+  } catch (error) {
+    console.error('YUNEX Supabase initialization failed:', error);
+  }
+
+  function setAuthFeedback(element, message, isError = false) {
+    if (!element) return;
+    element.textContent = message;
+    element.classList.toggle('validation-error', !!isError);
+  }
+  function setAuthMode(mode) {
+    const registering = mode === 'register';
+    if (registrationForm) registrationForm.hidden = !registering;
+    if (loginForm) loginForm.hidden = registering;
+    if (registerModeButton) registerModeButton.classList.toggle('active', registering);
+    if (loginModeButton) loginModeButton.classList.toggle('active', !registering);
+  }
+  if (registerModeButton) registerModeButton.addEventListener('click', () => setAuthMode('register'));
+  if (loginModeButton) loginModeButton.addEventListener('click', () => setAuthMode('login'));
+
   document.querySelectorAll('[data-toggle-password]').forEach(button => button.addEventListener('click', () => {
     const field = document.getElementById(button.dataset.togglePassword); if (!field) return;
     field.type = field.type === 'password' ? 'text' : 'password';
     button.setAttribute('aria-label', field.type === 'password' ? 'Show password' : 'Hide password');
     button.textContent = field.type === 'password' ? '◉' : '◎';
   }));
+
   const mobileField = document.getElementById('regMobile');
   if (mobileField) mobileField.addEventListener('input', () => { mobileField.value = mobileField.value.replace(/\D/g, '').slice(0, 10); });
-  if (registrationForm) registrationForm.addEventListener('submit', event => {
+
+  async function syncAuthenticatedProfile(user) {
+    if (!yunexSupabase || !user?.id) return;
+    const meta = user.user_metadata || {};
+    const profilePatch = {};
+    if (typeof meta.full_name === 'string' && meta.full_name.trim()) profilePatch.full_name = meta.full_name.trim();
+    if (typeof meta.username === 'string' && meta.username.trim()) profilePatch.username = meta.username.trim();
+    if (Object.keys(profilePatch).length) {
+      // Update only known profile columns. Never write yunex_id: the database trigger owns it.
+      const { error } = await yunexSupabase.from('profiles').update(profilePatch).eq('id', user.id);
+      if (error) console.warn('YUNEX profile sync was not completed:', error.message);
+    }
+    if (typeof meta.phone_number === 'string' && /^[0-9]{10}$/.test(meta.phone_number)) {
+      // user_private_details row is created by the existing database setup; update only its known phone column.
+      const { error } = await yunexSupabase.from('user_private_details')
+        .update({ phone_number: meta.phone_number }).eq('user_id', user.id);
+      if (error) console.warn('YUNEX private phone sync was not completed:', error.message);
+    }
+  }
+
+  function renderAuthSession(user) {
+    if (!authSessionPanel) return;
+    if (user) {
+      authSessionPanel.hidden = false;
+      if (authSessionText) authSessionText.textContent = `Signed in as ${user.email || 'YUNEX user'}. Your YUNEX profile and role remain controlled by the database.`;
+    } else {
+      authSessionPanel.hidden = true;
+    }
+  }
+
+  if (!yunexSupabase) {
+    setAuthFeedback(registrationFeedback, 'Supabase load nahi hua. Internet connection aur supabase-config.js check karein.', true);
+    setAuthFeedback(loginFeedback, 'Supabase load nahi hua. Internet connection aur configuration check karein.', true);
+  } else {
+    yunexSupabase.auth.getSession().then(({ data, error }) => {
+      if (error) console.warn('Could not read YUNEX session:', error.message);
+      renderAuthSession(data?.session?.user || null);
+    });
+    yunexSupabase.auth.onAuthStateChange((_event, session) => {
+      renderAuthSession(session?.user || null);
+    });
+  }
+
+  if (registrationForm) registrationForm.addEventListener('submit', async event => {
     event.preventDefault();
+    if (authActionBusy) return;
+    const fullName = document.getElementById('regFullName').value.trim();
+    const email = document.getElementById('regEmail').value.trim().toLowerCase();
     const mobile = document.getElementById('regMobile').value;
     const pass = document.getElementById('regPassword').value;
     const confirm = document.getElementById('regConfirmPassword').value;
@@ -295,24 +378,141 @@
     const gender = registrationForm.querySelector('input[name="regGender"]:checked');
     const celebrity = document.getElementById('celebrityCheck').checked;
     let message = '';
-    if (!/^[0-9]{10}$/.test(mobile)) message = 'Mobile number exactly 10 digits ka hona chahiye.';
-    else if (pass.length < 8) message = 'Password kam se kam 8 characters ka hona chahiye.';
+    if (fullName.length < 2) message = 'Full name kam se kam 2 characters ka hona chahiye.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) message = 'Valid email address enter karein.';
+    else if (!/^[0-9]{10}$/.test(mobile)) message = 'Mobile number exactly 10 digits ka hona chahiye.';
+    else if (pass.length < 8 || !/[A-Za-z]/.test(pass) || !/[0-9]/.test(pass)) message = 'Password kam se kam 8 characters ka ho aur letters + digits dono hon.';
     else if (pass !== confirm) message = 'Password aur Confirm Password match nahi karte.';
     else if (!/^[A-Za-z0-9_.]{3,24}$/.test(username)) message = 'Username 3–24 characters ka ho; letters, numbers, _ aur . allowed hain.';
     else if (!gender) message = 'Please Male ya Female select karein.';
-    if (message) { registrationFeedback.textContent = message; registrationFeedback.classList.add('validation-error'); return; }
-    registrationFeedback.classList.remove('validation-error');
-    // Only non-secret preview details are retained locally. No password or mobile is persisted.
+    if (message) { setAuthFeedback(registrationFeedback, message, true); return; }
+    if (!yunexSupabase) { setAuthFeedback(registrationFeedback, 'Supabase connection available nahi hai. Page reload karke dobara try karein.', true); return; }
+
+    authActionBusy = true;
+    const submitButton = document.getElementById('demoRegister');
+    if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'Creating account…'; }
+    setAuthFeedback(registrationFeedback, 'Supabase par account create ho raha hai…');
     try {
-      localStorage.setItem('yunexRegistrationPreview', JSON.stringify({ username, gender: gender.value, celebrityRequest: celebrity, status: 'preview-only' }));
-      if (celebrity) {
-        const requests = JSON.parse(localStorage.getItem('yunexCelebrityRequests') || '[]');
-        requests.push({ username, createdAt: new Date().toISOString(), status: 'pending' });
-        localStorage.setItem('yunexCelebrityRequests', JSON.stringify(requests));
+      const { data, error } = await yunexSupabase.auth.signUp({
+        email,
+        password: pass,
+        options: {
+          data: {
+            full_name: fullName,
+            username,
+            phone_number: mobile,
+            celebrity_request: celebrity,
+            // Gender is deliberately not sent to public profile metadata.
+          }
+        }
+      });
+      if (error) throw error;
+
+      // Existing database trigger must generate yunex_id and the default role.
+      // The client deliberately does not insert profiles, roles, or YUNEX IDs.
+      if (data?.session?.user) {
+        await syncAuthenticatedProfile(data.session.user);
+        renderAuthSession(data.session.user);
+        setAuthFeedback(registrationFeedback, 'Account create ho gaya! Database trigger se YUNEX ID generate honi chahiye. Ab Login karke profile check karein.');
+      } else {
+        setAuthFeedback(registrationFeedback, 'Registration request successful. Email confirmation required ho sakta hai—apna inbox check karein. Confirmation ke baad isi email aur password se Login karein.');
       }
-    } catch (_) {}
-    registrationFeedback.textContent = celebrity ? 'Form valid. Celebrity request preview added as Pending on this device. No real account or Admin notification was created.' : 'Form valid. Registration preview complete. No real account was created because Supabase authentication is not connected.';
+
+      // Keep only the existing local preview behavior for the private animation preference.
+      // No password or OTP is stored in localStorage.
+      try {
+        localStorage.setItem('yunexRegistrationPreview', JSON.stringify({
+          username, gender: gender.value, celebrityRequest: celebrity, status: 'preview-only'
+        }));
+        // Preserve the original on-device Celebrity pending-request preview.
+        if (celebrity) {
+          const requests = JSON.parse(localStorage.getItem('yunexCelebrityRequests') || '[]');
+          requests.push({ username, createdAt: new Date().toISOString(), status: 'pending' });
+          localStorage.setItem('yunexCelebrityRequests', JSON.stringify(requests));
+        }
+      } catch (_) {}
+      document.getElementById('regPassword').value = '';
+      document.getElementById('regConfirmPassword').value = '';
+    } catch (error) {
+      const msg = error?.message || 'Registration failed. Please try again.';
+      setAuthFeedback(registrationFeedback, msg, true);
+    } finally {
+      authActionBusy = false;
+      if (submitButton) { submitButton.disabled = false; submitButton.textContent = 'Create account'; }
+    }
   });
+
+  if (loginForm) loginForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (authActionBusy) return;
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !password) {
+      setAuthFeedback(loginFeedback, 'Registered email aur password dono bharein.', true); return;
+    }
+    if (!yunexSupabase) { setAuthFeedback(loginFeedback, 'Supabase connection available nahi hai. Page reload karke dobara try karein.', true); return; }
+    authActionBusy = true;
+    const button = document.getElementById('yunexLoginButton');
+    if (button) { button.disabled = true; button.textContent = 'Logging in…'; }
+    setAuthFeedback(loginFeedback, 'Supabase se login ho raha hai…');
+    try {
+      const { data, error } = await yunexSupabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      await syncAuthenticatedProfile(data.user);
+      renderAuthSession(data.user);
+      setAuthFeedback(loginFeedback, `Login successful. Welcome to YUNEX, ${data.user.user_metadata?.full_name || data.user.email}.`);
+      document.getElementById('loginPassword').value = '';
+    } catch (error) {
+      setAuthFeedback(loginFeedback, error?.message || 'Login failed. Please check your email and password.', true);
+    } finally {
+      authActionBusy = false;
+      if (button) { button.disabled = false; button.textContent = 'Login to YUNEX'; }
+    }
+  });
+
+  const logoutButton = document.getElementById('yunexLogoutButton');
+  if (logoutButton) logoutButton.addEventListener('click', async () => {
+    if (!yunexSupabase) return;
+    const { error } = await yunexSupabase.auth.signOut();
+    if (error) {
+      if (authSessionText) authSessionText.textContent = `Logout error: ${error.message}`;
+      return;
+    }
+    renderAuthSession(null);
+    setAuthMode('login');
+    setAuthFeedback(loginFeedback, 'You have been logged out.');
+  });
+
+  const forgotPasswordButton = document.getElementById('forgotPasswordButton');
+  if (forgotPasswordButton) forgotPasswordButton.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setAuthFeedback(loginFeedback, 'Pehle registered email address enter karein.', true); return;
+    }
+    if (!yunexSupabase) { setAuthFeedback(loginFeedback, 'Supabase connection available nahi hai.', true); return; }
+    const { error } = await yunexSupabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    setAuthFeedback(loginFeedback, error ? error.message : 'Password reset link email par bhej diya gaya hai. Inbox check karein.', !!error);
+  });
+
+  // Founder password changes use the currently authenticated Supabase session.
+  const changeFounderPassword = document.getElementById('changeFounderPassword');
+  if (changeFounderPassword) changeFounderPassword.addEventListener('click', async () => {
+    const pass = document.getElementById('founderNewPassword')?.value || '';
+    const confirm = document.getElementById('founderConfirmPassword')?.value || '';
+    if (!pass || !confirm) { alert('Dono password fields bharein.'); return; }
+    if (pass.length < 8 || !/[A-Za-z]/.test(pass) || !/[0-9]/.test(pass)) { alert('Password kam se kam 8 characters ka ho aur letters + digits dono hon.'); return; }
+    if (pass !== confirm) { alert('Dono passwords match nahi kar rahe.'); return; }
+    if (!yunexSupabase) { alert('Supabase connection available nahi hai.'); return; }
+    const { data } = await yunexSupabase.auth.getSession();
+    if (!data?.session) { alert('Pehle Founder account se Login karein.'); setAuthMode('login'); navigate('account'); return; }
+    const { error } = await yunexSupabase.auth.updateUser({ password: pass });
+    document.getElementById('founderNewPassword').value = '';
+    document.getElementById('founderConfirmPassword').value = '';
+    alert(error ? `Password update nahi hua: ${error.message}` : 'Supabase password successfully update ho gaya.');
+  });
+
 
   document.querySelectorAll('.category-grid button').forEach(button => {
     button.addEventListener('click', () => {
@@ -482,17 +682,7 @@
     try{localStorage.setItem('yunexFounderContactPreview',JSON.stringify({mobile,email}));}catch(_){alert('Is browser mein preview details save nahi ho paayi.');return;}
     alert('Contact details is browser preview mein save ho gayi hain. Ye abhi login credentials update nahi karti; Supabase Auth connection pending hai.');
   });
-  const changeFounderPassword=document.getElementById('changeFounderPassword');
-  if(changeFounderPassword)changeFounderPassword.addEventListener('click',()=>{
-    const pass=document.getElementById('founderNewPassword')?.value||'';
-    const confirm=document.getElementById('founderConfirmPassword')?.value||'';
-    if(!pass||!confirm){alert('Dono password fields bharein.');return;}
-    if(pass.length<8){alert('Password kam se kam 8 characters ka hona chahiye.');return;}
-    if(pass!==confirm){alert('Dono passwords match nahi kar rahe.');return;}
-    document.getElementById('founderNewPassword').value='';
-    document.getElementById('founderConfirmPassword').value='';
-    alert('Password browser mein save nahi kiya gaya. Actual password change ke liye secure Supabase Auth connection zaroori hai.');
-  });
+
   const closeFounderDates=document.getElementById('closeFounderDates');if(closeFounderDates)closeFounderDates.addEventListener('click',()=>founderDatesOverlay.hidden=true);if(founderDatesOverlay)founderDatesOverlay.addEventListener('click',e=>{if(e.target===founderDatesOverlay)founderDatesOverlay.hidden=true;});
   const addSpecialDay=document.getElementById('addSpecialDay');if(addSpecialDay)addSpecialDay.addEventListener('click',()=>{const title=document.getElementById('specialDayTitle').value.trim(),date=document.getElementById('specialDayDate').value,time=document.getElementById('specialDayTime').value||'09:00';if(!title||!date){alert('Special day name aur date dono bharo.');return;}founderDates.specialDays.push({title,date,time});document.getElementById('specialDayTitle').value='';document.getElementById('specialDayDate').value='';renderSpecialDays();});
   const saveFounderDates=document.getElementById('saveFounderDates');if(saveFounderDates)saveFounderDates.addEventListener('click',()=>{founderDates.birthday=document.getElementById('founderBirthday').value;founderDates.birthdayAlerts=document.getElementById('founderBirthdayAlerts').checked;const privacy={isPrivate:document.getElementById('privateAccountToggle').checked,manualTagApproval:document.getElementById('manualTagApproval').checked};try{localStorage.setItem('yunexFounderDates',JSON.stringify(founderDates));localStorage.setItem('yunexAccountPrivacy',JSON.stringify(privacy));}catch(_){}founderDatesOverlay.hidden=true;alert('Profile settings is browser preview mein save ho gayi hain. Secure privacy enforcement ke liye backend/RLS connect karna zaroori hai.');});
