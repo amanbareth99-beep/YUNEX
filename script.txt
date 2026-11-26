@@ -17,11 +17,11 @@
   let chatKeyboardHistoryEntry = false;
 
   // One avatar renderer is shared by every place a profile appears.
-  function profilePhotoKey(key) { return key === 'founder' ? 'yunexFounderPhoto' : `yunexProfilePhoto:${key.replace(/^user:/, '')}`; }
+  function profilePhotoKey(key) { return `yunexProfilePhoto:${key === 'founder' ? 'founder' : key.replace(/^user:/, '')}`; }
   function renderProfileAvatar(element, key, fallbackText) {
     if (!element || !key) return;
     let photo = '';
-    try { photo = localStorage.getItem(profilePhotoKey(key)) || (key === 'founder' ? localStorage.getItem('yunexFounderPhoto') : ''); } catch (_) {}
+    try { photo = localStorage.getItem(profilePhotoKey(key)) || ''; } catch (_) {}
     element.classList.add('has-profile-photo');
     let img = element.querySelector(':scope > img.profile-avatar-image');
     if (photo) {
@@ -316,6 +316,9 @@
   }
   if (registerModeButton) registerModeButton.addEventListener('click', () => setAuthMode('register'));
   if (loginModeButton) loginModeButton.addEventListener('click', () => setAuthMode('login'));
+  document.querySelectorAll('#feed .welcome-actions [data-view="account"]').forEach(button => {
+    button.addEventListener('click', () => { setAuthMode(button.textContent.trim().toLowerCase().includes('login') ? 'login' : 'register'); });
+  });
 
   document.querySelectorAll('[data-toggle-password]').forEach(button => button.addEventListener('click', () => {
     const field = document.getElementById(button.dataset.togglePassword); if (!field) return;
@@ -373,7 +376,6 @@
     const editButton = document.getElementById('editFounderProfile');
     const photoEdit = document.querySelector('#profile .photo-edit');
     const settingsButton = document.getElementById('founderSettings');
-    const photoKey = user?.id === FOUNDER_AUTH_ID ? 'founder' : (user?.id ? `user:${user.id}` : '');
     const photo = document.getElementById('founderPhoto');
     if (!user) {
       if (nameEl) nameEl.textContent = 'Login to view your profile';
@@ -388,40 +390,42 @@
       return;
     }
     const isFounder = user.id === FOUNDER_AUTH_ID;
+    const photoKey = isFounder ? 'founder' : `user:${user.id}`;
     if (founderBadge) founderBadge.hidden = !isFounder;
     if (verified) verified.hidden = !isFounder;
-    // Every signed-in account can edit its own profile and open its settings.
-    // Founder-only identity markers remain restricted to the verified Founder Auth UUID.
     if (editButton) editButton.hidden = false;
     if (photoEdit) photoEdit.hidden = false;
     if (settingsButton) settingsButton.hidden = false;
     if (photo) photo.dataset.profileAvatar = photoKey;
-    if (isFounder) {
-      if (typeof founderProfile !== 'undefined') {
-        if (nameEl) nameEl.textContent = founderProfile.name;
-        if (handleEl) handleEl.textContent = founderProfile.handle;
-        if (bioEl) bioEl.textContent = founderProfile.bio;
-      }
-      if (photo) renderProfileAvatar(photo, 'founder', 'AB');
-      return;
-    }
     if (!yunexSupabase) return;
     try {
       const { data, error } = await yunexSupabase.from('profiles')
-        .select('full_name, username, yunex_id').eq('id', user.id).maybeSingle();
+        .select('full_name, username, bio, yunex_id, avatar_path').eq('id', user.id).maybeSingle();
       if (error) throw error;
-      const fullName = data?.full_name || user.user_metadata?.full_name || 'ABAROX User';
-      const username = data?.username || user.user_metadata?.username || '';
+      const fullName = data?.full_name || user.user_metadata?.full_name || (isFounder ? founderDefaults.name : 'ABAROX User');
+      const username = data?.username || user.user_metadata?.username || (isFounder ? 'amanbareth' : '');
+      const bio = data?.bio || (isFounder ? founderDefaults.bio : 'Welcome to your profile.');
       if (nameEl) nameEl.textContent = fullName;
       if (handleEl) handleEl.textContent = username ? '@' + username.replace(/^@/, '') : '';
-      let savedBio = '';
-      try { savedBio = localStorage.getItem(`abaroxProfileBio:${user.id}`) || ''; } catch (_) {}
-      if (bioEl) bioEl.textContent = savedBio || 'Welcome to your profile.';
+      if (bioEl) bioEl.textContent = bio;
       const idEl = document.getElementById('founderId');
       if (idEl) idEl.textContent = data?.yunex_id || 'Account ID not available yet';
-      if (photo) renderProfileAvatar(photo, photoKey, fullName.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase());
+      if (photo) {
+        const fallback = fullName.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
+        photo.textContent = fallback || '?';
+        if (data?.avatar_path) {
+          const { data: publicData } = yunexSupabase.storage.from('avatars').getPublicUrl(data.avatar_path);
+          const url = publicData?.publicUrl || '';
+          if (url) {
+            photo.innerHTML = '';
+            const img = document.createElement('img'); img.className = 'profile-avatar-image'; img.alt = 'Profile photo'; img.src = url + (url.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(data.updated_at || Date.now());
+            photo.appendChild(img);
+          }
+        }
+      }
       const title = document.querySelector('#profile .founder-notice');
       if (title) title.hidden = true;
+      if (isFounder) { founderProfile = { name: fullName, handle: '@' + username.replace(/^@/, ''), bio }; paintFounderProfile(); }
     } catch (error) {
       console.warn('Could not load this account profile:', error.message);
       if (nameEl) nameEl.textContent = 'Profile could not be loaded';
@@ -431,6 +435,8 @@
   }
 
   function renderAuthSession(user) {
+    window.__abaroxCurrentUserId = user?.id || null;
+    loadAccountSettings?.();
     const welcomePoster = document.querySelector('#feed .welcome');
     if (welcomePoster) welcomePoster.hidden = !!user;
     if (authSessionPanel) {
@@ -703,22 +709,10 @@
   const notificationsButton = document.getElementById('notificationsButton');
   if (notificationsButton) notificationsButton.addEventListener('click', () => window.alert('You are all caught up. Notifications will appear here.'));
   const editFounderButton = document.getElementById('editFounderProfile');
-  if (editFounderButton) editFounderButton.addEventListener('click', async () => {
-    const { data: authData } = yunexSupabase ? await yunexSupabase.auth.getUser() : { data: { user: null } };
-    const user = authData?.user;
-    const isFounder = !!user && user.id === FOUNDER_AUTH_ID;
-    const nameField = document.getElementById('editFounderName');
-    const handleField = document.getElementById('editFounderHandle');
-    const bioField = document.getElementById('editFounderBio');
-    if (isFounder) {
-      nameField.value = founderProfile.name;
-      handleField.value = founderProfile.handle.replace(/^@/, '');
-      bioField.value = founderProfile.bio;
-    } else {
-      nameField.value = document.getElementById('founderName')?.textContent || '';
-      handleField.value = (document.getElementById('founderHandle')?.textContent || '').replace(/^@/, '');
-      try { bioField.value = localStorage.getItem(`abaroxProfileBio:${user.id}`) || ''; } catch (_) { bioField.value = ''; }
-    }
+  if (editFounderButton) editFounderButton.addEventListener('click', () => {
+    document.getElementById('editFounderName').value = document.getElementById('founderName')?.textContent || '';
+    document.getElementById('editFounderHandle').value = (document.getElementById('founderHandle')?.textContent || '').replace(/^@/, '');
+    document.getElementById('editFounderBio').value = document.getElementById('founderBio')?.textContent || '';
     founderEditOverlay.hidden = false;
   });
   const closeFounderEdit = document.getElementById('closeFounderEdit');
@@ -727,32 +721,30 @@
   const founderEditForm = document.getElementById('founderEditForm');
   if (founderEditForm) founderEditForm.addEventListener('submit', async event => {
     event.preventDefault();
+    if (!yunexSupabase) { alert('Supabase connection available nahi hai.'); return; }
+    const { data: sessionData } = await yunexSupabase.auth.getSession();
+    const user = sessionData?.session?.user;
+    if (!user) { alert('Profile update karne ke liye login karein.'); return; }
     const name = document.getElementById('editFounderName').value.trim();
     const username = document.getElementById('editFounderHandle').value.trim().replace(/^@/, '').replace(/\s+/g, '').toLowerCase();
     const bio = document.getElementById('editFounderBio').value.trim();
-    if (!name || name.length > 80 || !/^[A-Za-z0-9_.]{3,24}$/.test(username)) {
-      alert('Name aur username sahi bharein. Username 3-24 characters ka hona chahiye.');
-      return;
-    }
-    const { data: authData, error: authError } = yunexSupabase ? await yunexSupabase.auth.getUser() : { data: { user: null }, error: new Error('Supabase session unavailable') };
-    const user = authData?.user;
-    if (!user) { alert('Profile update karne ke liye login zaroori hai.'); return; }
-    if (user.id === FOUNDER_AUTH_ID) {
-      founderProfile = { name, handle: '@' + username, bio };
-      try { localStorage.setItem('yunexFounderProfile', JSON.stringify(founderProfile)); } catch (_) {}
-      paintFounderProfile();
-    } else {
-      const { error } = await yunexSupabase.from('profiles').update({ full_name: name, username }).eq('id', user.id);
-      if (error) { alert('Profile update nahi hua: ' + error.message); return; }
-      try { localStorage.setItem(`abaroxProfileBio:${user.id}`, bio); } catch (_) {}
-      const nameEl = document.getElementById('founderName');
-      const handleEl = document.getElementById('founderHandle');
-      const bioEl = document.getElementById('founderBio');
-      if (nameEl) nameEl.textContent = name;
-      if (handleEl) handleEl.textContent = '@' + username;
-      if (bioEl) bioEl.textContent = bio || 'Welcome to your profile.';
-    }
-    founderEditOverlay.hidden = true;
+    if (!name || !/^[A-Za-z0-9_.]{3,24}$/.test(username)) { alert('Valid name aur 3-24 character username enter karein.'); return; }
+    const saveButton = founderEditForm.querySelector('button[type=submit]');
+    if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'Saving…'; }
+    try {
+      const { error } = await yunexSupabase.from('profiles').update({ full_name: name, username, bio }).eq('id', user.id);
+      if (error) throw error;
+      if (user.id === FOUNDER_AUTH_ID) founderProfile = { name, handle: '@' + username, bio };
+      const { data: profileRow, error: readError } = await yunexSupabase.from('profiles').select('full_name,username,bio,yunex_id,avatar_path').eq('id', user.id).single();
+      if (readError) throw readError;
+      if (founderNameEl) founderNameEl.textContent = profileRow.full_name;
+      if (founderHandleEl) founderHandleEl.textContent = '@' + profileRow.username;
+      if (founderBioEl) founderBioEl.textContent = profileRow.bio || '';
+      if (user.id === FOUNDER_AUTH_ID) { try { localStorage.setItem('yunexFounderProfile', JSON.stringify(founderProfile)); } catch (_) {} }
+      founderEditOverlay.hidden = true;
+      alert('Profile successfully update ho gayi.');
+    } catch (error) { alert('Profile save nahi hui: ' + error.message); }
+    finally { if (saveButton) { saveButton.disabled = false; saveButton.textContent = 'Save changes'; } }
   });
   const founderSettingsButton = document.getElementById('founderSettings');
   const founderPhotoInput=document.getElementById('founderPhotoInput'),photoAdjustOverlay=document.getElementById('photoAdjustOverlay'),photoAdjustPreview=document.getElementById('photoAdjustPreview');
@@ -764,17 +756,27 @@
       photoAdjustPreview.style.transform=`scale(${photoTransform.zoom}) rotate(${photoTransform.rotation||0}deg)`;
     }
   }
-  function applyFounderPhoto(data,t=photoTransform){
-    const photo=document.getElementById('founderPhoto'); if(!photo)return;
-    photo.innerHTML=''; const img=document.createElement('img'); img.className='profile-avatar-image'; img.src=data; img.alt='Founder profile photo';
-    img.style.objectPosition=`${t.x}% ${t.y}%`; img.style.transform=`scale(${t.zoom}) rotate(${t.rotation||0}deg)`; photo.appendChild(img);
-    try{localStorage.setItem('yunexFounderPhoto',data);localStorage.setItem('yunexFounderPhotoTransform',JSON.stringify(t));}catch(_){}
-    refreshAllProfileAvatars();
-    const headerAvatar=document.getElementById('profileShortcut');
-    if(headerAvatar) renderProfileAvatar(headerAvatar,'founder','AB');
-    const profileNavAvatar=document.querySelector('.profile-nav-avatar');
-    if(profileNavAvatar) renderProfileAvatar(profileNavAvatar,'founder','AB');
+  async function applyFounderPhoto(data,t=photoTransform){
+    if(!yunexSupabase){alert('Supabase connection available nahi hai.');return;}
+    const { data: sessionData } = await yunexSupabase.auth.getSession();
+    const user = sessionData?.session?.user;
+    if(!user){alert('Photo update karne ke liye login karein.');return;}
+    try {
+      const blob = await (await fetch(data)).blob();
+      const ext = (blob.type.split('/')[1] || 'jpg').replace('jpeg','jpg').replace(/[^a-z0-9]/gi,'') || 'jpg';
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: uploadError } = await yunexSupabase.storage.from('avatars').upload(path, blob, { contentType: blob.type || 'image/jpeg', upsert: false });
+      if(uploadError) throw uploadError;
+      const { error: updateError } = await yunexSupabase.from('profiles').update({ avatar_path: path }).eq('id', user.id);
+      if(updateError) { await yunexSupabase.storage.from('avatars').remove([path]); throw updateError; }
+      const { data: publicResult } = yunexSupabase.storage.from('avatars').getPublicUrl(path);
+      try { localStorage.setItem(profilePhotoKey(user.id === FOUNDER_AUTH_ID ? 'founder' : `user:${user.id}`), publicResult?.publicUrl || ''); } catch(_) {}
+      await loadCurrentAccountProfile(user);
+      refreshAllProfileAvatars();
+      alert('Profile photo successfully update ho gayi.');
+    } catch(error) { alert('Photo save nahi hui: ' + error.message); }
   }
+
   if(founderPhotoInput)founderPhotoInput.addEventListener('change',()=>{
     const file=founderPhotoInput.files&&founderPhotoInput.files[0]; if(!file||!file.type.startsWith('image/'))return;
     const reader=new FileReader(); reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50,rotation:0};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;paintPhotoPreview();if(photoAdjustOverlay)photoAdjustOverlay.hidden=false;}; reader.readAsDataURL(file); founderPhotoInput.value='';
@@ -824,8 +826,7 @@
   }
   const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;pendingPhotoData='';});
   if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;pendingPhotoData='';}});
-  const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',()=>{if(pendingPhotoData)applyFounderPhoto(pendingPhotoData,photoTransform);pendingPhotoData='';photoAdjustOverlay.hidden=true;});
-  try{const saved=localStorage.getItem('yunexFounderPhoto');if(saved){try{photoTransform={...photoTransform,...JSON.parse(localStorage.getItem('yunexFounderPhotoTransform')||'{}')};}catch(_){}applyFounderPhoto(saved,photoTransform);}}catch(_){}
+  const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',async()=>{if(pendingPhotoData)await applyFounderPhoto(pendingPhotoData,photoTransform);pendingPhotoData='';photoAdjustOverlay.hidden=true;});
   const founderPhoto=document.getElementById('founderPhoto'),photoLightbox=document.getElementById('founderPhotoLightbox'),photoLarge=document.getElementById('founderPhotoLarge');let photoHoldTimer=null,photoHoldFired=false;
   if(founderPhoto&&photoLightbox){
     founderPhoto.addEventListener('contextmenu',e=>e.preventDefault());
@@ -834,9 +835,9 @@
     ['pointerup','pointerleave','pointercancel'].forEach(t=>founderPhoto.addEventListener(t,()=>clearTimeout(photoHoldTimer)));
     photoLightbox.addEventListener('click',()=>{photoLightbox.hidden=true;});photoLightbox.addEventListener('contextmenu',e=>e.preventDefault());
   }
-  const founderDatesOverlay=document.getElementById('founderDatesOverlay');let founderDates={birthday:'',birthdayAlerts:false,specialDays:[]};try{founderDates={...founderDates,...JSON.parse(localStorage.getItem('yunexFounderDates')||'{}')};}catch(_){}
+  const founderDatesOverlay=document.getElementById('founderDatesOverlay');let founderDates={birthday:'',birthdayAlerts:false,specialDays:[]};function accountSettingsKey(kind){const id=window.__abaroxCurrentUserId||'guest';return `abarox:${kind}:${id}`;}function loadAccountSettings(){try{founderDates={birthday:'',birthdayAlerts:false,specialDays:[],...JSON.parse(localStorage.getItem(accountSettingsKey('dates'))||'{}')};}catch(_){founderDates={birthday:'',birthdayAlerts:false,specialDays:[]};}}loadAccountSettings();
   function renderSpecialDays(){const list=document.getElementById('specialDaysList');if(!list)return;list.innerHTML='';founderDates.specialDays.forEach((d,i)=>{const row=document.createElement('div');row.className='special-day-item';const info=document.createElement('span');info.textContent=`${d.title} · ${d.date} · ${d.time}`;const rm=document.createElement('button');rm.type='button';rm.textContent='Remove';rm.addEventListener('click',()=>{founderDates.specialDays.splice(i,1);renderSpecialDays();});row.append(info,rm);list.appendChild(row);});}
-  function openFounderDates(){document.getElementById('founderBirthday').value=founderDates.birthday||'';document.getElementById('founderBirthdayAlerts').checked=!!founderDates.birthdayAlerts;const privacy=JSON.parse(localStorage.getItem('yunexAccountPrivacy')||'{}');document.getElementById('privateAccountToggle').checked=!!privacy.isPrivate;document.getElementById('manualTagApproval').checked=privacy.manualTagApproval!==false;renderSpecialDays();founderDatesOverlay.hidden=false;}
+  function openFounderDates(){document.getElementById('founderBirthday').value=founderDates.birthday||'';document.getElementById('founderBirthdayAlerts').checked=!!founderDates.birthdayAlerts;let privacy={};try{privacy=JSON.parse(localStorage.getItem(accountSettingsKey('privacy'))||'{}');}catch(_){}document.getElementById('privateAccountToggle').checked=!!privacy.isPrivate;document.getElementById('manualTagApproval').checked=privacy.manualTagApproval!==false;renderSpecialDays();founderDatesOverlay.hidden=false;}
   if(founderSettingsButton)founderSettingsButton.addEventListener('click',openFounderDates);
   // Account contact fields are a prototype-only convenience. Never persist passwords here.
   const founderAccountMobile=document.getElementById('founderAccountMobile');
@@ -858,7 +859,7 @@
 
   const closeFounderDates=document.getElementById('closeFounderDates');if(closeFounderDates)closeFounderDates.addEventListener('click',()=>founderDatesOverlay.hidden=true);if(founderDatesOverlay)founderDatesOverlay.addEventListener('click',e=>{if(e.target===founderDatesOverlay)founderDatesOverlay.hidden=true;});
   const addSpecialDay=document.getElementById('addSpecialDay');if(addSpecialDay)addSpecialDay.addEventListener('click',()=>{const title=document.getElementById('specialDayTitle').value.trim(),date=document.getElementById('specialDayDate').value,time=document.getElementById('specialDayTime').value||'09:00';if(!title||!date){alert('Special day name aur date dono bharo.');return;}founderDates.specialDays.push({title,date,time});document.getElementById('specialDayTitle').value='';document.getElementById('specialDayDate').value='';renderSpecialDays();});
-  const saveFounderDates=document.getElementById('saveFounderDates');if(saveFounderDates)saveFounderDates.addEventListener('click',()=>{founderDates.birthday=document.getElementById('founderBirthday').value;founderDates.birthdayAlerts=document.getElementById('founderBirthdayAlerts').checked;const privacy={isPrivate:document.getElementById('privateAccountToggle').checked,manualTagApproval:document.getElementById('manualTagApproval').checked};try{localStorage.setItem('yunexFounderDates',JSON.stringify(founderDates));localStorage.setItem('yunexAccountPrivacy',JSON.stringify(privacy));}catch(_){}founderDatesOverlay.hidden=true;alert('Profile settings is browser preview mein save ho gayi hain. Secure privacy enforcement ke liye backend/RLS connect karna zaroori hai.');});
+  const saveFounderDates=document.getElementById('saveFounderDates');if(saveFounderDates)saveFounderDates.addEventListener('click',()=>{founderDates.birthday=document.getElementById('founderBirthday').value;founderDates.birthdayAlerts=document.getElementById('founderBirthdayAlerts').checked;const privacy={isPrivate:document.getElementById('privateAccountToggle').checked,manualTagApproval:document.getElementById('manualTagApproval').checked};try{localStorage.setItem(accountSettingsKey('dates'),JSON.stringify(founderDates));localStorage.setItem(accountSettingsKey('privacy'),JSON.stringify(privacy));}catch(_){}founderDatesOverlay.hidden=true;alert('Profile settings is browser preview mein save ho gayi hain. Secure privacy enforcement ke liye backend/RLS connect karna zaroori hai.');});
   // Cover/banner feature intentionally removed from the Founder profile.
   try { localStorage.removeItem('yunexFounderCoverPhoto'); } catch (_) {}
 

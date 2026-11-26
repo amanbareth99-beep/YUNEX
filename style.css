@@ -400,24 +400,5 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 }
 .founder-dates-dialog { overscroll-behavior:contain; }
 
-
-/* ABAROX account + navigation compatibility fix (2026-11-26) */
-/* Founder markers must obey the hidden attribute even when older badge rules use !important. */
-#profile .founder-identity .founder-badge[hidden],
-#profile .founder-identity .founder-verified[hidden] { display: none !important; }
-/* The global dock is outside main. Keep it visible for Feed, Profile, Explore, Create and Compete. */
-@media (max-width: 700px) {
-  body.section-open > nav.tabs:not([hidden]),
-  body.founder-account-open > nav.tabs:not([hidden]) {
-    display: flex !important;
-    position: fixed !important;
-    top: auto !important; right: 0 !important; bottom: 0 !important; left: 0 !important;
-    width: 100% !important; margin: 0 !important;
-    transform: none !important; translate: none !important;
-    z-index: 12000 !important;
-  }
-  body.section-open main { padding-bottom: 0 !important; }
-  body.section-open main > .view.active {
-    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
-  }
-}
+/* ABAROX account visibility: the native hidden state must always win over badge display rules. */
+#profile .founder-badge[hidden], #profile .founder-verified[hidden], #profile #editFounderProfile[hidden], #profile .photo-edit[hidden], #profile #founderSettings[hidden] { display:none !important; }
