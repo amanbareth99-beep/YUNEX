@@ -104,16 +104,27 @@
       </div>
       <div class="founder-edit-overlay" id="founderDatesOverlay" hidden><div class="founder-edit-dialog founder-dates-dialog" role="dialog" aria-modal="true" aria-labelledby="founderDatesTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PRIVATE PROFILE DETAILS</p><h3 id="founderDatesTitle">Profile Settings</h3></div><button type="button" class="games-close" id="closeFounderDates" aria-label="Close">×</button></div>
+        <div class="founder-special-divider"></div><h4>Account privacy</h4>
+        <label class="founder-toggle-row"><input id="privateAccountToggle" type="checkbox"> Private account</label>
+        <label class="founder-toggle-row"><input id="manualTagApproval" type="checkbox" checked> Manually approve tagged posts</label>
+        <p class="tiny muted">Private account par naye followers ko approval chahiye. Existing followers remain. Ye preview settings is browser mein save hongi; backend policy launch se pehle connect hogi.</p>
+        <div class="founder-special-divider"></div><h4>Birthday date</h4>
+        <label>Birthday date<input id="founderBirthday" type="date"></label>
+        <label class="founder-toggle-row"><input id="founderBirthdayAlerts" type="checkbox"> Allow birthday notifications to followers / following</label>
+        <p class="tiny muted">Your full birth date stays private. Follower notifications require the ABAROX notification backend.</p>
+        <div class="founder-special-divider"></div><h4>My Special Days</h4>
+        <label>Special day name<input id="specialDayTitle" maxlength="40" placeholder="e.g. Business launch day"></label>
+        <div class="founder-date-grid"><label>Date<input id="specialDayDate" type="date"></label><label>Reminder time<input id="specialDayTime" type="time" value="09:00"></label></div>
+        <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button>
+        <div id="specialDaysList" class="special-days-list"></div>
+        <p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p>
         <div class="founder-special-divider"></div><h4>Change login password</h4>
         <label>New password<input id="founderNewPassword" type="password" autocomplete="new-password" placeholder="Enter new password"></label>
         <label>Confirm new password<input id="founderConfirmPassword" type="password" autocomplete="new-password" placeholder="Confirm new password"></label>
         <button type="button" class="secondary full" id="changeFounderPassword">Update password</button>
         <p class="tiny muted">Password is never saved in this browser preview. Actual mobile/email login changes and password updates will work only after secure Supabase authentication is connected and verified.</p>
         <div class="founder-special-divider"></div>
-        <label>Birthday date<input id="founderBirthday" type="date"></label><label class="founder-toggle-row"><input id="founderBirthdayAlerts" type="checkbox"> Allow birthday notifications to followers / following</label>
-        <p class="tiny muted">Your full birth date stays private. Follower notifications require the ABAROX notification backend.</p><div class="founder-special-divider"></div><h4>Account privacy</h4><label class="founder-toggle-row"><input id="privateAccountToggle" type="checkbox"> Private account</label><label class="founder-toggle-row"><input id="manualTagApproval" type="checkbox" checked> Manually approve tagged posts</label><p class="tiny muted">Private account par naye followers ko approval chahiye. Existing followers remain. Ye preview settings is browser mein save hongi; backend policy launch se pehle connect hogi.</p><div class="founder-special-divider"></div><h4>My Special Days</h4>
-        <label>Special day name<input id="specialDayTitle" maxlength="40" placeholder="e.g. Business launch day"></label><div class="founder-date-grid"><label>Date<input id="specialDayDate" type="date"></label><label>Reminder time<input id="specialDayTime" type="time" value="09:00"></label></div>
-        <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button><div id="specialDaysList" class="special-days-list"></div><p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p><button type="button" class="primary full" id="saveFounderDates">Save settings</button>
+        <button type="button" class="primary full" id="saveFounderDates">Save settings</button>
         <div class="founder-special-divider"></div><h4>Log out</h4>
         <button type="button" class="secondary full" id="yunexProfileLogoutButton">Log out</button>
         <p class="tiny muted" id="profileLogoutFeedback" role="status"></p>

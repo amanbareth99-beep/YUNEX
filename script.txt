@@ -66,10 +66,6 @@
   // Track the actual visible viewport. Android keyboards may resize the
   // layout viewport or overlay it; bottom-gap handles both modes.
   function syncVisibleViewport() {
-    // The VisualViewport changes while Android Chrome's address bar expands/collapses.
-    // Only chat needs these measurements for keyboard handling; other sections use
-    // stable CSS viewport sizing so ordinary scrolling cannot move the page frame.
-    if (!document.body.classList.contains('chat-open')) return;
     const vv = window.visualViewport;
     const height = vv ? vv.height : window.innerHeight;
     const top = vv ? vv.offsetTop : 0;
@@ -79,12 +75,15 @@
     document.documentElement.style.setProperty('--yunex-vv-top', `${Math.max(0, top)}px`);
     document.documentElement.style.setProperty('--yunex-vv-bottom-gap', `${bottomGap}px`);
   }
-  syncVisibleViewport();
-  window.addEventListener('resize', syncVisibleViewport, { passive: true });
-  window.addEventListener('orientationchange', () => window.setTimeout(syncVisibleViewport, 80), { passive: true });
+  // Only synchronize the visual viewport while chat is active. On Android,
+  // browser chrome animations can emit transient viewport scroll events;
+  // updating layout variables during ordinary tab navigation makes the dock jump.
+  if (currentView === 'chat') syncVisibleViewport();
+  window.addEventListener('resize', () => { if (currentView === 'chat') syncVisibleViewport(); }, { passive: true });
+  window.addEventListener('orientationchange', () => window.setTimeout(() => { if (currentView === 'chat') syncVisibleViewport(); }, 80), { passive: true });
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', syncVisibleViewport, { passive: true });
-    window.visualViewport.addEventListener('scroll', syncVisibleViewport, { passive: true });
+    window.visualViewport.addEventListener('resize', () => { if (currentView === 'chat') syncVisibleViewport(); }, { passive: true });
+    window.visualViewport.addEventListener('scroll', () => { if (currentView === 'chat') syncVisibleViewport(); }, { passive: true });
   }
   const chatInputForViewport = document.getElementById('chatInput');
   if (chatInputForViewport) {
