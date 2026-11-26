@@ -595,3 +595,39 @@ body.public-profile-open #demoProfile .demo-user-card{
 
 .photo-adjust-control{display:block!important;margin:12px 0!important;color:#dceeff!important;font-size:12px!important;font-weight:800!important}
 .photo-adjust-control input[type=range]{display:block;width:100%;margin:9px 0 0!important;accent-color:#168bff}
+
+
+/* ABAROX profile polish: stable width, founder identity hierarchy and action order. */
+html,body{max-width:100%;overflow-x:clip!important}
+main,.view{max-width:100%;overflow-x:clip!important;overscroll-behavior-x:none}
+.founder-profile-panel{min-width:0!important}
+.founder-identity{display:flex!important;align-items:center!important;gap:7px!important;flex-wrap:wrap!important}
+.founder-handle{margin:5px 0 8px!important;color:#9db4cf!important;font-size:13px!important}
+.founder-id-row{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important;margin:5px 0 9px!important}
+.founder-id-row span{font-size:10px!important;letter-spacing:1px!important;color:#79a4d1!important;font-weight:800!important}
+.founder-id-row b{font-size:13px!important;color:#d9edff!important;letter-spacing:.4px!important}
+.founder-crown-badge{width:max-content!important;margin:0 0 7px!important;color:#ffe3a0!important;border:1px solid #b58a2d!important;background:linear-gradient(135deg,#3a2a0d,#1d1a12)!important}
+.founder-personal-badge{width:max-content!important;margin:0 0 12px!important;color:#a9d9ff!important;border:1px solid #246fba!important;background:linear-gradient(135deg,#102c4c,#101b30)!important}
+.founder-personal-star{color:#ffd45a!important;font-size:16px!important}
+.founder-profile-actions.profile-primary-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin-top:17px!important}
+.founder-profile-actions.profile-primary-actions button{min-width:0!important;min-height:46px!important;padding:9px 5px!important;font-size:clamp(10px,2.7vw,12px)!important;white-space:normal!important;line-height:1.15!important}
+.brand-collaboration-action{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;width:100%!important;min-height:49px!important;margin:10px 0 17px!important;padding:10px 14px!important;border:1px solid #138edb!important;border-radius:14px!important;background:linear-gradient(100deg,#0a1d32,#0b2943)!important;color:#53c9ff!important;font-weight:850!important;font-size:14px!important;box-shadow:0 0 18px #0788d522!important}
+.brand-collaboration-action>span:first-child{font-size:19px!important}.brand-collab-arrow{margin-left:auto!important;font-size:24px!important;line-height:1!important}
+#founderCrownBadge[hidden],#founderPersonalBadge[hidden]{display:none!important}
+.demo-profile-back{display:none!important}
+/* Photo selection opens a true full-screen crop workspace on mobile and desktop. */
+#photoAdjustOverlay{position:fixed!important;inset:0!important;z-index:50000!important;padding:0!important;display:grid!important;place-items:stretch!important;background:#030812!important;overscroll-behavior:contain!important}
+#photoAdjustOverlay[hidden]{display:none!important}
+#photoAdjustOverlay .photo-adjust-dialog{width:100%!important;max-width:none!important;height:100dvh!important;max-height:100dvh!important;min-height:100dvh!important;overflow:auto!important;border:0!important;border-radius:0!important;padding:calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 18px)!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;background:radial-gradient(ellipse at 50% 34%,#102b4b 0%,#071321 52%,#030812 100%)!important}
+#photoAdjustOverlay .founder-edit-head{width:100%!important;flex:0 0 auto!important}
+#photoAdjustOverlay .photo-adjust-preview{width:min(78vw,52vh)!important;height:min(78vw,52vh)!important;max-width:420px!important;max-height:420px!important;flex:0 0 auto!important;margin:clamp(18px,5vh,42px) auto 14px!important;border-radius:50%!important}
+#photoAdjustOverlay .photo-gesture-hint{color:#a9c5e1!important;text-align:center!important;font-size:12px!important;margin:8px 0 18px!important}
+#photoAdjustOverlay .photo-adjust-control{display:block!important;flex:0 0 auto!important}
+#photoAdjustOverlay .photo-adjust-control input[type=range]{display:block!important;min-height:30px!important}
+#photoAdjustOverlay #resetPhotoAdjust{margin-top:12px!important}
+#photoAdjustOverlay #savePhotoAdjust{margin-top:auto!important;min-height:52px!important}
+body.photo-adjust-open{overflow:hidden!important;touch-action:pan-y!important}
+@media(max-width:380px){.founder-profile-actions.profile-primary-actions{gap:5px!important}.founder-profile-actions.profile-primary-actions button{font-size:10px!important;padding:8px 3px!important}}
+
+.profile-photo-change{display:flex!important;align-items:center!important;justify-content:center!important;min-height:44px!important;margin:8px 0 16px!important;padding:10px 14px!important;border:1px solid #238fe0!important;border-radius:12px!important;background:#102c49!important;color:#83d5ff!important;font-size:13px!important;font-weight:850!important;text-align:center!important;cursor:pointer!important}
+#profile .photo-edit{display:none!important}

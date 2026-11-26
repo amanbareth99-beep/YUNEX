@@ -377,7 +377,8 @@
     const nameEl = document.getElementById('founderName');
     const handleEl = document.getElementById('founderHandle');
     const bioEl = document.getElementById('founderBio');
-    const founderBadge = document.querySelector('#profile .founder-badge');
+    const founderBadge = document.getElementById('founderCrownBadge');
+    const personalFounderBadge = document.getElementById('founderPersonalBadge');
     const verified = document.querySelector('#profile .founder-verified');
     const editButton = document.getElementById('editFounderProfile');
     const photoEdit = document.querySelector('#profile .photo-edit');
@@ -389,6 +390,7 @@
       if (handleEl) handleEl.textContent = '';
       if (bioEl) bioEl.textContent = '';
       if (founderBadge) founderBadge.hidden = true;
+      if (personalFounderBadge) personalFounderBadge.hidden = true;
       if (verified) verified.hidden = true;
       if (editButton) editButton.hidden = true;
       if (photoEdit) photoEdit.hidden = true;
@@ -400,6 +402,7 @@
     const isFounder = user.id === FOUNDER_AUTH_ID;
     const photoKey = isFounder ? 'founder' : `user:${user.id}`;
     if (founderBadge) founderBadge.hidden = !isFounder;
+    if (personalFounderBadge) personalFounderBadge.hidden = !isFounder;
     if (verified) verified.hidden = !isFounder;
     if (editButton) editButton.hidden = false;
     if (photoEdit) photoEdit.hidden = false;
@@ -944,7 +947,7 @@
   if(founderPhotoInput)founderPhotoInput.addEventListener('change',(event)=>{
     event.stopPropagation();
     const file=founderPhotoInput.files&&founderPhotoInput.files[0]; if(!file||!file.type.startsWith('image/'))return;
-    const reader=new FileReader(); reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50,rotation:0};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;paintPhotoPreview();if(photoAdjustOverlay)photoAdjustOverlay.hidden=false;}; reader.onerror=()=>alert('Selected photo read nahi ho paayi. Dusri photo try karein.'); reader.readAsDataURL(file); founderPhotoInput.value='';
+    const reader=new FileReader(); reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50,rotation:0};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;paintPhotoPreview();if(photoAdjustOverlay){photoAdjustOverlay.hidden=false;document.body.classList.add('photo-adjust-open');}window.scrollTo(0,0);}; reader.onerror=()=>alert('Selected photo read nahi ho paayi. Dusri photo try karein.'); reader.readAsDataURL(file); founderPhotoInput.value='';
   });
   // Direct manipulation: one-finger pan; two-finger pinch zoom + full 360-degree rotation.
   const adjustStage=document.querySelector('.photo-adjust-preview');
@@ -995,9 +998,9 @@
   if(photoZoomControl)photoZoomControl.addEventListener('input',()=>{photoTransform.zoom=Number(photoZoomControl.value)||1;paintPhotoPreview();});
   if(photoRotationControl)photoRotationControl.addEventListener('input',()=>{photoTransform.rotation=Number(photoRotationControl.value)||0;paintPhotoPreview();});
   if(resetPhotoAdjust)resetPhotoAdjust.addEventListener('click',()=>{photoTransform={zoom:1,x:50,y:50,rotation:0};paintPhotoPreview();});
-  const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;pendingPhotoData='';});
-  if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;pendingPhotoData='';}});
-  const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',async(e)=>{e.preventDefault();e.stopPropagation();if(!pendingPhotoData)return;savePhotoAdjust.disabled=true;const oldLabel=savePhotoAdjust.textContent;savePhotoAdjust.textContent='Saving…';const saved=await applyFounderPhoto(pendingPhotoData,photoTransform);savePhotoAdjust.disabled=false;savePhotoAdjust.textContent=oldLabel;if(saved){pendingPhotoData='';if(photoAdjustOverlay)photoAdjustOverlay.hidden=true;}});
+  const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;document.body.classList.remove('photo-adjust-open');pendingPhotoData='';});
+  if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;document.body.classList.remove('photo-adjust-open');pendingPhotoData='';}});
+  const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',async(e)=>{e.preventDefault();e.stopPropagation();if(!pendingPhotoData)return;savePhotoAdjust.disabled=true;const oldLabel=savePhotoAdjust.textContent;savePhotoAdjust.textContent='Saving…';const saved=await applyFounderPhoto(pendingPhotoData,photoTransform);savePhotoAdjust.disabled=false;savePhotoAdjust.textContent=oldLabel;if(saved){pendingPhotoData='';if(photoAdjustOverlay){photoAdjustOverlay.hidden=true;document.body.classList.remove('photo-adjust-open');}}});
   const founderPhoto=document.getElementById('founderPhoto'),photoLightbox=document.getElementById('founderPhotoLightbox'),photoLarge=document.getElementById('founderPhotoLarge');let photoHoldTimer=null,photoHoldFired=false;
   if(founderPhoto&&photoLightbox){
     founderPhoto.addEventListener('contextmenu',e=>e.preventDefault());
@@ -1145,7 +1148,7 @@
   }));
 
   const backFromDemoProfile = document.getElementById('backFromDemoProfile');
-  if (backFromDemoProfile) backFromDemoProfile.addEventListener('click', () => navigate('explore'));
+  if (backFromDemoProfile) backFromDemoProfile.remove();
 
   const shareFounderButton = document.getElementById('shareFounderProfile');
   if (shareFounderButton) shareFounderButton.addEventListener('click', async () => {
