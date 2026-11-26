@@ -87,7 +87,6 @@
         <div class="founder-identity"><h2 id="founderName">Aman Bareth</h2><span class="founder-verified" title="Founder profile">✦</span><p id="founderHandle" class="founder-handle">@amanbareth</p><span class="founder-badge"><svg class="founder-badge-crown" viewBox="0 0 24 18" aria-hidden="true" focusable="false"><path d="M2 4.2 6.7 8 11.9 1.8 17.2 8 22 4.2 20 15.8H4L2 4.2Z" fill="currentColor" stroke="#fff0ad" stroke-width=".7" stroke-linejoin="round"/><path d="M4.1 16.8h15.8" stroke="#fff0ad" stroke-width="1.2" stroke-linecap="round"/></svg><span>ABAROX FOUNDER</span></span></div>
         <p class="founder-bio" id="founderBio">Building ABAROX — a place to connect, create and win. 🚀</p>
         <div class="founder-id-row"><span>ACCOUNT ID</span><b id="founderId">Loading ACCOUNT ID…</b></div>
-        <button type="button" class="secondary full" id="logoutCurrentProfile">Log out</button>
         <div class="stats founder-stats"><div><b>0</b><small>Posts</small></div><div><b>0</b><small>Followers</small></div><div><b>0</b><small>Following</small></div></div>
         <div class="founder-profile-actions"><button class="primary" id="shareFounderProfile">Share profile</button><button class="secondary" id="founderSettings">Profile settings</button><button class="secondary" id="brandCollabFounder">Brand Collaboration</button></div>
         <div class="founder-content-tabs"><button class="selected" data-profile-tab="posts">Posts</button><button data-profile-tab="reels">Reels</button><button data-profile-tab="tagged">Tagged</button></div>
@@ -107,8 +106,6 @@
       <div class="founder-edit-overlay" id="founderDatesOverlay" hidden><div class="founder-edit-dialog founder-dates-dialog" role="dialog" aria-modal="true" aria-labelledby="founderDatesTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PRIVATE PROFILE DETAILS</p><h3 id="founderDatesTitle">Profile Settings</h3></div><button type="button" class="games-close" id="closeFounderDates" aria-label="Close">×</button></div>
         <div class="founder-special-divider"></div><h4>Account &amp; Security</h4>
-        <button type="button" class="secondary full" id="yunexProfileLogoutButton">Log out</button>
-        <p class="tiny muted" id="profileLogoutFeedback" role="status"></p>
         <p class="tiny muted">Founder contact details for the account setup. These fields are a local preview until Supabase Auth is connected.</p>
         <label>Mobile number<input id="founderAccountMobile" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" autocomplete="tel" value="9340869865"></label>
         <label>Email / Gmail<input id="founderAccountEmail" type="email" autocomplete="email" value="Amanbareth99@gmail.com"></label>
@@ -123,6 +120,9 @@
         <p class="tiny muted">Your full birth date stays private. Follower notifications require the ABAROX notification backend.</p><div class="founder-special-divider"></div><h4>Account privacy</h4><label class="founder-toggle-row"><input id="privateAccountToggle" type="checkbox"> Private account</label><label class="founder-toggle-row"><input id="manualTagApproval" type="checkbox" checked> Manually approve tagged posts</label><p class="tiny muted">Private account par naye followers ko approval chahiye. Existing followers remain. Ye preview settings is browser mein save hongi; backend policy launch se pehle connect hogi.</p><div class="founder-special-divider"></div><h4>My Special Days</h4>
         <label>Special day name<input id="specialDayTitle" maxlength="40" placeholder="e.g. Business launch day"></label><div class="founder-date-grid"><label>Date<input id="specialDayDate" type="date"></label><label>Reminder time<input id="specialDayTime" type="time" value="09:00"></label></div>
         <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button><div id="specialDaysList" class="special-days-list"></div><p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p><button type="button" class="primary full" id="saveFounderDates">Save settings</button>
+        <div class="founder-special-divider"></div><h4>Log out</h4>
+        <button type="button" class="secondary full" id="yunexProfileLogoutButton">Log out</button>
+        <p class="tiny muted" id="profileLogoutFeedback" role="status"></p>
       </div></div>
       <div class="founder-edit-overlay" id="photoAdjustOverlay" hidden><div class="founder-edit-dialog photo-adjust-dialog" role="dialog" aria-modal="true" aria-labelledby="photoAdjustTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PROFILE PHOTO</p><h3 id="photoAdjustTitle">Adjust your photo</h3></div><button type="button" class="games-close" id="closePhotoAdjust" aria-label="Close">×</button></div>

@@ -587,8 +587,6 @@
   if (logoutButton) logoutButton.addEventListener('click', yunexLogout);
   const profileLogoutButton = document.getElementById('yunexProfileLogoutButton');
   if (profileLogoutButton) profileLogoutButton.addEventListener('click', yunexLogout);
-  const currentProfileLogout = document.getElementById('logoutCurrentProfile');
-  if (currentProfileLogout) currentProfileLogout.addEventListener('click', yunexLogout);
 
   const forgotPasswordButton = document.getElementById('forgotPasswordButton');
   if (forgotPasswordButton) forgotPasswordButton.addEventListener('click', async () => {
