@@ -858,7 +858,7 @@
     if (!user) { alert('Profile update karne ke liye login karein.'); return; }
     const name = document.getElementById('editFounderName').value.trim();
     const username = document.getElementById('editFounderHandle').value.trim().replace(/^@/, '').replace(/\s+/g, '').toLowerCase();
-    const bio = document.getElementById('editFounderBio').value.trim();
+    const bio = document.getElementById('editFounderBio').value;
     if (!name || !/^[A-Za-z0-9_.]{3,24}$/.test(username)) { alert('Valid name aur 3-24 character username enter karein.'); return; }
     const saveButton = founderEditForm.querySelector('button[type=submit]');
     if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'Saving…'; }
@@ -879,10 +879,8 @@
 
   function paintPhotoPreview(){
     if(photoAdjustPreview){
-      const radians=(Number(photoTransform.rotation)||0)*Math.PI/180;
-      const rotationCoverage=Math.abs(Math.cos(radians))+Math.abs(Math.sin(radians));
       photoAdjustPreview.style.objectPosition=`${photoTransform.x}% ${photoTransform.y}%`;
-      photoAdjustPreview.style.transform=`scale(${(Number(photoTransform.zoom)||1)*rotationCoverage}) rotate(${photoTransform.rotation||0}deg)`;
+      photoAdjustPreview.style.transform=`scale(${Number(photoTransform.zoom)||1}) rotate(${photoTransform.rotation||0}deg)`;
       photoAdjustPreview.style.transformOrigin='center center';
     }
     const zoomControl=document.getElementById('photoZoom');
@@ -917,8 +915,7 @@
       cropCtx.drawImage(source, left, top, drawW, drawH);
       // Then apply the same zoom/rotation shown in the editor preview.
       const radians=(Number(t?.rotation)||0)*Math.PI/180;
-      const rotationCoverage=Math.abs(Math.cos(radians))+Math.abs(Math.sin(radians));
-      const finalScale=Math.max(1,Number(t?.zoom)||1)*rotationCoverage;
+      const finalScale=Math.max(1,Number(t?.zoom)||1);
       ctx.fillStyle = '#071426'; ctx.fillRect(0,0,size,size);
       ctx.save(); ctx.translate(size/2,size/2); ctx.rotate(radians); ctx.scale(finalScale,finalScale);
       ctx.drawImage(cropCanvas,-size/2,-size/2,size,size); ctx.restore();

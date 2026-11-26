@@ -668,3 +668,37 @@ body.photo-adjust-open{overflow:hidden!important;touch-action:pan-y!important}
 .demo-user-card .brand-collaboration-action{min-height:58px!important;margin:12px 0 16px!important}
 .demo-user-card .founder-content-tabs{margin:0 -18px!important}
 @media(max-width:390px){#profile .profile-heading-row{gap:11px!important}#profile .founder-photo-wrap{flex-basis:88px!important;width:88px!important;height:88px!important}#profile .founder-avatar.founder-photo{width:84px!important;height:84px!important}#profile .founder-identity h2{font-size:19px!important}.demo-profile-heading{gap:11px!important}.demo-profile-avatar{flex-basis:84px!important;width:84px!important;height:84px!important}}
+
+/* Profile refinement requested: username under square avatar, compact Founder badge,
+   borderless stats row, newline-preserving bio and square crop workspace. */
+#profile .founder-profile-top{align-items:flex-start!important;justify-content:flex-start!important;gap:16px!important;min-height:0!important;padding:8px 0 2px!important;margin:0!important}
+#profile .founder-photo-column{flex:0 0 104px!important;width:104px!important;min-width:0!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:6px!important}
+#profile .founder-photo-wrap{width:104px!important;height:104px!important;flex:0 0 104px!important}
+#profile .founder-avatar.founder-photo{width:104px!important;height:104px!important;border-radius:15px!important;object-fit:cover!important}
+#profile .founder-photo img{border-radius:12px!important;object-fit:cover!important}
+#profile .founder-handle{display:block!important;width:100%!important;text-align:center!important;margin:0!important;font-size:12px!important;line-height:1.25!important;overflow-wrap:anywhere!important}
+#profile .profile-identity-column{flex:1 1 0!important;min-width:0!important;gap:7px!important;align-items:flex-start!important;padding-top:2px!important}
+#profile .founder-identity{margin:0!important;gap:6px!important;align-items:center!important}
+#profile .founder-identity h2{font-size:clamp(18px,5.1vw,25px)!important;line-height:1.15!important}
+#profile .profile-badge-id-row{gap:7px!important;align-items:center!important;flex-wrap:wrap!important}
+#profile .founder-crown-badge{padding:5px 7px!important;min-height:25px!important;font-size:8px!important;gap:4px!important;border-radius:999px!important}
+#profile .founder-badge-crown{width:15px!important;height:12px!important;flex:0 0 15px!important}
+#profile .founder-id-row{padding:0!important;min-height:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;gap:0!important;display:inline-flex!important}
+#profile .founder-id-row span{display:none!important}
+#profile .founder-id-row b{font-size:clamp(10px,3vw,12px)!important;letter-spacing:.2px!important;color:#d9edff!important}
+#profile .founder-bio{white-space:pre-wrap!important;overflow-wrap:anywhere!important;word-break:normal!important;line-height:1.55!important}
+#profile .founder-stats{border-top:0!important;border-bottom:0!important;padding:12px 0 10px!important;margin:12px 0 0!important}
+#profile .founder-stats>div+div:before{top:6px!important;bottom:6px!important;background:#203750!important}
+#photoAdjustOverlay .photo-adjust-preview{border-radius:16px!important;border:3px solid #219dff!important;box-shadow:0 0 0 4px #10233a,0 10px 32px #0008!important;background:#081321!important}
+#photoAdjustOverlay .photo-adjust-preview img{border-radius:12px!important}
+#photoAdjustOverlay .photo-adjust-dialog{justify-content:flex-start!important}
+#photoAdjustOverlay #savePhotoAdjust{margin-top:20px!important}
+#demoBio,.demo-profile-bio{white-space:pre-wrap!important;overflow-wrap:anywhere!important}
+@media(max-width:390px){
+  #profile .founder-profile-top{gap:12px!important}
+  #profile .founder-photo-column,#profile .founder-photo-wrap{width:88px!important;flex-basis:88px!important}
+  #profile .founder-photo-wrap{height:88px!important}
+  #profile .founder-avatar.founder-photo{width:88px!important;height:88px!important}
+  #profile .founder-identity h2{font-size:18px!important}
+  #profile .founder-crown-badge{padding:4px 6px!important;font-size:8px!important}
+}
