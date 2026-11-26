@@ -482,8 +482,33 @@
     }
   }
 
+  function themeStorageKey(userId) { return `abarox:theme:${userId || 'guest'}`; }
+  function applyTheme(theme) {
+    const chosen = theme === 'light' ? 'light' : 'dark';
+    document.body.dataset.theme = chosen;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = chosen === 'light' ? '#f4f7fc' : '#070b14';
+    document.querySelectorAll('[data-theme-choice]').forEach(button => button.classList.toggle('selected', button.dataset.themeChoice === chosen));
+  }
+  function loadThemeForAccount(userId) {
+    let theme = 'dark';
+    try { theme = localStorage.getItem(themeStorageKey(userId)) || localStorage.getItem('abarox:theme:last') || 'dark'; } catch (_) {}
+    applyTheme(theme);
+  }
+  function saveThemeChoice(theme) {
+    const chosen = theme === 'light' ? 'light' : 'dark';
+    try {
+      localStorage.setItem(themeStorageKey(window.__abaroxCurrentUserId || 'guest'), chosen);
+      localStorage.setItem('abarox:theme:last', chosen);
+    } catch (_) { /* keep the selected theme active for this session */ }
+    applyTheme(chosen);
+  }
+  loadThemeForAccount(window.__abaroxCurrentUserId || null);
+  document.querySelectorAll('[data-theme-choice]').forEach(button => button.addEventListener('click', () => saveThemeChoice(button.dataset.themeChoice)));
+
   function renderAuthSession(user) {
     window.__abaroxCurrentUserId = user?.id || null;
+    loadThemeForAccount(window.__abaroxCurrentUserId);
     if (typeof loadAccountSettings === 'function') loadAccountSettings();
     const welcomePoster = document.querySelector('#feed .welcome');
     if (welcomePoster) welcomePoster.hidden = !!user;
@@ -1056,6 +1081,16 @@
       row.append(info,rm); list.appendChild(row);
     });
   }
+  function showSettingsPage(page) {
+    document.querySelectorAll('#founderDatesOverlay [data-settings-page]').forEach(section => {
+      section.hidden = section.dataset.settingsPage !== page;
+    });
+    const title = document.getElementById('founderDatesTitle');
+    const pageTitles = { main:'Profile Settings', password:'Password', birthday:'Birthday', privacy:'Privacy', special:'My Special Days', theme:'Theme', logout:'Log out' };
+    if (title) title.textContent = pageTitles[page] || 'Profile Settings';
+  }
+  document.querySelectorAll('#founderDatesOverlay [data-settings-open]').forEach(button => button.addEventListener('click', () => showSettingsPage(button.dataset.settingsOpen)));
+  document.querySelectorAll('#founderDatesOverlay [data-settings-back]').forEach(button => button.addEventListener('click', () => showSettingsPage('main')));
   function openFounderDates() {
     const birthday=document.getElementById('founderBirthday');
     const alerts=document.getElementById('founderBirthdayAlerts');
@@ -1068,7 +1103,7 @@
     if(privateToggle)privateToggle.checked=!!privacy.isPrivate;
     if(tagToggle)tagToggle.checked=privacy.manualTagApproval!==false;
     renderSpecialDays();
-    if(founderDatesOverlay)founderDatesOverlay.hidden=false;
+    if(founderDatesOverlay){showSettingsPage('main');founderDatesOverlay.hidden=false;}
   }
   if(founderSettingsButton)founderSettingsButton.addEventListener('click',openFounderDates);
 
@@ -1107,8 +1142,7 @@
     document.getElementById('specialDayDate').value='';
     renderSpecialDays();
   });
-  const saveFounderDates=document.getElementById('saveFounderDates');
-  if(saveFounderDates)saveFounderDates.addEventListener('click',()=>{
+  function saveFounderSettings() {
     founderDates.birthday=document.getElementById('founderBirthday').value;
     founderDates.birthdayAlerts=document.getElementById('founderBirthdayAlerts').checked;
     const privacy={
@@ -1122,9 +1156,10 @@
       alert('Profile settings save nahi ho paayi. Browser storage available nahi hai.');
       return;
     }
-    founderDatesOverlay.hidden=true;
-    // Successful saves stay silent; no confirmation popup.
-  });
+    // Successful saves stay silent. Keep the current layer open so the user can continue.
+    showSettingsPage('main');
+  }
+  document.querySelectorAll('#founderDatesOverlay .settings-save').forEach(button => button.addEventListener('click', saveFounderSettings));
   // Cover/banner feature intentionally removed from the Founder profile.
   try { localStorage.removeItem('yunexFounderCoverPhoto'); } catch (_) {}
 

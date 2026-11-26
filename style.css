@@ -720,3 +720,105 @@ body.photo-adjust-open{overflow:hidden!important;touch-action:pan-y!important}
 #photoAdjustOverlay .photo-adjust-preview{border-radius:18px!important}
 #photoAdjustOverlay .photo-adjust-preview img{border-radius:14px!important}
 @media(max-width:390px){.demo-profile-heading{gap:16px!important}.demo-profile-photo-column{width:88px!important;flex-basis:88px!important}.demo-profile-avatar{width:88px!important;height:88px!important;flex-basis:88px!important;border-radius:14px!important}.demo-profile-identity h2{font-size:18px!important}.demo-profile-identity .founder-crown-badge{padding:4px 6px!important;font-size:8px!important}}
+
+/* Profile Settings layered navigation + account theme preferences */
+.settings-layer-dialog{padding:18px 16px 20px}
+.settings-layer[hidden],.settings-layer[data-settings-page][hidden]{display:none!important}
+.settings-intro{margin:0 0 12px}
+.settings-menu-item{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 12px;margin:7px 0;background:#101e31;border:1px solid #233c59;border-radius:13px;color:var(--text)}
+.settings-menu-item:active{transform:scale(.99)}
+.settings-menu-icon{width:38px;height:38px;flex:none;display:grid;place-items:center;background:#102c4a;border:1px solid #244d75;border-radius:12px;font-size:17px}
+.settings-menu-item>span:nth-child(2){display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.settings-menu-item b{font-size:13px}.settings-menu-item small{font-size:10px;color:var(--muted);line-height:1.35}.settings-chevron{font-size:24px;color:#76bfff;line-height:1}
+.settings-logout-item b{color:#ff8d9d}
+.settings-subpage h4{font-size:16px;margin:10px 0 14px}
+.settings-back{display:inline-flex;align-items:center;border:1px solid #284866;background:#10243a;color:#8fd0ff;border-radius:10px;padding:9px 12px;font-weight:800;font-size:12px;margin:0 0 12px}
+.theme-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.theme-choice{display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 8px;border-radius:14px;border:1px solid #2b4969;background:#101e31;color:var(--text)}
+.theme-choice.selected{border-color:#168bff;box-shadow:0 0 0 2px #168bff35,0 0 20px #168bff22}
+.theme-preview{width:100%;height:68px;border-radius:10px;display:grid;place-items:center;font-size:25px;border:1px solid #34516f}
+.theme-preview-dark{background:linear-gradient(140deg,#07111f,#102c4b);color:#63c4ff}
+.theme-preview-light{background:linear-gradient(140deg,#fff,#eaf2fb);color:#147cff}
+.theme-choice b{font-size:12px}.theme-choice small{font-size:9px;color:var(--muted);text-align:center}
+
+/* Light mode: same ABAROX layout, light surfaces and electric-blue accents */
+body[data-theme="light"]{--bg:#f3f6fb;--panel:#ffffff;--panel2:#edf2f8;--line:#d6e0ec;--blue:#1678ed;--cyan:#087fc8;--text:#17253a;--muted:#66788e;background:radial-gradient(ellipse at 80% 0%,#e1efff 0%,transparent 38%),var(--bg);color:var(--text)}
+body[data-theme="light"] .topbar{background:#ffffffed;border-bottom-color:#dbe4ef}
+body[data-theme="light"] .brand{color:#13243a}
+body[data-theme="light"] .tagline{color:#168bff}
+body[data-theme="light"] .tabs{background:#fff;border-color:#d7e1ee;box-shadow:0 8px 25px #1d477012}
+body[data-theme="light"] .tab{color:#687c93}
+body[data-theme="light"] .tab.active{background:#e5f2ff;color:#087de5}
+body[data-theme="light"] .welcome{background:linear-gradient(120deg,#eaf4ff,#fff 70%);color:#15263d;border:1px solid #d8e7f7}
+body[data-theme="light"] .panel,body[data-theme="light"] .post,body[data-theme="light"] .competition-card,body[data-theme="light"] .form-panel{background:linear-gradient(145deg,#fff,#f6f9fd);border-color:#d8e2ef;color:#17253a;box-shadow:0 12px 35px #1b47700d}
+body[data-theme="light"] .secondary{background:#edf4fc;border-color:#c8d9eb;color:#18334f}
+body[data-theme="light"] .search,body[data-theme="light"] textarea,body[data-theme="light"] input:not([type=checkbox]),body[data-theme="light"] select,body[data-theme="light"] .chat-compose input{background:#fff;border-color:#cbd9e8;color:#17253a}
+body[data-theme="light"] .category-grid button{background:#fff;border-color:#d3dfed;color:#17253a;box-shadow:0 5px 16px #173b6308}
+body[data-theme="light"] .notice{background:#edf7ff;border-color:#c6e3fb;color:#285b83}
+body[data-theme="light"] .form-panel label,body[data-theme="light"] .founder-edit-dialog label{color:#344c66}
+body[data-theme="light"] .chat-messages{background:#f1f5fa;border-color:#d5e0ec}
+body[data-theme="light"] .chat-bubble.received{background:#e3ebf5;color:#23384f}
+body[data-theme="light"] .chat-bubble.sent{background:#d8ecff;color:#123d68}
+body[data-theme="light"] .chat-compose{background:#fff;border-top-color:#d5e0ec}
+body[data-theme="light"] .chat-demo-warning{background:#fff4e5;border-color:#ead1aa;color:#6c4b24}
+body[data-theme="light"] .typing-indicator{background:#fff;border-color:#d6e1ed;color:#5e7188}
+body[data-theme="light"] .founder-profile-panel{background:linear-gradient(160deg,#fff,#f4f8fc 65%,#eef4fa)!important;border-color:#d4e0ed!important;box-shadow:0 15px 45px #173c650c!important}
+body[data-theme="light"] .founder-profile-view{color:#17253a}
+body[data-theme="light"] .founder-identity h2{color:#17253a!important}
+body[data-theme="light"] .founder-handle{color:#61778f!important}
+body[data-theme="light"] .founder-bio{color:#334b65!important}
+body[data-theme="light"] .founder-id-row{background:linear-gradient(110deg,#f3f8fd,#fff)!important;border-color:#d5e2ef!important}
+body[data-theme="light"] .founder-id-row b{color:#53708c!important}
+body[data-theme="light"] .founder-stats{border-color:#d6e1ed}
+body[data-theme="light"] .founder-empty-state{color:#23384f}
+body[data-theme="light"] .founder-empty-state p{color:#657990}
+body[data-theme="light"] .founder-content-tabs{border-color:#d7e1ed}
+body[data-theme="light"] .founder-content-tabs button{color:#6d8198}
+body[data-theme="light"] .founder-content-tabs button.selected{color:#087fe5}
+body[data-theme="light"] .founder-edit-overlay{background:#d7e2efb8}
+body[data-theme="light"] .founder-edit-dialog{background:#fff;border-color:#cbdced;color:#17253a;box-shadow:0 20px 70px #23496c24}
+body[data-theme="light"] .founder-edit-dialog textarea{background:#fff;border-color:#ccd9e8;color:#17253a}
+body[data-theme="light"] .special-day-item{background:#f1f6fc;border-color:#d5e0ec;color:#263d56}
+body[data-theme="light"] .settings-menu-item{background:#fff;border-color:#d5e0ec;color:#17253a;box-shadow:0 4px 14px #173c6508}
+body[data-theme="light"] .settings-menu-icon{background:#eaf4ff;border-color:#d1e5f8}
+body[data-theme="light"] .settings-chevron{color:#168bff}
+body[data-theme="light"] .settings-back{background:#edf6ff;border-color:#c8def2;color:#1676ce}
+body[data-theme="light"] .theme-choice{background:#fff;border-color:#d2deeb;color:#17253a}
+body[data-theme="light"] .theme-choice.selected{border-color:#168bff;box-shadow:0 0 0 2px #168bff25}
+body[data-theme="light"] footer{color:#6d8198;border-top-color:#d9e3ef}
+body[data-theme="light"] .exit-toast{background:#fff;color:#17253a;border-color:#168bff;box-shadow:0 8px 28px #173c6520}
+body[data-theme="light"] .chat-top-fixed{background:#fff!important;border-color:#d5e0ec!important}
+body[data-theme="light"] .chat-compose button,body[data-theme="light"] .primary{color:#fff}
+body[data-theme="light"] .brand-collaboration-action{color:#087fe5}
+body[data-theme="light"] .bottom-dock,body[data-theme="light"] .mobile-bottom-nav{background:#ffffffed;border-color:#d5e0ec}
+body[data-theme="light"] .tab.create-tab{background:linear-gradient(100deg,#0879f9,#25b9ff);color:#fff}
+/* Additional light-theme coverage for existing section controls */
+body[data-theme="light"] .post-head,body[data-theme="light"] .post-actions,body[data-theme="light"] .caption,body[data-theme="light"] .competition-meta{color:#344b65}
+body[data-theme="light"] .competition-meta b{color:#17253a}
+body[data-theme="light"] .live-pill{background:#e8f4ff;border-color:#c9e2fa;color:#1476c8}
+body[data-theme="light"] .post-actions button{color:#536b85}
+body[data-theme="light"] .post-actions .liked{color:#e84f75}
+body[data-theme="light"] .profile-card{color:#17253a}
+body[data-theme="light"] .chat-heading,body[data-theme="light"] .chat-heading h2{color:#17253a}
+body[data-theme="light"] .chat-demo-warning{color:#6c4b24}
+body[data-theme="light"] .founder-edit-head .eyebrow{color:#1678ed}
+body[data-theme="light"] .founder-badge{color:#7b5813;background:#fff6df;border-color:#d6b363}
+body[data-theme="light"] .founder-profile-panel .founder-identity .founder-badge{background:linear-gradient(135deg,#fff5d9,#fffaf0)!important;color:#8b6415!important;border-color:#d8b665!important}
+body[data-theme="light"] .founder-avatar.founder-photo{background:#e8f3ff!important;border-color:#fff!important;outline-color:#168bff!important;color:#1669b4!important;box-shadow:0 8px 28px #173b6518,0 0 24px #168bff1c!important}
+body[data-theme="light"] .founder-profile-actions .secondary{background:#edf5fd!important;border-color:#d1e0ef!important;color:#193957!important}
+body[data-theme="light"] .founder-empty-state .empty-grid-icon{background:#e9f4ff;border-color:#c8e1f8;color:#168bff}
+body[data-theme="light"] .photo-adjust-preview{background:#e5edf6;border-color:#cbd9e8}
+body[data-theme="light"] .photo-gesture-hint{color:#62768d}
+body[data-theme="light"] .founder-photo-lightbox{background:#f1f6fcf2}
+body[data-theme="light"] .founder-photo-lightbox span{color:#526981}
+body[data-theme="light"] .chat-bubble{box-shadow:0 2px 8px #183a5d0b}
+body[data-theme="light"] .message-meta{color:#60758c}
+body[data-theme="light"] .message-status{color:#177bd4}
+body[data-theme="light"] .post-art{color:#fff}
+body[data-theme="light"] .upload-box{background:#f4f9ff!important;color:#24445f!important}
+body[data-theme="light"] .upload-box small{color:#61778d}
+body[data-theme="light"] .chat-compose input::placeholder,body[data-theme="light"] input::placeholder,body[data-theme="light"] textarea::placeholder{color:#7b8ea3}
+body[data-theme="light"] .founder-special-divider{border-color:#d8e3ee}
+body[data-theme="light"] .founder-date-grid{color:#344b65}
+body[data-theme="light"] .profile-photo-change{background:#eaf4ff;color:#1678d5;border-color:#c6def5}
+body[data-theme="light"] .notification-shortcut{color:#173b5d}
