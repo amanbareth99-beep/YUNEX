@@ -390,9 +390,11 @@
     const isFounder = user.id === FOUNDER_AUTH_ID;
     if (founderBadge) founderBadge.hidden = !isFounder;
     if (verified) verified.hidden = !isFounder;
-    if (editButton) editButton.hidden = !isFounder;
-    if (photoEdit) photoEdit.hidden = !isFounder;
-    if (settingsButton) settingsButton.hidden = !isFounder;
+    // Every signed-in account can edit its own profile and open its settings.
+    // Founder-only identity markers remain restricted to the verified Founder Auth UUID.
+    if (editButton) editButton.hidden = false;
+    if (photoEdit) photoEdit.hidden = false;
+    if (settingsButton) settingsButton.hidden = false;
     if (photo) photo.dataset.profileAvatar = photoKey;
     if (isFounder) {
       if (typeof founderProfile !== 'undefined') {
@@ -412,7 +414,9 @@
       const username = data?.username || user.user_metadata?.username || '';
       if (nameEl) nameEl.textContent = fullName;
       if (handleEl) handleEl.textContent = username ? '@' + username.replace(/^@/, '') : '';
-      if (bioEl) bioEl.textContent = 'Welcome to your profile.';
+      let savedBio = '';
+      try { savedBio = localStorage.getItem(`abaroxProfileBio:${user.id}`) || ''; } catch (_) {}
+      if (bioEl) bioEl.textContent = savedBio || 'Welcome to your profile.';
       const idEl = document.getElementById('founderId');
       if (idEl) idEl.textContent = data?.yunex_id || 'Account ID not available yet';
       if (photo) renderProfileAvatar(photo, photoKey, fullName.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase());
@@ -699,25 +703,55 @@
   const notificationsButton = document.getElementById('notificationsButton');
   if (notificationsButton) notificationsButton.addEventListener('click', () => window.alert('You are all caught up. Notifications will appear here.'));
   const editFounderButton = document.getElementById('editFounderProfile');
-  if (editFounderButton) editFounderButton.addEventListener('click', () => {
-    document.getElementById('editFounderName').value = founderProfile.name;
-    document.getElementById('editFounderHandle').value = founderProfile.handle.replace(/^@/, '');
-    document.getElementById('editFounderBio').value = founderProfile.bio;
+  if (editFounderButton) editFounderButton.addEventListener('click', async () => {
+    const { data: authData } = yunexSupabase ? await yunexSupabase.auth.getUser() : { data: { user: null } };
+    const user = authData?.user;
+    const isFounder = !!user && user.id === FOUNDER_AUTH_ID;
+    const nameField = document.getElementById('editFounderName');
+    const handleField = document.getElementById('editFounderHandle');
+    const bioField = document.getElementById('editFounderBio');
+    if (isFounder) {
+      nameField.value = founderProfile.name;
+      handleField.value = founderProfile.handle.replace(/^@/, '');
+      bioField.value = founderProfile.bio;
+    } else {
+      nameField.value = document.getElementById('founderName')?.textContent || '';
+      handleField.value = (document.getElementById('founderHandle')?.textContent || '').replace(/^@/, '');
+      try { bioField.value = localStorage.getItem(`abaroxProfileBio:${user.id}`) || ''; } catch (_) { bioField.value = ''; }
+    }
     founderEditOverlay.hidden = false;
   });
   const closeFounderEdit = document.getElementById('closeFounderEdit');
   if (closeFounderEdit) closeFounderEdit.addEventListener('click', () => { founderEditOverlay.hidden = true; });
   if (founderEditOverlay) founderEditOverlay.addEventListener('click', event => { if (event.target === founderEditOverlay) founderEditOverlay.hidden = true; });
   const founderEditForm = document.getElementById('founderEditForm');
-  if (founderEditForm) founderEditForm.addEventListener('submit', event => {
+  if (founderEditForm) founderEditForm.addEventListener('submit', async event => {
     event.preventDefault();
-    founderProfile = {
-      name: document.getElementById('editFounderName').value.trim() || founderDefaults.name,
-      handle: '@' + document.getElementById('editFounderHandle').value.trim().replace(/^@/, '').replace(/\s+/g, '').toLowerCase(),
-      bio: document.getElementById('editFounderBio').value.trim()
-    };
-    try { localStorage.setItem('yunexFounderProfile', JSON.stringify(founderProfile)); } catch (_) {}
-    paintFounderProfile();
+    const name = document.getElementById('editFounderName').value.trim();
+    const username = document.getElementById('editFounderHandle').value.trim().replace(/^@/, '').replace(/\s+/g, '').toLowerCase();
+    const bio = document.getElementById('editFounderBio').value.trim();
+    if (!name || name.length > 80 || !/^[A-Za-z0-9_.]{3,24}$/.test(username)) {
+      alert('Name aur username sahi bharein. Username 3-24 characters ka hona chahiye.');
+      return;
+    }
+    const { data: authData, error: authError } = yunexSupabase ? await yunexSupabase.auth.getUser() : { data: { user: null }, error: new Error('Supabase session unavailable') };
+    const user = authData?.user;
+    if (!user) { alert('Profile update karne ke liye login zaroori hai.'); return; }
+    if (user.id === FOUNDER_AUTH_ID) {
+      founderProfile = { name, handle: '@' + username, bio };
+      try { localStorage.setItem('yunexFounderProfile', JSON.stringify(founderProfile)); } catch (_) {}
+      paintFounderProfile();
+    } else {
+      const { error } = await yunexSupabase.from('profiles').update({ full_name: name, username }).eq('id', user.id);
+      if (error) { alert('Profile update nahi hua: ' + error.message); return; }
+      try { localStorage.setItem(`abaroxProfileBio:${user.id}`, bio); } catch (_) {}
+      const nameEl = document.getElementById('founderName');
+      const handleEl = document.getElementById('founderHandle');
+      const bioEl = document.getElementById('founderBio');
+      if (nameEl) nameEl.textContent = name;
+      if (handleEl) handleEl.textContent = '@' + username;
+      if (bioEl) bioEl.textContent = bio || 'Welcome to your profile.';
+    }
     founderEditOverlay.hidden = true;
   });
   const founderSettingsButton = document.getElementById('founderSettings');
