@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#070b14">
-  <title>YUNEX — Connect. Create. Win.</title>
+  <title>ABAROX — Connect. Create. Win.</title>
+  <meta name="description" content="ABAROX — Connect. Create. Win. A social media and competition platform.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#" aria-label="YUNEX home"><span class="brand-mark">Y</span><span class="brand-copy"><b>YUNEX</b><small class="tagline">CONNECT. CREATE. WIN.</small></span></a>
-    <div class="top-account-name" id="topAccountName">Aman Bareth</div>
+    <a class="brand" href="#" aria-label="ABAROX home"><img class="brand-logo" src="assets/branding/abarox-symbol.jpg" alt="ABAROX logo"><span class="brand-copy"><b>ABAROX</b><small class="tagline">CONNECT. CREATE. WIN.</small></span></a>
     <button class="notification-shortcut" id="notificationsButton" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="notification-indicator" aria-hidden="true"></span></button>
   </header>
 
@@ -24,29 +24,24 @@
     </nav>
 
     <section id="feed" class="view active">
-    <section class="welcome panel">
-      <div>
-        <p class="eyebrow">YOUR NEXT SOCIAL SPACE</p>
-        <h1>Make your moment<br><span>matter.</span></h1>
-        <p class="muted">Discover creators, share your talent and be part of something new.</p>
-        <div class="welcome-actions">
-          <button class="primary" data-view="feed">Explore YUNEX</button>
-          <button class="secondary" data-view="account">Create account</button>
-        </div>
+    <section class="welcome panel abarox-welcome" aria-label="ABAROX welcome poster">
+      <img class="abarox-launch-poster" src="assets/branding/abarox-launch-poster.png" alt="ABAROX — Connect. Create. Win. Make Your Moment Matter">
+      <div class="welcome-actions abarox-welcome-actions">
+        <button class="primary" data-view="account">Join ABAROX</button>
+        <button class="secondary" data-view="account">Login</button>
       </div>
-      <div class="orb" aria-hidden="true"><span>Y</span></div>
     </section>
 
           <div class="section-heading"><div><p class="eyebrow">THE COMMUNITY</p><h2>For you</h2></div><span class="live-pill">● DEMO FEED</span></div>
       <article class="post panel">
         <div class="post-head" role="group" aria-label="Post author profile"><button class="userpic profile-open" data-profile-avatar="user:@riya_demo" data-user="Riya Creates" data-handle="@riya_demo">RK</button><button class="post-user profile-open" data-user="Riya Creates" data-handle="@riya_demo"><b>Riya Creates</b><small>@riya_demo · 2h ago</small></button><button class="dots" aria-label="More">•••</button></div>
-        <div class="post-art art-one"><span>CREATE<br>WITHOUT<br>LIMITS.</span><small>YUNEX CREATOR SPOTLIGHT</small></div>
+        <div class="post-art art-one"><span>CREATE<br>WITHOUT<br>LIMITS.</span><small>ABAROX CREATOR SPOTLIGHT</small></div>
         <div class="post-actions"><button class="like-btn">♡ <span>Like</span></button><button>◌ <span>Comment</span></button><button>↗ <span>Share</span></button></div>
         <p class="caption"><b>Riya Creates</b> Every small step is part of a big journey. ✨</p>
       </article>
       <article class="post panel">
         <div class="post-head"><button class="userpic blue profile-open" data-profile-avatar="user:@arjun_demo" data-user="Arjun Singh" data-handle="@arjun_demo">AS</button><button class="post-user profile-open" data-user="Arjun Singh" data-handle="@arjun_demo"><b>Arjun Singh</b><small>@arjun_demo · 5h ago</small></button><button class="dots" aria-label="More">•••</button></div>
-        <div class="post-art art-two"><span>YOUR<br>STORY.<br>YOUR STAGE.</span><small>YUNEX COMMUNITY</small></div>
+        <div class="post-art art-two"><span>YOUR<br>STORY.<br>YOUR STAGE.</span><small>ABAROX COMMUNITY</small></div>
         <div class="post-actions"><button class="like-btn">♡ <span>Like</span></button><button>◌ <span>Comment</span></button><button>↗ <span>Share</span></button></div>
         <p class="caption"><b>Arjun Singh</b> Keep creating. Your audience is out there. 🚀</p>
       </article>
@@ -54,7 +49,8 @@
 
     <section id="explore" class="view">
       <p class="eyebrow">FIND YOUR PEOPLE</p><h2>Explore</h2>
-      <input class="search" id="exploreSearch" placeholder="Search creators or categories…">
+      <input class="search" id="exploreSearch" placeholder="Search by username…" autocomplete="off">
+      <div id="exploreSearchResults" class="explore-search-results" aria-live="polite">Search by username (at least 2 characters).</div>
       <div class="category-grid">
         <button>🎭<b>Comedy</b></button><button>💃<b>Dancing</b></button><button>🎤<b>Singing</b></button><button>🎮<b>Gaming</b></button><button>🎨<b>Art</b></button><button>🌟<b>Talent</b></button>
       </div>
@@ -87,9 +83,9 @@
           <div class="founder-photo-wrap"><div class="founder-avatar founder-photo" id="founderPhoto" data-profile-avatar="founder">AB</div><label class="photo-edit" for="founderPhotoInput" aria-label="Change profile photo">✎</label><input id="founderPhotoInput" type="file" accept="image/*" hidden></div>
           <button class="secondary edit-profile-btn" id="editFounderProfile">Edit profile</button>
         </div>
-        <div class="founder-identity"><h2 id="founderName">Aman Bareth</h2><span class="founder-verified" title="Founder profile">✦</span><p id="founderHandle" class="founder-handle">@amanbareth</p><span class="founder-badge"><svg class="founder-badge-crown" viewBox="0 0 24 18" aria-hidden="true" focusable="false"><path d="M2 4.2 6.7 8 11.9 1.8 17.2 8 22 4.2 20 15.8H4L2 4.2Z" fill="currentColor" stroke="#fff0ad" stroke-width=".7" stroke-linejoin="round"/><path d="M4.1 16.8h15.8" stroke="#fff0ad" stroke-width="1.2" stroke-linecap="round"/></svg><span>YUNEX FOUNDER</span></span></div>
-        <p class="founder-bio" id="founderBio">Building YUNEX — a place to connect, create and win. 🚀</p>
-        <div class="founder-id-row"><span>YUNEX ID</span><b id="founderId">Will be assigned after secure account setup</b></div>
+        <div class="founder-identity"><h2 id="founderName">Aman Bareth</h2><span class="founder-verified" title="Founder profile">✦</span><p id="founderHandle" class="founder-handle">@amanbareth</p><span class="founder-badge"><svg class="founder-badge-crown" viewBox="0 0 24 18" aria-hidden="true" focusable="false"><path d="M2 4.2 6.7 8 11.9 1.8 17.2 8 22 4.2 20 15.8H4L2 4.2Z" fill="currentColor" stroke="#fff0ad" stroke-width=".7" stroke-linejoin="round"/><path d="M4.1 16.8h15.8" stroke="#fff0ad" stroke-width="1.2" stroke-linecap="round"/></svg><span>ABAROX FOUNDER</span></span></div>
+        <p class="founder-bio" id="founderBio">Building ABAROX — a place to connect, create and win. 🚀</p>
+        <div class="founder-id-row"><span>ACCOUNT ID</span><b id="founderId">Loading ACCOUNT ID…</b></div>
         <div class="stats founder-stats"><div><b>0</b><small>Posts</small></div><div><b>0</b><small>Followers</small></div><div><b>0</b><small>Following</small></div></div>
         <div class="founder-profile-actions"><button class="primary" id="shareFounderProfile">Share profile</button><button class="secondary" id="founderSettings">Profile settings</button><button class="secondary" id="brandCollabFounder">Brand Collaboration</button></div>
         <div class="founder-content-tabs"><button class="selected" data-profile-tab="posts">Posts</button><button data-profile-tab="reels">Reels</button><button data-profile-tab="tagged">Tagged</button></div>
@@ -107,12 +103,7 @@
         </form>
       </div>
       <div class="founder-edit-overlay" id="founderDatesOverlay" hidden><div class="founder-edit-dialog founder-dates-dialog" role="dialog" aria-modal="true" aria-labelledby="founderDatesTitle">
-        <div class="founder-edit-head"><div><p class="eyebrow">PRIVATE PROFILE DETAILS</p><h3 id="founderDatesTitle">Birthday &amp; Special Days</h3></div><button type="button" class="games-close" id="closeFounderDates" aria-label="Close">×</button></div>
-        <div class="founder-special-divider"></div><h4>Account &amp; Security</h4>
-        <p class="tiny muted">Founder contact details for the account setup. These fields are a local preview until Supabase Auth is connected.</p>
-        <label>Mobile number<input id="founderAccountMobile" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" autocomplete="tel" value="9340869865"></label>
-        <label>Email / Gmail<input id="founderAccountEmail" type="email" autocomplete="email" value="Amanbareth99@gmail.com"></label>
-        <button type="button" class="secondary full" id="saveFounderContact">Save contact details (preview)</button>
+        <div class="founder-edit-head"><div><p class="eyebrow">PRIVATE PROFILE DETAILS</p><h3 id="founderDatesTitle">Profile Settings</h3></div><button type="button" class="games-close" id="closeFounderDates" aria-label="Close">×</button></div>
         <div class="founder-special-divider"></div><h4>Change login password</h4>
         <label>New password<input id="founderNewPassword" type="password" autocomplete="new-password" placeholder="Enter new password"></label>
         <label>Confirm new password<input id="founderConfirmPassword" type="password" autocomplete="new-password" placeholder="Confirm new password"></label>
@@ -120,9 +111,12 @@
         <p class="tiny muted">Password is never saved in this browser preview. Actual mobile/email login changes and password updates will work only after secure Supabase authentication is connected and verified.</p>
         <div class="founder-special-divider"></div>
         <label>Birthday date<input id="founderBirthday" type="date"></label><label class="founder-toggle-row"><input id="founderBirthdayAlerts" type="checkbox"> Allow birthday notifications to followers / following</label>
-        <p class="tiny muted">Your full birth date stays private. Follower notifications require the YUNEX notification backend.</p><div class="founder-special-divider"></div><h4>Account privacy</h4><label class="founder-toggle-row"><input id="privateAccountToggle" type="checkbox"> Private account</label><label class="founder-toggle-row"><input id="manualTagApproval" type="checkbox" checked> Manually approve tagged posts</label><p class="tiny muted">Private account par naye followers ko approval chahiye. Existing followers remain. Ye preview settings is browser mein save hongi; backend policy launch se pehle connect hogi.</p><div class="founder-special-divider"></div><h4>My Special Days</h4>
+        <p class="tiny muted">Your full birth date stays private. Follower notifications require the ABAROX notification backend.</p><div class="founder-special-divider"></div><h4>Account privacy</h4><label class="founder-toggle-row"><input id="privateAccountToggle" type="checkbox"> Private account</label><label class="founder-toggle-row"><input id="manualTagApproval" type="checkbox" checked> Manually approve tagged posts</label><p class="tiny muted">Private account par naye followers ko approval chahiye. Existing followers remain. Ye preview settings is browser mein save hongi; backend policy launch se pehle connect hogi.</p><div class="founder-special-divider"></div><h4>My Special Days</h4>
         <label>Special day name<input id="specialDayTitle" maxlength="40" placeholder="e.g. Business launch day"></label><div class="founder-date-grid"><label>Date<input id="specialDayDate" type="date"></label><label>Reminder time<input id="specialDayTime" type="time" value="09:00"></label></div>
         <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button><div id="specialDaysList" class="special-days-list"></div><p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p><button type="button" class="primary full" id="saveFounderDates">Save settings</button>
+        <div class="founder-special-divider"></div><h4>Log out</h4>
+        <button type="button" class="secondary full" id="yunexProfileLogoutButton">Log out</button>
+        <p class="tiny muted" id="profileLogoutFeedback" role="status"></p>
       </div></div>
       <div class="founder-edit-overlay" id="photoAdjustOverlay" hidden><div class="founder-edit-dialog photo-adjust-dialog" role="dialog" aria-modal="true" aria-labelledby="photoAdjustTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PROFILE PHOTO</p><h3 id="photoAdjustTitle">Adjust your photo</h3></div><button type="button" class="games-close" id="closePhotoAdjust" aria-label="Close">×</button></div>
@@ -150,7 +144,7 @@
             <button class="chat-tool games-tool" id="gamesButton" type="button" aria-label="Games" title="Games"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 17h16a8 8 0 0 1 7.7 10l-1.4 5.2a4 4 0 0 1-6.5 2l-4.1-3.4h-8.4l-4.1 3.4a4 4 0 0 1-6.5-2L7.3 27A8 8 0 0 1 15 17Z"/><path d="M16 23v8m-4-4h8m11-2h.1m5 5h.1"/></svg></button>
           </div>
         </header>
-        <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my YUNEX profile. 👋</div></div></div>
+        <div id="chatMessages" class="chat-messages" aria-live="polite"><div class="chat-bubble received"><div>Hi! Welcome to my ABAROX profile. 👋</div></div></div>
         <div class="reaction-tray" id="reactionTray" hidden aria-label="Animated chat reactions"><button type="button" data-reaction="kiss">💋<span>Kiss</span></button><button type="button" data-reaction="love">💗<span>Love You</span></button><button type="button" data-reaction="miss">💔<span>Miss You</span></button><button type="button" data-reaction="laugh">😂<span>Laugh</span></button><button type="button" data-reaction="cry">😭<span>Cry</span></button><button type="button" data-reaction="horror">👻<span>Horror</span></button></div><form id="chatForm" class="chat-compose"><button class="chat-gallery-button" id="chatGalleryButton" type="button" aria-label="Open gallery" title="Attach photo or video"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button><input id="chatGalleryInput" type="file" accept="image/*,video/*" hidden><input id="chatInput" autocomplete="off" placeholder="Write a message…" aria-label="Write a message"><button class="primary" type="submit">Send</button></form>
       </div>
     </section>
@@ -181,7 +175,7 @@
       <form class="panel form-panel yunex-login-form" id="yunexLoginForm" novalidate hidden>
         <label>Email address<input id="loginEmail" type="email" autocomplete="username" placeholder="Enter your registered email" required></label>
         <label>Password<div class="password-wrap"><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password" required><button class="password-eye" type="button" data-toggle-password="loginPassword" aria-label="Show password">◉</button></div></label>
-        <button class="primary full" id="yunexLoginButton" type="submit">Login to YUNEX</button>
+        <button class="primary full" id="yunexLoginButton" type="submit">Login to ABAROX</button>
         <p id="loginFeedback" class="notice" role="status">Founder and user accounts both sign in with their registered email and password.</p>
         <button type="button" class="text-button" id="forgotPasswordButton">Forgot password?</button>
       </form>
@@ -192,7 +186,7 @@
     </section>
   </main>
 
-  <div class="hug-overlay" id="hugOverlay" hidden><section class="hug-dialog" role="dialog" aria-modal="true" aria-labelledby="hugTitle"><h2 id="hugTitle">🤗 Hug request</h2><p id="hugRequestText">A friend sent you a hug request.</p><div class="hug-preview" id="hugPreview" aria-hidden="true">🧑‍🤝‍🧑</div><div class="hug-actions"><button class="secondary" id="declineHug" type="button">Decline</button><button class="primary" id="acceptHug" type="button">Accept Hug</button></div><p class="tiny muted">Local preview only. A real request/accept event needs the YUNEX messaging backend.</p></section></div>
+  <div class="hug-overlay" id="hugOverlay" hidden><section class="hug-dialog" role="dialog" aria-modal="true" aria-labelledby="hugTitle"><h2 id="hugTitle">🤗 Hug request</h2><p id="hugRequestText">A friend sent you a hug request.</p><div class="hug-preview" id="hugPreview" aria-hidden="true">🧑‍🤝‍🧑</div><div class="hug-actions"><button class="secondary" id="declineHug" type="button">Decline</button><button class="primary" id="acceptHug" type="button">Accept Hug</button></div><p class="tiny muted">Local preview only. A real request/accept event needs the ABAROX messaging backend.</p></section></div>
 
   <div class="games-overlay" id="gamesOverlay" hidden>
     <section class="games-dialog" role="dialog" aria-modal="true" aria-labelledby="gamesTitle">
@@ -201,12 +195,12 @@
       <p class="game-demo-note" id="gameStatus">Invite your chat friend. This is a local preview; invitations are not delivered to another device.</p>
       <div class="game-invite-row"><button class="secondary" id="sendGameInvite">Send game invite</button><button class="secondary" id="acceptGameInvite">Accept</button><button class="secondary" id="declineGameInvite">Decline</button></div>
       <div id="ticTacToeBoard" class="ttt-board" aria-label="Tic-Tac-Toe board"><button data-cell="0"></button><button data-cell="1"></button><button data-cell="2"></button><button data-cell="3"></button><button data-cell="4"></button><button data-cell="5"></button><button data-cell="6"></button><button data-cell="7"></button><button data-cell="8"></button></div>
-      <div id="wordGamePanel" class="word-game-panel" hidden><p>Take turns adding a word to the chain.</p><div id="wordChain" class="word-chain">YUNEX</div><form id="wordForm"><input id="wordInput" placeholder="Type your word…" aria-label="Type your word"><button class="primary" type="submit">Add</button></form></div>
+      <div id="wordGamePanel" class="word-game-panel" hidden><p>Take turns adding a word to the chain.</p><div id="wordChain" class="word-chain">ABAROX</div><form id="wordForm"><input id="wordInput" placeholder="Type your word…" aria-label="Type your word"><button class="primary" type="submit">Add</button></form></div>
       <button class="secondary full" id="resetGame">Restart game</button>
     </section>
   </div>
 
-  <footer>© 2026 YUNEX <span>Built to create something bigger.</span></footer>
+  <footer>© 2026 ABAROX <span>Built to create something bigger.</span></footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="script.js"></script>

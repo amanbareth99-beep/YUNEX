@@ -66,6 +66,10 @@
   // Track the actual visible viewport. Android keyboards may resize the
   // layout viewport or overlay it; bottom-gap handles both modes.
   function syncVisibleViewport() {
+    // The VisualViewport changes while Android Chrome's address bar expands/collapses.
+    // Only chat needs these measurements for keyboard handling; other sections use
+    // stable CSS viewport sizing so ordinary scrolling cannot move the page frame.
+    if (!document.body.classList.contains('chat-open')) return;
     const vv = window.visualViewport;
     const height = vv ? vv.height : window.innerHeight;
     const top = vv ? vv.offsetTop : 0;
@@ -118,7 +122,7 @@
     const profileButton = event.target.closest('.profile-open');
     if (profileButton) {
       activeDemoUser = {
-        name: profileButton.dataset.user || 'YUNEX Creator',
+        name: profileButton.dataset.user || 'ABAROX Creator',
         handle: profileButton.dataset.handle || '@creator_demo'
       };
       document.getElementById('demoName').textContent = activeDemoUser.name;
@@ -296,7 +300,7 @@
       );
     }
   } catch (error) {
-    console.error('YUNEX Supabase initialization failed:', error);
+    console.error('ABAROX Supabase initialization failed:', error);
   }
 
   function setAuthFeedback(element, message, isError = false) {
@@ -333,23 +337,112 @@
     if (Object.keys(profilePatch).length) {
       // Update only known profile columns. Never write yunex_id: the database trigger owns it.
       const { error } = await yunexSupabase.from('profiles').update(profilePatch).eq('id', user.id);
-      if (error) console.warn('YUNEX profile sync was not completed:', error.message);
+      if (error) console.warn('ABAROX profile sync was not completed:', error.message);
     }
     if (typeof meta.phone_number === 'string' && /^[0-9]{10}$/.test(meta.phone_number)) {
       // user_private_details row is created by the existing database setup; update only its known phone column.
       const { error } = await yunexSupabase.from('user_private_details')
         .update({ phone_number: meta.phone_number }).eq('user_id', user.id);
-      if (error) console.warn('YUNEX private phone sync was not completed:', error.message);
+      if (error) console.warn('ABAROX private phone sync was not completed:', error.message);
+    }
+  }
+
+  const FOUNDER_AUTH_ID = '84293736-9358-4c8d-ae27-48eda6e4cb1c';
+
+  async function refreshYunexId(user) {
+    const idElement = document.getElementById('founderId');
+    if (!idElement) return;
+    if (!user || !yunexSupabase) { idElement.textContent = 'Login to view your Account ID'; return; }
+    idElement.textContent = 'Loading Account ID…';
+    try {
+      const { data, error } = await yunexSupabase.from('profiles')
+        .select('yunex_id').eq('id', user.id).maybeSingle();
+      if (error) throw error;
+      idElement.textContent = data?.yunex_id || 'Account ID not available yet';
+    } catch (error) {
+      console.warn('Could not load Account ID:', error.message);
+      idElement.textContent = 'Account ID could not be loaded';
+    }
+  }
+
+  async function loadCurrentAccountProfile(user) {
+    const nameEl = document.getElementById('founderName');
+    const handleEl = document.getElementById('founderHandle');
+    const bioEl = document.getElementById('founderBio');
+    const founderBadge = document.querySelector('#profile .founder-badge');
+    const verified = document.querySelector('#profile .founder-verified');
+    const editButton = document.getElementById('editFounderProfile');
+    const photoEdit = document.querySelector('#profile .photo-edit');
+    const settingsButton = document.getElementById('founderSettings');
+    const photoKey = user?.id === FOUNDER_AUTH_ID ? 'founder' : (user?.id ? `user:${user.id}` : '');
+    const photo = document.getElementById('founderPhoto');
+    if (!user) {
+      if (nameEl) nameEl.textContent = 'Login to view your profile';
+      if (handleEl) handleEl.textContent = '';
+      if (bioEl) bioEl.textContent = '';
+      if (founderBadge) founderBadge.hidden = true;
+      if (verified) verified.hidden = true;
+      if (editButton) editButton.hidden = true;
+      if (photoEdit) photoEdit.hidden = true;
+      if (settingsButton) settingsButton.hidden = true;
+      if (photo) { photo.dataset.profileAvatar = ''; photo.textContent = '?'; }
+      return;
+    }
+    const isFounder = user.id === FOUNDER_AUTH_ID;
+    if (founderBadge) founderBadge.hidden = !isFounder;
+    if (verified) verified.hidden = !isFounder;
+    if (editButton) editButton.hidden = !isFounder;
+    if (photoEdit) photoEdit.hidden = !isFounder;
+    if (settingsButton) settingsButton.hidden = !isFounder;
+    if (photo) photo.dataset.profileAvatar = photoKey;
+    if (isFounder) {
+      if (typeof founderProfile !== 'undefined') {
+        if (nameEl) nameEl.textContent = founderProfile.name;
+        if (handleEl) handleEl.textContent = founderProfile.handle;
+        if (bioEl) bioEl.textContent = founderProfile.bio;
+      }
+      if (photo) renderProfileAvatar(photo, 'founder', 'AB');
+      return;
+    }
+    if (!yunexSupabase) return;
+    try {
+      const { data, error } = await yunexSupabase.from('profiles')
+        .select('full_name, username, yunex_id').eq('id', user.id).maybeSingle();
+      if (error) throw error;
+      const fullName = data?.full_name || user.user_metadata?.full_name || 'ABAROX User';
+      const username = data?.username || user.user_metadata?.username || '';
+      if (nameEl) nameEl.textContent = fullName;
+      if (handleEl) handleEl.textContent = username ? '@' + username.replace(/^@/, '') : '';
+      if (bioEl) bioEl.textContent = 'Welcome to your profile.';
+      const idEl = document.getElementById('founderId');
+      if (idEl) idEl.textContent = data?.yunex_id || 'Account ID not available yet';
+      if (photo) renderProfileAvatar(photo, photoKey, fullName.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase());
+      const title = document.querySelector('#profile .founder-notice');
+      if (title) title.hidden = true;
+    } catch (error) {
+      console.warn('Could not load this account profile:', error.message);
+      if (nameEl) nameEl.textContent = 'Profile could not be loaded';
+      if (handleEl) handleEl.textContent = '';
+      if (bioEl) bioEl.textContent = 'Check profiles table permissions (RLS) in Supabase.';
     }
   }
 
   function renderAuthSession(user) {
-    if (!authSessionPanel) return;
-    if (user) {
-      authSessionPanel.hidden = false;
-      if (authSessionText) authSessionText.textContent = `Signed in as ${user.email || 'YUNEX user'}. Your YUNEX profile and role remain controlled by the database.`;
-    } else {
-      authSessionPanel.hidden = true;
+    const welcomePoster = document.querySelector('#feed .welcome');
+    if (welcomePoster) welcomePoster.hidden = !!user;
+    if (authSessionPanel) {
+      authSessionPanel.hidden = !user;
+      if (user && authSessionText) authSessionText.textContent = `Signed in as ${user.email || 'ABAROX user'}.`;
+    }
+    refreshYunexId(user);
+    loadCurrentAccountProfile(user);
+  }
+
+  function enterHomeAfterAuth() {
+    setAuthMode('register');
+    if (currentView !== 'feed') {
+      history.replaceState({ yunex: true, view: 'feed' }, '', location.pathname + location.search);
+      renderView('feed');
     }
   }
 
@@ -359,10 +452,14 @@
   } else {
     yunexSupabase.auth.getSession().then(({ data, error }) => {
       if (error) console.warn('Could not read YUNEX session:', error.message);
-      renderAuthSession(data?.session?.user || null);
+      const user = data?.session?.user || null;
+      renderAuthSession(user);
+      if (user) enterHomeAfterAuth();
     });
     yunexSupabase.auth.onAuthStateChange((_event, session) => {
-      renderAuthSession(session?.user || null);
+      const user = session?.user || null;
+      renderAuthSession(user);
+      if (user) enterHomeAfterAuth();
     });
   }
 
@@ -397,6 +494,8 @@
         email,
         password: pass,
         options: {
+          // Keep the existing GitHub Pages project path (/YUNEX/) in the confirmation redirect.
+          emailRedirectTo: new URL('./', window.location.href).toString(),
           data: {
             full_name: fullName,
             username,
@@ -409,11 +508,12 @@
       if (error) throw error;
 
       // Existing database trigger must generate yunex_id and the default role.
-      // The client deliberately does not insert profiles, roles, or YUNEX IDs.
+      // The client deliberately does not insert profiles, roles, or Account IDs.
       if (data?.session?.user) {
         await syncAuthenticatedProfile(data.session.user);
         renderAuthSession(data.session.user);
-        setAuthFeedback(registrationFeedback, 'Account create ho gaya! Database trigger se YUNEX ID generate honi chahiye. Ab Login karke profile check karein.');
+        enterHomeAfterAuth();
+        setAuthFeedback(registrationFeedback, 'Account create ho gaya! Welcome to ABAROX.');
       } else {
         setAuthFeedback(registrationFeedback, 'Registration request successful. Email confirmation required ho sakta hai—apna inbox check karein. Confirmation ke baad isi email aur password se Login karein.');
       }
@@ -460,28 +560,37 @@
       if (error) throw error;
       await syncAuthenticatedProfile(data.user);
       renderAuthSession(data.user);
-      setAuthFeedback(loginFeedback, `Login successful. Welcome to YUNEX, ${data.user.user_metadata?.full_name || data.user.email}.`);
+      setAuthFeedback(loginFeedback, `Login successful. Welcome to ABAROX, ${data.user.user_metadata?.full_name || data.user.email}.`);
       document.getElementById('loginPassword').value = '';
+      enterHomeAfterAuth();
     } catch (error) {
       setAuthFeedback(loginFeedback, error?.message || 'Login failed. Please check your email and password.', true);
     } finally {
       authActionBusy = false;
-      if (button) { button.disabled = false; button.textContent = 'Login to YUNEX'; }
+      if (button) { button.disabled = false; button.textContent = 'Login to ABAROX'; }
     }
   });
 
-  const logoutButton = document.getElementById('yunexLogoutButton');
-  if (logoutButton) logoutButton.addEventListener('click', async () => {
+  async function yunexLogout() {
     if (!yunexSupabase) return;
+    const feedback = document.getElementById('profileLogoutFeedback');
     const { error } = await yunexSupabase.auth.signOut();
     if (error) {
-      if (authSessionText) authSessionText.textContent = `Logout error: ${error.message}`;
+      if (feedback) feedback.textContent = `Logout error: ${error.message}`;
+      else if (authSessionText) authSessionText.textContent = `Logout error: ${error.message}`;
       return;
     }
     renderAuthSession(null);
+    const settingsOverlay = document.getElementById('founderDatesOverlay');
+    if (settingsOverlay) settingsOverlay.hidden = true;
     setAuthMode('login');
     setAuthFeedback(loginFeedback, 'You have been logged out.');
-  });
+    enterHomeAfterAuth();
+  }
+  const logoutButton = document.getElementById('yunexLogoutButton');
+  if (logoutButton) logoutButton.addEventListener('click', yunexLogout);
+  const profileLogoutButton = document.getElementById('yunexProfileLogoutButton');
+  if (profileLogoutButton) profileLogoutButton.addEventListener('click', yunexLogout);
 
   const forgotPasswordButton = document.getElementById('forgotPasswordButton');
   if (forgotPasswordButton) forgotPasswordButton.addEventListener('click', async () => {
@@ -520,6 +629,37 @@
     });
   });
 
+  // Public creator lookup: only public profile fields are requested.
+  const exploreSearch = document.getElementById('exploreSearch');
+  const exploreResults = document.getElementById('exploreSearchResults');
+  let exploreSearchTimer = null;
+  if (exploreSearch && exploreResults) exploreSearch.addEventListener('input', () => {
+    clearTimeout(exploreSearchTimer);
+    const term = exploreSearch.value.trim().replace(/^@/, '');
+    if (term.length < 2) { exploreResults.textContent = 'Search by username (at least 2 characters).'; return; }
+    exploreResults.textContent = 'Searching…';
+    exploreSearchTimer = setTimeout(async () => {
+      if (!yunexSupabase) { exploreResults.textContent = 'Search service is unavailable.'; return; }
+      try {
+        const { data, error } = await yunexSupabase.from('profiles')
+          .select('full_name, username, yunex_id').ilike('username', `%${term}%`).limit(20);
+        if (error) throw error;
+        exploreResults.replaceChildren();
+        if (!data?.length) { exploreResults.textContent = 'No matching username found.'; return; }
+        data.forEach(profile => {
+          const item = document.createElement('div'); item.className = 'explore-result-item';
+          const name = document.createElement('b'); name.textContent = profile.full_name || 'ABAROX User';
+          const username = document.createElement('span'); username.textContent = '@' + (profile.username || '');
+          const id = document.createElement('small'); id.textContent = profile.yunex_id || 'ID unavailable';
+          item.append(name, username, id); exploreResults.appendChild(item);
+        });
+      } catch (error) {
+        exploreResults.textContent = 'Search failed. Supabase profiles SELECT policy/RLS ko check karna hoga.';
+        console.warn('Explore username search failed:', error.message);
+      }
+    }, 350);
+  });
+
   function appendAnimatedReaction(kind, label, art) {
     const box = document.createElement('div'); box.className = 'chat-bubble sent yunex-reaction reaction-' + kind;
     const visual = document.createElement('div'); visual.className = 'reaction-art'; visual.textContent = art || ({kiss:'💋',love:'💞',miss:'💔',laugh:'😂',cry:'😭',horror:'👻'}[kind] || '💗');
@@ -537,7 +677,7 @@
   // Chat status preview: all delivery/read states below are simulated locally.
   // Real Sent/Delivered/Seen receipts require authenticated Supabase messaging.
   // Founder profile: editable local preview. Real identity/permissions remain server-controlled.
-  const founderDefaults = { name: 'Aman Bareth', handle: '@amanbareth', bio: 'Building YUNEX — a place to connect, create and win. 🚀' };
+  const founderDefaults = { name: 'Aman Bareth', handle: '@amanbareth', bio: 'Building ABAROX — a place to connect, create and win. 🚀' };
   let founderProfile = { ...founderDefaults };
   try {
     const savedFounder = JSON.parse(localStorage.getItem('yunexFounderProfile') || 'null');
@@ -707,9 +847,9 @@
 
   const shareFounderButton = document.getElementById('shareFounderProfile');
   if (shareFounderButton) shareFounderButton.addEventListener('click', async () => {
-    const shareText = `${founderProfile.name} ${founderProfile.handle} · YUNEX Founder`;
+    const shareText = `${founderProfile.name} ${founderProfile.handle} · ABAROX Founder`;
     try {
-      if (navigator.share) await navigator.share({ title: 'YUNEX Founder', text: shareText, url: location.href.split('#')[0] + '#profile' });
+      if (navigator.share) await navigator.share({ title: 'ABAROX Founder', text: shareText, url: location.href.split('#')[0] + '#profile' });
       else if (navigator.clipboard) { await navigator.clipboard.writeText(shareText + ' · ' + location.href.split('#')[0] + '#profile'); shareFounderButton.textContent = 'Copied!'; }
       else shareFounderButton.textContent = 'Share unavailable';
     } catch (_) {}
@@ -848,7 +988,7 @@
   let selectedGame = 'ttt';
   let boardState = Array(9).fill('');
   let gameTurn = 'X';
-  let wordItems = ['YUNEX'];
+  let wordItems = ['ABAROX'];
   function selectGame(which) {
     selectedGame = which;
     document.querySelectorAll('.game-choice').forEach(b => b.classList.toggle('active', b.dataset.game === which));
@@ -859,7 +999,7 @@
   function resetGames() {
     boardState = Array(9).fill(''); gameTurn = 'X';
     document.querySelectorAll('[data-cell]').forEach(b => b.textContent = '');
-    wordItems = ['YUNEX']; document.getElementById('wordChain').textContent = wordItems.join(' · ');
+    wordItems = ['ABAROX']; document.getElementById('wordChain').textContent = wordItems.join(' · ');
     document.getElementById('gameStatus').textContent = 'Game reset · local preview';
   }
   function playCell(index) {
