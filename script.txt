@@ -757,27 +757,51 @@
     }
   }
   async function applyFounderPhoto(data,t=photoTransform){
-    if(!yunexSupabase){alert('Supabase connection available nahi hai.');return;}
-    const { data: sessionData } = await yunexSupabase.auth.getSession();
+    if(!yunexSupabase){alert('Supabase connection available nahi hai.');return false;}
+    const { data: sessionData, error: sessionError } = await yunexSupabase.auth.getSession();
+    if(sessionError) { alert('Login session check nahi ho saka: ' + sessionError.message); return false; }
     const user = sessionData?.session?.user;
-    if(!user){alert('Photo update karne ke liye login karein.');return;}
+    if(!user){alert('Photo update karne ke liye login karein.');return false;}
     try {
-      const blob = await (await fetch(data)).blob();
-      const ext = (blob.type.split('/')[1] || 'jpg').replace('jpeg','jpg').replace(/[^a-z0-9]/gi,'') || 'jpg';
-      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error: uploadError } = await yunexSupabase.storage.from('avatars').upload(path, blob, { contentType: blob.type || 'image/jpeg', upsert: false });
+      // Render the chosen crop/zoom/rotation into a real square image before upload.
+      const source = new Image();
+      source.src = data;
+      await new Promise((resolve,reject)=>{ source.onload=resolve; source.onerror=()=>reject(new Error('Photo load nahi ho paayi.')); });
+      const size = 640, canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      if(!ctx) throw new Error('Photo editor start nahi ho saka.');
+      const scale = Math.max(size/source.width, size/source.height) * Math.max(1, Number(t?.zoom)||1);
+      const drawW = source.width * scale, drawH = source.height * scale;
+      const px = (Number(t?.x ?? 50)-50)/50 * (drawW-size)/2;
+      const py = (Number(t?.y ?? 50)-50)/50 * (drawH-size)/2;
+      ctx.fillStyle = '#071426'; ctx.fillRect(0,0,size,size);
+      ctx.save(); ctx.translate(size/2,size/2); ctx.rotate((Number(t?.rotation)||0)*Math.PI/180);
+      ctx.drawImage(source, -drawW/2-px, -drawH/2-py, drawW, drawH); ctx.restore();
+      const blob = await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.88));
+      if(!blob) throw new Error('Edited photo create nahi ho paayi.');
+      const path = `${user.id}/avatar-${Date.now()}.jpg`;
+      const { error: uploadError } = await yunexSupabase.storage.from('avatars').upload(path, blob, { contentType:'image/jpeg', upsert:false });
       if(uploadError) throw uploadError;
-      const { error: updateError } = await yunexSupabase.from('profiles').update({ avatar_path: path }).eq('id', user.id);
-      if(updateError) { await yunexSupabase.storage.from('avatars').remove([path]); throw updateError; }
-      const { data: publicResult } = yunexSupabase.storage.from('avatars').getPublicUrl(path);
-      try { localStorage.setItem(profilePhotoKey(user.id === FOUNDER_AUTH_ID ? 'founder' : `user:${user.id}`), publicResult?.publicUrl || ''); } catch(_) {}
+      const { data: updatedRows, error: updateError } = await yunexSupabase.from('profiles').update({ avatar_path:path, updated_at:new Date().toISOString() }).eq('id',user.id).select('id,avatar_path');
+      if(updateError || !updatedRows?.length) {
+        await yunexSupabase.storage.from('avatars').remove([path]);
+        throw updateError || new Error('Profile row update nahi hui. Apni profile update policy check karein.');
+      }
+      // Clear any stale per-user local preview; Supabase remains the source of truth.
+      try { localStorage.removeItem(profilePhotoKey(user.id === FOUNDER_AUTH_ID ? 'founder' : `user:${user.id}`)); } catch(_) {}
       await loadCurrentAccountProfile(user);
       refreshAllProfileAvatars();
-      alert('Profile photo successfully update ho gayi.');
-    } catch(error) { alert('Photo save nahi hui: ' + error.message); }
+      return true;
+    } catch(error) {
+      console.error('Avatar upload/update failed:', error);
+      alert('Photo save nahi hui: ' + (error?.message || error));
+      return false;
+    }
   }
 
-  if(founderPhotoInput)founderPhotoInput.addEventListener('change',()=>{
+  if(founderPhotoInput)founderPhotoInput.addEventListener('change',(event)=>{
+    event.stopPropagation();
     const file=founderPhotoInput.files&&founderPhotoInput.files[0]; if(!file||!file.type.startsWith('image/'))return;
     const reader=new FileReader(); reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50,rotation:0};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;paintPhotoPreview();if(photoAdjustOverlay)photoAdjustOverlay.hidden=false;}; reader.readAsDataURL(file); founderPhotoInput.value='';
   });
@@ -826,7 +850,7 @@
   }
   const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;pendingPhotoData='';});
   if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;pendingPhotoData='';}});
-  const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',async()=>{if(pendingPhotoData)await applyFounderPhoto(pendingPhotoData,photoTransform);pendingPhotoData='';photoAdjustOverlay.hidden=true;});
+  const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',async(e)=>{e.preventDefault();e.stopPropagation();if(!pendingPhotoData)return;savePhotoAdjust.disabled=true;const oldLabel=savePhotoAdjust.textContent;savePhotoAdjust.textContent='Saving…';const saved=await applyFounderPhoto(pendingPhotoData,photoTransform);savePhotoAdjust.disabled=false;savePhotoAdjust.textContent=oldLabel;if(saved){pendingPhotoData='';if(photoAdjustOverlay)photoAdjustOverlay.hidden=true;}});
   const founderPhoto=document.getElementById('founderPhoto'),photoLightbox=document.getElementById('founderPhotoLightbox'),photoLarge=document.getElementById('founderPhotoLarge');let photoHoldTimer=null,photoHoldFired=false;
   if(founderPhoto&&photoLightbox){
     founderPhoto.addEventListener('contextmenu',e=>e.preventDefault());
