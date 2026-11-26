@@ -678,7 +678,7 @@
     const { error } = await yunexSupabase.auth.updateUser({ password: pass });
     document.getElementById('founderNewPassword').value = '';
     document.getElementById('founderConfirmPassword').value = '';
-    alert(error ? `Password update nahi hua: ${error.message}` : 'Supabase password successfully update ho gaya.');
+    if (error) alert(`Password update nahi hua: ${error.message}`);
   });
 
 
@@ -869,7 +869,7 @@
       if (user.id === FOUNDER_AUTH_ID) { try { localStorage.setItem('yunexFounderProfile', JSON.stringify(founderProfile)); } catch (_) {} }
       await loadCurrentAccountProfile(user);
       founderEditOverlay.hidden = true;
-      alert('Profile successfully update ho gayi.');
+      // Successful saves stay silent; the updated profile is already visible.
     } catch (error) { alert('Profile save nahi hui: ' + error.message); }
     finally { if (saveButton) { saveButton.disabled = false; saveButton.textContent = 'Save changes'; } }
   });
@@ -1088,7 +1088,7 @@
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Valid email address enter karein.');return;}
     try{localStorage.setItem('yunexFounderContactPreview',JSON.stringify({mobile,email}));}
     catch(_){alert('Is browser mein preview details save nahi ho paayi.');return;}
-    alert('Contact details is browser preview mein save ho gayi hain. Ye abhi login credentials update nahi karti; Supabase Auth connection pending hai.');
+    // Successful saves stay silent; no confirmation popup.
   });
 
   const closeFounderDates=document.getElementById('closeFounderDates');
@@ -1123,7 +1123,7 @@
       return;
     }
     founderDatesOverlay.hidden=true;
-    alert('Profile settings is browser preview mein save ho gayi hain. Secure privacy enforcement ke liye backend/RLS connect karna zaroori hai.');
+    // Successful saves stay silent; no confirmation popup.
   });
   // Cover/banner feature intentionally removed from the Founder profile.
   try { localStorage.removeItem('yunexFounderCoverPhoto'); } catch (_) {}
