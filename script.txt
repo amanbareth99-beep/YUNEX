@@ -66,6 +66,10 @@
   // Track the actual visible viewport. Android keyboards may resize the
   // layout viewport or overlay it; bottom-gap handles both modes.
   function syncVisibleViewport() {
+    // The VisualViewport changes while Android Chrome's address bar expands/collapses.
+    // Only chat needs these measurements for keyboard handling; other sections use
+    // stable CSS viewport sizing so ordinary scrolling cannot move the page frame.
+    if (!document.body.classList.contains('chat-open')) return;
     const vv = window.visualViewport;
     const height = vv ? vv.height : window.innerHeight;
     const top = vv ? vv.offsetTop : 0;
