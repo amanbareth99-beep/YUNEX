@@ -631,3 +631,40 @@ body.photo-adjust-open{overflow:hidden!important;touch-action:pan-y!important}
 
 .profile-photo-change{display:flex!important;align-items:center!important;justify-content:center!important;min-height:44px!important;margin:8px 0 16px!important;padding:10px 14px!important;border:1px solid #238fe0!important;border-radius:12px!important;background:#102c49!important;color:#83d5ff!important;font-size:13px!important;font-weight:850!important;text-align:center!important;cursor:pointer!important}
 #profile .photo-edit{display:none!important}
+
+/* ABAROX profile layout v3: avatar left, identity right, single Founder badge. */
+#profile .profile-heading-row{display:flex!important;align-items:center!important;gap:18px!important;min-height:126px!important;margin:0!important;padding:8px 0 2px!important}
+#profile .founder-photo-wrap{position:relative!important;flex:0 0 104px!important;width:104px!important;height:104px!important;margin:0!important}
+#profile .founder-avatar.founder-photo{width:100px!important;height:100px!important;margin:0!important}
+#profile .profile-identity-column{display:flex!important;flex:1 1 auto!important;min-width:0!important;flex-direction:column!important;align-items:flex-start!important;gap:8px!important}
+#profile .founder-identity{margin:0!important;min-width:0!important}
+#profile .founder-identity h2{font-size:clamp(19px,5.4vw,26px)!important;overflow-wrap:anywhere!important}
+#profile .profile-badge-id-row{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:7px!important;width:100%!important;min-width:0!important}
+#profile .founder-crown-badge{display:inline-flex!important;align-items:center!important;gap:6px!important;margin:0!important;padding:7px 9px!important;min-height:31px!important;font-size:9px!important}
+#profile .founder-crown-badge[hidden]{display:none!important}
+#profile .founder-id-row{display:inline-flex!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important;margin:0!important;padding:7px 9px!important;border-radius:30px!important;width:auto!important;min-height:31px!important}
+#profile .founder-id-row span{font-size:8px!important;white-space:nowrap!important}
+#profile .founder-id-row b{font-size:10px!important;white-space:nowrap!important;max-width:none!important}
+#profile .founder-handle{margin:0!important;font-size:12px!important;overflow-wrap:anywhere!important}
+#profile .founder-personal-badge,#founderPersonalBadge{display:none!important}
+#profile .founder-bio{margin:13px 0 8px!important}
+#profile .founder-stats{margin-top:12px!important}
+#profile .founder-profile-actions.profile-primary-actions{margin-top:15px!important}
+#profile .brand-collaboration-action{min-height:58px!important;margin:12px 0 16px!important;font-size:15px!important}
+#profile .founder-content-tabs{margin-top:0!important}
+.demo-user-card{text-align:left!important;padding:18px!important}
+.demo-profile-heading{display:flex!important;align-items:center!important;gap:16px!important;min-width:0!important}
+.demo-profile-avatar{flex:0 0 100px!important;width:100px!important;height:100px!important;margin:0!important;border-radius:50%!important}
+.demo-profile-identity{min-width:0!important;flex:1!important}
+.demo-profile-identity h2{margin:0 0 8px!important;font-size:clamp(19px,5vw,25px)!important;overflow-wrap:anywhere!important}
+.demo-profile-identity .profile-badge-id-row{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:7px!important}
+.demo-profile-identity .founder-crown-badge{margin:0!important;padding:7px 9px!important;font-size:9px!important}
+.demo-account-id{display:inline-flex!important;align-items:center!important;gap:5px!important;margin:0!important;padding:7px 9px!important;border:1px solid #1c3b5b!important;border-radius:30px!important;background:#0b1b2d!important;color:#a9d9fa!important;font-size:10px!important}
+.demo-account-id b{font-size:8px!important;letter-spacing:.5px!important;color:#79a4d1!important}
+.demo-profile-identity .muted{margin:7px 0 0!important;font-size:12px!important;overflow-wrap:anywhere!important}
+.demo-profile-bio{margin:14px 0 8px!important;font-size:14px!important}
+.demo-profile-stats{margin-top:12px!important}
+.demo-profile-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important;margin-top:15px!important}
+.demo-user-card .brand-collaboration-action{min-height:58px!important;margin:12px 0 16px!important}
+.demo-user-card .founder-content-tabs{margin:0 -18px!important}
+@media(max-width:390px){#profile .profile-heading-row{gap:11px!important}#profile .founder-photo-wrap{flex-basis:88px!important;width:88px!important;height:88px!important}#profile .founder-avatar.founder-photo{width:84px!important;height:84px!important}#profile .founder-identity h2{font-size:19px!important}.demo-profile-heading{gap:11px!important}.demo-profile-avatar{flex-basis:84px!important;width:84px!important;height:84px!important}}
