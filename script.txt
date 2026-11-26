@@ -21,6 +21,9 @@
   function profilePhotoKey(key) { return key === 'founder' ? 'yunexFounderPhoto' : `yunexProfilePhoto:${key.replace(/^user:/, '')}`; }
   function renderProfileAvatar(element, key, fallbackText) {
     if (!element || !key) return;
+    // A Supabase-backed avatar is authoritative across browsers. Do not replace
+    // or remove it during later localStorage-only avatar refreshes.
+    if (element.dataset.remoteAvatar === 'true') return;
     let photo = '';
     try { photo = localStorage.getItem(profilePhotoKey(key)) || (key === 'founder' ? localStorage.getItem('yunexFounderPhoto') : ''); } catch (_) {}
     element.classList.add('has-profile-photo');
@@ -57,6 +60,7 @@
     document.body.classList.toggle('registration-open', id === 'account');
     document.body.classList.toggle('chat-open', id === 'chat');
     document.body.classList.toggle('founder-account-open', id === 'profile');
+    document.body.classList.toggle('public-profile-open', id === 'demoProfile');
     const profileView = document.getElementById('profile');
     if (profileView && id !== 'profile') profileView.classList.remove('cover-expanded');
     document.querySelectorAll('main > .view.active .back-home, main > .view.active .back-button, main > .view.active .back-btn, main > .view.active [data-action="back"]').forEach(button => button.remove());
@@ -401,13 +405,9 @@
     if (photoEdit) photoEdit.hidden = false;
     if (settingsButton) settingsButton.hidden = false;
 
-    // Founder-only contact, birthday and special-day controls are hidden for other accounts,
-    // and explicitly restored when the Founder account signs in again.
-    const founderOnlyFields = [
-      'founderAccountMobile','founderAccountEmail','founderBirthday','founderBirthdayAlerts',
-      'specialDayTitle','specialDayDate','specialDayTime','addSpecialDay','specialDaysList',
-      'saveFounderDates','saveFounderContact'
-    ];
+    // Birthday, Special Days, privacy and password settings are common to
+    // every account. Only the optional Founder contact preview is restricted.
+    const founderOnlyFields = ['founderAccountMobile','founderAccountEmail','saveFounderContact'];
     founderOnlyFields.forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -416,10 +416,13 @@
     });
     const settingsDialog = document.querySelector('#founderDatesOverlay .founder-edit-dialog');
     if (settingsDialog) settingsDialog.querySelectorAll('h4').forEach(h => {
-      if (/Founder contact|My Special Days/i.test(h.textContent)) h.hidden = !isFounder;
+      if (/Founder contact/i.test(h.textContent)) h.hidden = !isFounder;
     });
 
-    if (photo) photo.dataset.profileAvatar = photoKey;
+    if (photo) {
+      photo.dataset.profileAvatar = photoKey;
+      photo.dataset.remoteAvatar = 'false';
+    }
     if (!yunexSupabase) return;
 
     try {
@@ -445,15 +448,18 @@
         const fallback = fullName.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
         photo.textContent = fallback || '?';
         if (data?.avatar_path) {
-          const { data: publicData } = yunexSupabase.storage.from('avatars').getPublicUrl(data.avatar_path);
-          const url = publicData?.publicUrl || '';
+          const url = /^https?:\/\//i.test(data.avatar_path)
+            ? data.avatar_path
+            : (yunexSupabase.storage.from('avatars').getPublicUrl(data.avatar_path).data?.publicUrl || '');
           if (url) {
             photo.innerHTML = '';
             const img = document.createElement('img');
             img.className = 'profile-avatar-image';
             img.alt = 'Profile photo';
+            img.referrerPolicy = 'no-referrer';
             img.src = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
             photo.appendChild(img);
+            photo.dataset.remoteAvatar = 'true';
           }
         } else {
           renderProfileAvatar(photo, photoKey, fallback || '?');
@@ -504,10 +510,12 @@
       renderAuthSession(user);
       if (user) enterHomeAfterAuth();
     });
-    yunexSupabase.auth.onAuthStateChange((_event, session) => {
+    yunexSupabase.auth.onAuthStateChange((eventName, session) => {
       const user = session?.user || null;
       renderAuthSession(user);
-      if (user) enterHomeAfterAuth();
+      // TOKEN_REFRESHED / USER_UPDATED can occur when Android returns from
+      // the system photo picker. Only a real sign-in should force Home Feed.
+      if (user && eventName === 'SIGNED_IN') enterHomeAfterAuth();
     });
   }
 
@@ -702,6 +710,8 @@
     if (idEl) idEl.textContent = profile.yunex_id || 'ID unavailable';
     if (avatarEl) {
       avatarEl.dataset.profileAvatar = `user:${profile.id}`;
+      avatarEl.dataset.remoteAvatar = 'false';
+      avatarEl.innerHTML = '';
       avatarEl.textContent = name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
       renderProfileAvatar(avatarEl, `user:${profile.id}`, name.slice(0, 1).toUpperCase());
     }
@@ -724,12 +734,14 @@
         ? profile.avatar_path
         : yunexSupabase.storage.from('avatars').getPublicUrl(profile.avatar_path).data?.publicUrl;
       if (publicUrl) {
+        avatarEl.dataset.remoteAvatar = 'true';
         let remoteImage = avatarEl.querySelector('img.profile-avatar-image');
         if (!remoteImage) {
           avatarEl.textContent = '';
           remoteImage = document.createElement('img');
           remoteImage.className = 'profile-avatar-image';
           remoteImage.alt = `${name} profile photo`;
+          remoteImage.referrerPolicy = 'no-referrer';
           avatarEl.appendChild(remoteImage);
         }
         remoteImage.src = publicUrl;
@@ -851,12 +863,8 @@
       const { error } = await yunexSupabase.from('profiles').update({ full_name: name, username, bio }).eq('id', user.id);
       if (error) throw error;
       if (user.id === FOUNDER_AUTH_ID) founderProfile = { name, handle: '@' + username, bio };
-      const { data: profileRow, error: readError } = await yunexSupabase.from('profiles').select('full_name,username,bio,yunex_id,avatar_path').eq('id', user.id).single();
-      if (readError) throw readError;
-      if (founderNameEl) founderNameEl.textContent = profileRow.full_name;
-      if (founderHandleEl) founderHandleEl.textContent = '@' + profileRow.username;
-      if (founderBioEl) founderBioEl.textContent = profileRow.bio || '';
       if (user.id === FOUNDER_AUTH_ID) { try { localStorage.setItem('yunexFounderProfile', JSON.stringify(founderProfile)); } catch (_) {} }
+      await loadCurrentAccountProfile(user);
       founderEditOverlay.hidden = true;
       alert('Profile successfully update ho gayi.');
     } catch (error) { alert('Profile save nahi hui: ' + error.message); }
@@ -868,9 +876,16 @@
 
   function paintPhotoPreview(){
     if(photoAdjustPreview){
+      const radians=(Number(photoTransform.rotation)||0)*Math.PI/180;
+      const rotationCoverage=Math.abs(Math.cos(radians))+Math.abs(Math.sin(radians));
       photoAdjustPreview.style.objectPosition=`${photoTransform.x}% ${photoTransform.y}%`;
-      photoAdjustPreview.style.transform=`scale(${photoTransform.zoom}) rotate(${photoTransform.rotation||0}deg)`;
+      photoAdjustPreview.style.transform=`scale(${(Number(photoTransform.zoom)||1)*rotationCoverage}) rotate(${photoTransform.rotation||0}deg)`;
+      photoAdjustPreview.style.transformOrigin='center center';
     }
+    const zoomControl=document.getElementById('photoZoom');
+    const rotationControl=document.getElementById('photoRotation');
+    if(zoomControl)zoomControl.value=String(photoTransform.zoom);
+    if(rotationControl)rotationControl.value=String(photoTransform.rotation||0);
   }
   async function applyFounderPhoto(data,t=photoTransform){
     if(!yunexSupabase){alert('Supabase connection available nahi hai.');return false;}
@@ -887,17 +902,27 @@
       canvas.width = size; canvas.height = size;
       const ctx = canvas.getContext('2d');
       if(!ctx) throw new Error('Photo editor start nahi ho saka.');
-      const scale = Math.max(size/source.width, size/source.height) * Math.max(1, Number(t?.zoom)||1);
-      const drawW = source.width * scale, drawH = source.height * scale;
-      const px = (Number(t?.x ?? 50)-50)/50 * (drawW-size)/2;
-      const py = (Number(t?.y ?? 50)-50)/50 * (drawH-size)/2;
+      // First reproduce the preview's object-fit:cover + object-position crop.
+      const cropCanvas = document.createElement('canvas');
+      cropCanvas.width = size; cropCanvas.height = size;
+      const cropCtx = cropCanvas.getContext('2d');
+      if(!cropCtx) throw new Error('Photo crop create nahi ho saka.');
+      const coverScale = Math.max(size/source.width, size/source.height);
+      const drawW = source.width * coverScale, drawH = source.height * coverScale;
+      const left = (size-drawW) * (Number(t?.x ?? 50)/100);
+      const top = (size-drawH) * (Number(t?.y ?? 50)/100);
+      cropCtx.drawImage(source, left, top, drawW, drawH);
+      // Then apply the same zoom/rotation shown in the editor preview.
+      const radians=(Number(t?.rotation)||0)*Math.PI/180;
+      const rotationCoverage=Math.abs(Math.cos(radians))+Math.abs(Math.sin(radians));
+      const finalScale=Math.max(1,Number(t?.zoom)||1)*rotationCoverage;
       ctx.fillStyle = '#071426'; ctx.fillRect(0,0,size,size);
-      ctx.save(); ctx.translate(size/2,size/2); ctx.rotate((Number(t?.rotation)||0)*Math.PI/180);
-      ctx.drawImage(source, -drawW/2-px, -drawH/2-py, drawW, drawH); ctx.restore();
-      const blob = await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.88));
+      ctx.save(); ctx.translate(size/2,size/2); ctx.rotate(radians); ctx.scale(finalScale,finalScale);
+      ctx.drawImage(cropCanvas,-size/2,-size/2,size,size); ctx.restore();
+      const blob = await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.9));
       if(!blob) throw new Error('Edited photo create nahi ho paayi.');
       const path = `${user.id}/avatar-${Date.now()}.jpg`;
-      const { error: uploadError } = await yunexSupabase.storage.from('avatars').upload(path, blob, { contentType:'image/jpeg', upsert:false });
+      const { error: uploadError } = await yunexSupabase.storage.from('avatars').upload(path, blob, { cacheControl:'3600', contentType:'image/jpeg', upsert:false });
       if(uploadError) throw uploadError;
       const { data: updatedRows, error: updateError } = await yunexSupabase.from('profiles').update({ avatar_path:path }).eq('id',user.id).select('id,avatar_path');
       if(updateError || !updatedRows?.length) {
@@ -907,6 +932,7 @@
       // Clear any stale per-user local preview; Supabase remains the source of truth.
       try { localStorage.removeItem(profilePhotoKey(user.id === FOUNDER_AUTH_ID ? 'founder' : `user:${user.id}`)); } catch(_) {}
       await loadCurrentAccountProfile(user);
+      refreshAllProfileAvatars();
       return true;
     } catch(error) {
       console.error('Avatar upload/update failed:', error);
@@ -918,7 +944,7 @@
   if(founderPhotoInput)founderPhotoInput.addEventListener('change',(event)=>{
     event.stopPropagation();
     const file=founderPhotoInput.files&&founderPhotoInput.files[0]; if(!file||!file.type.startsWith('image/'))return;
-    const reader=new FileReader(); reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50,rotation:0};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;paintPhotoPreview();if(photoAdjustOverlay)photoAdjustOverlay.hidden=false;}; reader.readAsDataURL(file); founderPhotoInput.value='';
+    const reader=new FileReader(); reader.onload=()=>{pendingPhotoData=String(reader.result||'');photoTransform={zoom:1,x:50,y:50,rotation:0};if(photoAdjustPreview)photoAdjustPreview.src=pendingPhotoData;paintPhotoPreview();if(photoAdjustOverlay)photoAdjustOverlay.hidden=false;}; reader.onerror=()=>alert('Selected photo read nahi ho paayi. Dusri photo try karein.'); reader.readAsDataURL(file); founderPhotoInput.value='';
   });
   // Direct manipulation: one-finger pan; two-finger pinch zoom + full 360-degree rotation.
   const adjustStage=document.querySelector('.photo-adjust-preview');
@@ -963,6 +989,12 @@
     };
     ['pointerup','pointercancel','lostpointercapture'].forEach(t=>adjustStage.addEventListener(t,stop));
   }
+  const photoZoomControl=document.getElementById('photoZoom');
+  const photoRotationControl=document.getElementById('photoRotation');
+  const resetPhotoAdjust=document.getElementById('resetPhotoAdjust');
+  if(photoZoomControl)photoZoomControl.addEventListener('input',()=>{photoTransform.zoom=Number(photoZoomControl.value)||1;paintPhotoPreview();});
+  if(photoRotationControl)photoRotationControl.addEventListener('input',()=>{photoTransform.rotation=Number(photoRotationControl.value)||0;paintPhotoPreview();});
+  if(resetPhotoAdjust)resetPhotoAdjust.addEventListener('click',()=>{photoTransform={zoom:1,x:50,y:50,rotation:0};paintPhotoPreview();});
   const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;pendingPhotoData='';});
   if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;pendingPhotoData='';}});
   const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',async(e)=>{e.preventDefault();e.stopPropagation();if(!pendingPhotoData)return;savePhotoAdjust.disabled=true;const oldLabel=savePhotoAdjust.textContent;savePhotoAdjust.textContent='Saving…';const saved=await applyFounderPhoto(pendingPhotoData,photoTransform);savePhotoAdjust.disabled=false;savePhotoAdjust.textContent=oldLabel;if(saved){pendingPhotoData='';if(photoAdjustOverlay)photoAdjustOverlay.hidden=true;}});
@@ -1111,6 +1143,9 @@
     const copy={posts:['Posts','Creator photos and posts will appear here.'],reels:['Reels','Published short videos will appear here.'],tagged:['Tagged','Posts this creator is tagged in will appear here.']}[tab.dataset.demoProfileTab];
     document.getElementById('demoEmptyTitle').textContent=copy[0];document.getElementById('demoEmptyText').textContent=copy[1];
   }));
+
+  const backFromDemoProfile = document.getElementById('backFromDemoProfile');
+  if (backFromDemoProfile) backFromDemoProfile.addEventListener('click', () => navigate('explore'));
 
   const shareFounderButton = document.getElementById('shareFounderProfile');
   if (shareFounderButton) shareFounderButton.addEventListener('click', async () => {
