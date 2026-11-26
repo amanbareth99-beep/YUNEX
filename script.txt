@@ -12,6 +12,7 @@
   // report transient offsetTop changes that make a dock visibly jump.
 
   let currentView = 'feed';
+  let currentProfileAuthUser = null;
   let activeDemoUser = { name: 'Riya Creates', handle: '@riya_demo' };
   let exitWarningAt = 0;
   let chatKeyboardHistoryEntry = false;
@@ -362,6 +363,7 @@
   }
 
   async function loadCurrentAccountProfile(user) {
+    currentProfileAuthUser = user || null;
     const nameEl = document.getElementById('founderName');
     const handleEl = document.getElementById('founderHandle');
     const bioEl = document.getElementById('founderBio');
@@ -387,9 +389,13 @@
     const isFounder = user.id === FOUNDER_AUTH_ID;
     if (founderBadge) founderBadge.hidden = !isFounder;
     if (verified) verified.hidden = !isFounder;
-    if (editButton) editButton.hidden = !isFounder;
-    if (photoEdit) photoEdit.hidden = !isFounder;
-    if (settingsButton) settingsButton.hidden = !isFounder;
+    // Every signed-in account can edit its own profile and open its own settings.
+    if (editButton) editButton.hidden = false;
+    if (photoEdit) photoEdit.hidden = false;
+    if (settingsButton) settingsButton.hidden = false;
+    // Founder-only contact/date fields must never be shown to ordinary accounts.
+    const founderOnlyFields = ['founderAccountMobile','founderAccountEmail','founderBirthday','founderBirthdayAlerts','specialDayTitle','specialDayDate','specialDayTime','addSpecialDay','specialDaysList','saveFounderDates','saveFounderContact'];
+    if (!isFounder) { founderOnlyFields.forEach(id => { const el = document.getElementById(id); if (el) { const target = el.closest('label') || el; target.hidden = true; } }); const settingsDialog = document.querySelector('#founderDatesOverlay .founder-edit-dialog'); if (settingsDialog) settingsDialog.querySelectorAll('h4').forEach(h => { if (/Founder contact|My Special Days/i.test(h.textContent)) h.hidden = true; }); }
     if (photo) photo.dataset.profileAvatar = photoKey;
     if (isFounder) {
       if (typeof founderProfile !== 'undefined') {
@@ -409,7 +415,7 @@
       const username = data?.username || user.user_metadata?.username || '';
       if (nameEl) nameEl.textContent = fullName;
       if (handleEl) handleEl.textContent = username ? '@' + username.replace(/^@/, '') : '';
-      if (bioEl) bioEl.textContent = 'Welcome to your profile.';
+      if (bioEl) bioEl.textContent = user.user_metadata?.bio || 'Welcome to your profile.';
       const idEl = document.getElementById('founderId');
       if (idEl) idEl.textContent = data?.yunex_id || 'Account ID not available yet';
       if (photo) renderProfileAvatar(photo, photoKey, fullName.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase());
@@ -697,22 +703,35 @@
   if (notificationsButton) notificationsButton.addEventListener('click', () => window.alert('You are all caught up. Notifications will appear here.'));
   const editFounderButton = document.getElementById('editFounderProfile');
   if (editFounderButton) editFounderButton.addEventListener('click', () => {
-    document.getElementById('editFounderName').value = founderProfile.name;
-    document.getElementById('editFounderHandle').value = founderProfile.handle.replace(/^@/, '');
-    document.getElementById('editFounderBio').value = founderProfile.bio;
+    document.getElementById('editFounderName').value = document.getElementById('founderName')?.textContent || founderProfile.name;
+    document.getElementById('editFounderHandle').value = (document.getElementById('founderHandle')?.textContent || founderProfile.handle).replace(/^@/, '');
+    document.getElementById('editFounderBio').value = document.getElementById('founderBio')?.textContent || founderProfile.bio;
     founderEditOverlay.hidden = false;
   });
   const closeFounderEdit = document.getElementById('closeFounderEdit');
   if (closeFounderEdit) closeFounderEdit.addEventListener('click', () => { founderEditOverlay.hidden = true; });
   if (founderEditOverlay) founderEditOverlay.addEventListener('click', event => { if (event.target === founderEditOverlay) founderEditOverlay.hidden = true; });
   const founderEditForm = document.getElementById('founderEditForm');
-  if (founderEditForm) founderEditForm.addEventListener('submit', event => {
+  if (founderEditForm) founderEditForm.addEventListener('submit', async event => {
     event.preventDefault();
-    founderProfile = {
-      name: document.getElementById('editFounderName').value.trim() || founderDefaults.name,
-      handle: '@' + document.getElementById('editFounderHandle').value.trim().replace(/^@/, '').replace(/\s+/g, '').toLowerCase(),
-      bio: document.getElementById('editFounderBio').value.trim()
-    };
+    const name = document.getElementById('editFounderName').value.trim();
+    const username = document.getElementById('editFounderHandle').value.trim().replace(/^@/, '').replace(/\s+/g, '').toLowerCase();
+    const bio = document.getElementById('editFounderBio').value.trim();
+    if (!name || !username || !/^[A-Za-z0-9_.]{3,24}$/.test(username)) { alert('Name aur 3–24 characters ka valid username bharein.'); return; }
+    if (currentProfileAuthUser && currentProfileAuthUser.id !== FOUNDER_AUTH_ID) {
+      if (!yunexSupabase) { alert('Profile service abhi connect nahi hai.'); return; }
+      const { error: authError } = await yunexSupabase.auth.updateUser({ data: { full_name: name, username, bio } });
+      if (authError) { alert('Profile update nahi hua: ' + authError.message); return; }
+      const { error } = await yunexSupabase.from('profiles').update({ full_name: name, username }).eq('id', currentProfileAuthUser.id);
+      if (error) { alert('Auth metadata update ho gaya, lekin profile table update nahi hua: ' + error.message); return; }
+      const nameEl = document.getElementById('founderName'); if (nameEl) nameEl.textContent = name;
+      const handleEl = document.getElementById('founderHandle'); if (handleEl) handleEl.textContent = '@' + username;
+      const bioEl = document.getElementById('founderBio'); if (bioEl) bioEl.textContent = bio || 'Welcome to your profile.';
+      founderEditOverlay.hidden = true;
+      alert('Profile update ho gayi.');
+      return;
+    }
+    founderProfile = { name, handle: '@' + username, bio };
     try { localStorage.setItem('yunexFounderProfile', JSON.stringify(founderProfile)); } catch (_) {}
     paintFounderProfile();
     founderEditOverlay.hidden = true;
@@ -731,7 +750,7 @@
     const photo=document.getElementById('founderPhoto'); if(!photo)return;
     photo.innerHTML=''; const img=document.createElement('img'); img.className='profile-avatar-image'; img.src=data; img.alt='Founder profile photo';
     img.style.objectPosition=`${t.x}% ${t.y}%`; img.style.transform=`scale(${t.zoom}) rotate(${t.rotation||0}deg)`; photo.appendChild(img);
-    try{localStorage.setItem('yunexFounderPhoto',data);localStorage.setItem('yunexFounderPhotoTransform',JSON.stringify(t));}catch(_){}
+    try{ const key = currentProfileAuthUser?.id === FOUNDER_AUTH_ID ? 'yunexFounderPhoto' : `yunexProfilePhoto:${currentProfileAuthUser?.id || 'guest'}`; localStorage.setItem(key,data); localStorage.setItem(key+':transform',JSON.stringify(t)); }catch(_){}
     refreshAllProfileAvatars();
     const headerAvatar=document.getElementById('profileShortcut');
     if(headerAvatar) renderProfileAvatar(headerAvatar,'founder','AB');
@@ -788,7 +807,7 @@
   const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;pendingPhotoData='';});
   if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;pendingPhotoData='';}});
   const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',()=>{if(pendingPhotoData)applyFounderPhoto(pendingPhotoData,photoTransform);pendingPhotoData='';photoAdjustOverlay.hidden=true;});
-  try{const saved=localStorage.getItem('yunexFounderPhoto');if(saved){try{photoTransform={...photoTransform,...JSON.parse(localStorage.getItem('yunexFounderPhotoTransform')||'{}')};}catch(_){}applyFounderPhoto(saved,photoTransform);}}catch(_){}
+  try{const photoKey=currentProfileAuthUser?.id===FOUNDER_AUTH_ID?'yunexFounderPhoto':`yunexProfilePhoto:${currentProfileAuthUser?.id||'guest'}`;const saved=localStorage.getItem(photoKey);if(saved){try{photoTransform={...photoTransform,...JSON.parse(localStorage.getItem(photoKey+':transform')||'{}')};}catch(_){}applyFounderPhoto(saved,photoTransform);}}catch(_){}
   const founderPhoto=document.getElementById('founderPhoto'),photoLightbox=document.getElementById('founderPhotoLightbox'),photoLarge=document.getElementById('founderPhotoLarge');let photoHoldTimer=null,photoHoldFired=false;
   if(founderPhoto&&photoLightbox){
     founderPhoto.addEventListener('contextmenu',e=>e.preventDefault());
