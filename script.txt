@@ -1089,8 +1089,20 @@
     const pageTitles = { main:'Profile Settings', password:'Password', birthday:'Birthday', privacy:'Privacy', special:'My Special Days', theme:'Theme', logout:'Log out' };
     if (title) title.textContent = pageTitles[page] || 'Profile Settings';
   }
-  document.querySelectorAll('#founderDatesOverlay [data-settings-open]').forEach(button => button.addEventListener('click', () => showSettingsPage(button.dataset.settingsOpen)));
-  document.querySelectorAll('#founderDatesOverlay [data-settings-back]').forEach(button => button.addEventListener('click', () => showSettingsPage('main')));
+  // Delegated Settings navigation: resilient to mobile tap targets and page-cache updates.
+  if (founderDatesOverlay) founderDatesOverlay.addEventListener('click', event => {
+    const openButton = event.target.closest('[data-settings-open]');
+    if (openButton) {
+      event.preventDefault();
+      showSettingsPage(openButton.dataset.settingsOpen);
+      return;
+    }
+    const backButton = event.target.closest('[data-settings-back]');
+    if (backButton) {
+      event.preventDefault();
+      showSettingsPage('main');
+    }
+  });
   function openFounderDates() {
     const birthday=document.getElementById('founderBirthday');
     const alerts=document.getElementById('founderBirthdayAlerts');

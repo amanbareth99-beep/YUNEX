@@ -822,3 +822,31 @@ body[data-theme="light"] .founder-special-divider{border-color:#d8e3ee}
 body[data-theme="light"] .founder-date-grid{color:#344b65}
 body[data-theme="light"] .profile-photo-change{background:#eaf4ff;color:#1678d5;border-color:#c6def5}
 body[data-theme="light"] .notification-shortcut{color:#173b5d}
+
+
+/* Mobile Profile Settings readability/tap repair (cache-busted build) */
+#founderDatesOverlay .settings-layer-dialog{box-sizing:border-box;width:min(460px,100%);padding:20px 18px;max-height:min(88dvh,760px);overflow-y:auto;overscroll-behavior:contain}
+#founderDatesOverlay .settings-layer{width:100%;box-sizing:border-box}
+#founderDatesOverlay .settings-menu-item{appearance:none;-webkit-appearance:none;box-sizing:border-box;display:flex!important;align-items:center!important;gap:12px!important;width:100%!important;min-height:64px!important;margin:8px 0!important;padding:12px!important;border:1px solid #2a4665!important;border-radius:14px!important;background:#102137!important;color:#eaf4ff!important;font-family:inherit!important;font-size:14px!important;font-weight:400!important;line-height:1.25!important;text-align:left!important;text-decoration:none!important;box-shadow:0 3px 12px #0002!important;white-space:normal!important;overflow:visible!important;cursor:pointer!important}
+#founderDatesOverlay .settings-menu-item:active{background:#173354!important;border-color:#168bff!important;transform:scale(.985)}
+#founderDatesOverlay .settings-menu-icon{box-sizing:border-box;width:40px!important;height:40px!important;flex:0 0 40px!important;display:grid!important;place-items:center!important;border:1px solid #2b5a82!important;border-radius:12px!important;background:#0c2b48!important;color:#78cfff!important;font-size:19px!important}
+#founderDatesOverlay .settings-menu-item>span:nth-child(2){display:flex!important;flex:1 1 auto!important;flex-direction:column!important;gap:4px!important;min-width:0!important}
+#founderDatesOverlay .settings-menu-item b{display:block!important;color:#f2f7ff!important;font-size:14px!important;font-weight:800!important;line-height:1.25!important}
+#founderDatesOverlay .settings-menu-item small{display:block!important;color:#a7bdd5!important;font-size:11px!important;font-weight:500!important;line-height:1.35!important;white-space:normal!important}
+#founderDatesOverlay .settings-chevron{flex:0 0 auto!important;color:#75c5ff!important;font-size:24px!important;line-height:1!important}
+#founderDatesOverlay .settings-logout-item b{color:#ff9dad!important}
+#founderDatesOverlay .settings-back{appearance:none;-webkit-appearance:none;display:inline-flex!important;align-items:center!important;min-height:42px!important;padding:10px 13px!important;background:#10243a!important;border:1px solid #2a4b6b!important;border-radius:11px!important;color:#8ed2ff!important;font-family:inherit!important;font-size:13px!important;font-weight:800!important}
+#founderDatesOverlay .settings-subpage h4{color:var(--text);font-size:18px!important;margin:12px 0 16px!important}
+#founderDatesOverlay .theme-choice{appearance:none;-webkit-appearance:none;min-width:0;background:#102137!important;border:1px solid #2a4665!important;color:#eaf4ff!important;font-family:inherit!important}
+#founderDatesOverlay .theme-choice b{color:#f2f7ff!important;font-size:13px!important}
+#founderDatesOverlay .theme-choice small{color:#a7bdd5!important;font-size:10px!important;line-height:1.35!important}
+body[data-theme="light"] #founderDatesOverlay .settings-menu-item{background:#fff!important;border-color:#cbd9e8!important;color:#17253a!important;box-shadow:0 3px 12px #23496c0d!important}
+body[data-theme="light"] #founderDatesOverlay .settings-menu-item b{color:#17253a!important}
+body[data-theme="light"] #founderDatesOverlay .settings-menu-item small{color:#5c7088!important}
+body[data-theme="light"] #founderDatesOverlay .settings-menu-icon{background:#eaf4ff!important;border-color:#d0e4f8!important;color:#1678ed!important}
+body[data-theme="light"] #founderDatesOverlay .settings-chevron{color:#1678ed!important}
+body[data-theme="light"] #founderDatesOverlay .settings-back{background:#edf6ff!important;border-color:#c8def2!important;color:#1676ce!important}
+body[data-theme="light"] #founderDatesOverlay .theme-choice{background:#fff!important;border-color:#cbd9e8!important;color:#17253a!important}
+body[data-theme="light"] #founderDatesOverlay .theme-choice b{color:#17253a!important}
+body[data-theme="light"] #founderDatesOverlay .theme-choice small{color:#5c7088!important}
+@media(max-width:420px){#founderDatesOverlay .settings-layer-dialog{padding:17px 14px!important}#founderDatesOverlay .settings-menu-item{min-height:62px!important;padding:10px!important;gap:10px!important}#founderDatesOverlay .settings-menu-icon{width:36px!important;height:36px!important;flex-basis:36px!important}#founderDatesOverlay .settings-menu-item b{font-size:13px!important}#founderDatesOverlay .settings-menu-item small{font-size:10px!important}}
