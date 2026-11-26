@@ -313,73 +313,6 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 .delete-chat-tool svg{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .chat-empty-state{align-self:center;margin:auto;color:#8294aa;font-size:13px;padding:20px}
 
-/* YUNEX mobile primary navigation: fixed bottom dock, preserving labels and icons. */
-@media (max-width: 700px) {
-  body:not(.chat-open):not(.registration-open) .tabs {
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    top: auto !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 8px 7px calc(8px + env(safe-area-inset-bottom)) !important;
-    display: flex !important;
-    justify-content: space-around !important;
-    align-items: center !important;
-    gap: 3px !important;
-    border: 0 !important;
-    border-top: 1px solid #263b57 !important;
-    border-radius: 16px 16px 0 0 !important;
-    background: rgba(7, 15, 28, .97) !important;
-    box-shadow: 0 -8px 28px rgba(0,0,0,.32) !important;
-    backdrop-filter: blur(18px) !important;
-    z-index: 1200 !important;
-  }
-  body:not(.chat-open):not(.registration-open) main {
-    padding-bottom: calc(82px + env(safe-area-inset-bottom)) !important;
-  }
-  body.section-open:not(.chat-open):not(.registration-open) .tabs {
-    display: flex !important;
-  }
-  body.section-open:not(.chat-open):not(.registration-open) main > .view.active {
-    padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
-  }
-  body.founder-account-open .tabs {
-    display: flex !important;
-  }
-  body.founder-account-open #profile.view.active {
-    padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
-  }
-  .tabs .tab {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-    min-height: 52px !important;
-    padding: 7px 2px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 3px !important;
-    font-size: 19px !important;
-    white-space: nowrap !important;
-  }
-  .tabs .tab span {
-    display: block !important;
-    font-size: 10px !important;
-    line-height: 1.15 !important;
-  }
-  .tabs .profile-nav-tab {
-    flex-direction: column !important;
-    gap: 3px !important;
-  }
-  .tabs .create-tab {
-    border-radius: 13px !important;
-    background: #0879f9 !important;
-    color: #fff !important;
-  }
-}
-
 /* YUNEX header refinement: brand tagline under the wordmark, account centered, notifications at right. */
 .topbar{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;align-items:center!important;gap:8px!important;height:76px!important;padding:0 16px!important}
 .brand{justify-self:start!important;display:flex!important;align-items:center!important;gap:9px!important;min-width:0}
@@ -392,87 +325,12 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 .notification-indicator{position:absolute;right:7px;top:6px;width:7px;height:7px;border-radius:50%;background:#36d7ff;box-shadow:0 0 8px #36d7ff}
 @media(max-width:540px){.topbar{height:72px!important;padding:0 12px!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important}.brand-mark{width:32px;height:32px}.brand-copy>b{font-size:18px}.brand-copy .tagline{font-size:6px;letter-spacing:.9px}.top-account-name{font-size:11px;max-width:32vw}.notification-shortcut{width:36px;height:36px}}
 
-/* Keep the mobile navigation dock pinned to the true bottom edge while the feed scrolls. */
-@media(max-width:700px){
-  body:not(.chat-open):not(.registration-open) .tabs{position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;margin:0!important;transform:none!important;width:100%!important;min-height:76px!important;padding:8px 7px calc(8px + env(safe-area-inset-bottom,0px))!important;border-radius:16px 16px 0 0!important;z-index:5000!important}
-  body:not(.chat-open):not(.registration-open) main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
-}
-
 /* Chat gallery attachment and heart-shaped Hug control. */
 .chat-compose .chat-gallery-button{width:42px;height:44px;flex:0 0 42px;display:grid;place-items:center;border:1px solid #294d70;border-radius:14px;background:#10243a;color:#70cfff;padding:9px;margin:0}
 .chat-compose .chat-gallery-button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .chat-tool.hug-tool svg.hug-heart-icon{width:27px!important;height:27px!important;fill:#ff5b83!important;stroke:#fff!important;stroke-width:1.7!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 .attachment-bubble img,.attachment-bubble video{display:block;max-width:min(65vw,260px);max-height:240px;border-radius:12px;object-fit:cover}
 @media(max-width:540px){.chat-compose .chat-gallery-button{width:40px;flex-basis:40px;height:44px;padding:8px}}
-
-
-/* Final mobile dock stability fix: viewport-pinned and detached from main scrolling. */
-@media (max-width:700px) {
-  body:not(.chat-open):not(.registration-open) > .tabs {
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
-    top: auto !important;
-    bottom: var(--yunex-visual-bottom-gap, 0px) !important;
-    transform: translate3d(0,0,0) !important;
-    width: 100% !important;
-    margin: 0 !important;
-    z-index: 12000 !important;
-    will-change: transform;
-    backface-visibility: hidden;
-  }
-}
-
-
-/* Definitive Android mobile dock fix: fixed to the layout viewport bottom.
-   No VisualViewport-derived offset and no transform/compositor promotion. */
-@media (max-width:700px) {
-  body:not(.chat-open):not(.registration-open) > nav.tabs {
-    position: fixed !important;
-    inset-inline: 0 !important;
-    top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 !important;
-    transform: none !important;
-    translate: none !important;
-    width: 100% !important;
-    z-index: 12000 !important;
-    will-change: auto !important;
-    backface-visibility: visible !important;
-    contain: layout paint !important;
-    touch-action: manipulation !important;
-  }
-}
-
-
-/* YUNEX mobile dock: one authoritative viewport anchor.
-   Android Chrome expands/collapses browser chrome; use the large-to-dynamic
-   viewport difference so the dock remains at the visible screen edge.
-   This rule intentionally overrides the older conflicting sticky/fixed rules. */
-@media (max-width: 700px) {
-  html {
-    --yunex-dock-browser-chrome-gap: max(0px, calc(100vh - 100dvh));
-  }
-  body:not(.chat-open):not(.registration-open) > nav.tabs {
-    position: fixed !important;
-    inset-inline: 0 !important;
-    inset-block-start: auto !important;
-    inset-block-end: var(--yunex-dock-browser-chrome-gap, 0px) !important;
-    width: 100% !important;
-    min-height: 76px !important;
-    margin: 0 !important;
-    transform: none !important;
-    translate: none !important;
-    animation: none !important;
-    transition: none !important;
-    will-change: auto !important;
-    z-index: 12000 !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
-    touch-action: manipulation !important;
-  }
-}
 
 
 /* YUNEX registration and animated reaction additions */
@@ -524,54 +382,33 @@ body.founder-account-open .founder-profile-top{margin-top:0!important;min-height
 }
 .founder-dates-dialog { overscroll-behavior: contain; }
 
-/* ABAROX profile correction: hidden Founder markers must stay hidden even
-   when the visual badge styles are applied. */
-#profile .founder-badge[hidden],
-#profile .founder-verified[hidden] { display: none !important; }
 
-/* ABAROX mobile navigation: one stable fixed dock for feed and profile. */
+/* ABAROX: single mobile navigation rule. The nav is moved directly under body by script.js; keep it anchored to the layout viewport bottom. No viewport-gap calculations, transforms, sticky positioning, or competing overrides. */
 @media (max-width: 700px) {
-  body:not(.chat-open):not(.registration-open) > nav.tabs,
-  body.founder-account-open > nav.tabs {
-    display: flex !important;
+  body:not(.chat-open):not(.registration-open) > nav.tabs {
     position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
     top: auto !important;
     bottom: 0 !important;
-    inset-block-end: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    inset: auto 0 0 0 !important;
     width: 100% !important;
+    min-height: 76px !important;
     margin: 0 !important;
+    padding: 8px 7px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
     transform: none !important;
     translate: none !important;
     animation: none !important;
     transition: none !important;
     will-change: auto !important;
-    z-index: 20000 !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 12000 !important;
+    border-radius: 16px 16px 0 0 !important;
+    touch-action: manipulation !important;
   }
-  body:not(.chat-open):not(.registration-open) main,
-  body.founder-account-open #profile.view.active {
+  body:not(.chat-open):not(.registration-open) main {
     padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
   }
-}
-
-
-/* ABAROX final mobile layout: nav is a direct body child, fixed to viewport bottom. */
-.topbar{grid-template-columns:minmax(0,1fr) auto!important}
-.topbar .brand{grid-column:1;justify-self:start!important}
-.topbar .notification-shortcut{grid-column:2;justify-self:end!important}
-.top-account-name{display:none!important}
-@media(max-width:700px){
-  body:not(.chat-open):not(.registration-open) > nav.tabs{
-    position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;
-    inset-inline:0!important;inset-block-start:auto!important;inset-block-end:0!important;
-    display:flex!important;width:100%!important;min-height:76px!important;height:auto!important;
-    margin:0!important;padding:8px 7px calc(8px + env(safe-area-inset-bottom,0px))!important;
-    transform:none!important;translate:none!important;animation:none!important;transition:none!important;
-    will-change:auto!important;z-index:20000!important;box-sizing:border-box!important;
-    border-radius:16px 16px 0 0!important;background:rgba(7,15,28,.98)!important;
-    border:1px solid #263b57!important;border-bottom:0!important;box-shadow:0 -8px 28px rgba(0,0,0,.32)!important;
-  }
-  body:not(.chat-open):not(.registration-open) main{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}
 }
