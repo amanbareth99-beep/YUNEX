@@ -995,3 +995,80 @@ body.chat-open .abx-animation-scene .abx-effects{overflow:hidden!important;}
 @keyframes abx-real-tear{0%{opacity:0;transform:translateY(-6px) scale(.6)}35%{opacity:1}100%{opacity:0;transform:translateY(40px) scale(.85)}}
 @keyframes abx-ghost-entrance{0%{opacity:0;transform:translateY(35px) scale(.4)}45%{opacity:1;transform:translateY(-8px) scale(1.12)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-height:520px){.abx-animation-stage{height:clamp(120px,26svh,170px)!important}.abx-svg-character{width:clamp(100px,30vw,132px)}}
+
+
+/* ABAROX word-triggered reactions — lightweight CSS animation, no per-effect GIFs */
+.chat-messages{position:relative;isolation:isolate}
+.abx-animation-scene{
+  position:absolute!important;inset:0!important;z-index:20!important;
+  display:grid!important;place-items:center!important;overflow:hidden!important;
+  pointer-events:none!important;opacity:0;background:radial-gradient(ellipse at 50% 52%,rgba(39,117,255,.10),transparent 68%)!important;
+  transition:opacity .32s ease!important;min-height:0!important
+}
+.abx-animation-scene.show{opacity:1!important}
+.abx-animation-scene.fade-out{opacity:0!important}
+.abx-word-animation-stage{position:relative;width:100%;height:100%;display:grid;place-items:center}
+.abx-animation-hero{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;min-width:110px;min-height:110px}
+.abx-hero-heart{font-size:clamp(76px,19vw,112px);line-height:1;color:#ff3d83;
+  text-shadow:0 0 8px #ff75ad,0 0 22px #ff2d79,0 0 48px rgba(255,35,120,.7);
+  animation:abx-heart-beat 1.05s ease-in-out infinite}
+.abx-miss-heart{font-size:clamp(70px,17vw,100px);line-height:1;color:#a9d8ff;
+  text-shadow:0 0 10px #77c5ff,0 0 28px rgba(81,160,255,.8);
+  animation:abx-miss-drift 2.2s ease-in-out infinite}
+.abx-miss-heart-two{position:absolute;font-size:38px;left:76%;top:0;color:#ff8bb7;animation:abx-miss-drift 2.6s ease-in-out infinite reverse}
+.abx-kiss-lips{font-size:clamp(66px,17vw,96px);filter:drop-shadow(0 0 13px rgba(255,80,145,.8));animation:abx-kiss-pop 1.2s ease-in-out infinite}
+.abx-kiss-heart{position:absolute;left:72%;top:0;color:#ff4e91;font-size:44px;text-shadow:0 0 15px #ff4e91;animation:abx-kiss-heart 1.1s ease-in-out infinite}
+.abx-hero-emoji{font-size:clamp(76px,19vw,112px);line-height:1;filter:drop-shadow(0 7px 12px rgba(0,0,0,.28))}
+.abx-scene-laugh .abx-hero-emoji{animation:abx-laugh-bounce .62s cubic-bezier(.36,.07,.19,.97) infinite}
+.abx-scene-cry .abx-hero-emoji{animation:abx-cry-sob 1.3s ease-in-out infinite}
+.abx-scene-angry .abx-hero-emoji{filter:drop-shadow(0 0 12px rgba(255,58,45,.8));animation:abx-angry-shake .24s linear infinite}
+.abx-scene-horror .abx-hero-emoji{filter:drop-shadow(0 0 16px rgba(80,195,255,.85));animation:abx-ghost-float 1.1s ease-in-out infinite}
+.abx-cry-drop{position:absolute;top:53%;width:9px;height:22px;border-radius:80% 20% 65% 65%;background:linear-gradient(#e8fbff,#48aaff);filter:drop-shadow(0 0 6px #45baff);opacity:0}
+.abx-cry-drop-one{left:42%;animation:abx-drop-fall .85s ease-in infinite}
+.abx-cry-drop-two{left:57%;animation:abx-drop-fall .85s .35s ease-in infinite}
+.abx-angry-steam{position:absolute;top:-3px;color:#ff806d;font-size:42px;font-weight:900;text-shadow:0 0 10px #ff493e;opacity:0}
+.abx-angry-steam-one{left:25%;animation:abx-steam-rise 1s ease-out infinite}
+.abx-angry-steam-two{right:22%;animation:abx-steam-rise 1s .35s ease-out infinite}
+.abx-word-particles{position:absolute;inset:0;overflow:hidden;z-index:1}
+.abx-word-particle{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);opacity:0}
+.abx-word-particle:before{content:"♥";display:block;color:var(--particle-color);font-size:var(--size);line-height:1;text-shadow:0 0 7px currentColor,0 0 15px currentColor}
+.abx-scene-love .abx-word-particle{--particle-color:#ff5b9d;animation:abx-heart-rise 2.2s ease-out infinite}
+.abx-scene-miss .abx-word-particle{--particle-color:#8fcfff;animation:abx-miss-fall 2.3s ease-in-out infinite}
+.abx-scene-kiss .abx-word-particle{--particle-color:#ff80ad;animation:abx-heart-rise 1.8s ease-out infinite}
+.abx-scene-laugh .abx-word-particle:before{content:"✦";color:#ffd36b}
+.abx-scene-laugh .abx-word-particle{animation:abx-sparkle 1.25s ease-out infinite}
+.abx-scene-cry .abx-word-particle:before{content:"•";color:#79caff}
+.abx-scene-cry .abx-word-particle{animation:abx-sparkle 1.45s ease-out infinite}
+.abx-scene-angry .abx-word-particle:before{content:"✦";color:#ff604e}
+.abx-scene-angry .abx-word-particle{animation:abx-angry-sparks .9s ease-out infinite}
+.abx-scene-horror .abx-word-particle:before{content:"✦";color:#8ce8ff}
+.abx-scene-horror .abx-word-particle{animation:abx-sparkle 1.3s ease-out infinite}
+.abx-word-particle.p1{--x:12%;--y:68%;--size:20px;animation-delay:0s}
+.abx-word-particle.p2{--x:24%;--y:25%;--size:15px;animation-delay:.22s}
+.abx-word-particle.p3{--x:78%;--y:22%;--size:22px;animation-delay:.45s}
+.abx-word-particle.p4{--x:88%;--y:62%;--size:14px;animation-delay:.12s}
+.abx-word-particle.p5{--x:40%;--y:12%;--size:12px;animation-delay:.55s}
+.abx-word-particle.p6{--x:60%;--y:78%;--size:18px;animation-delay:.3s}
+.abx-word-particle.p7{--x:8%;--y:42%;--size:13px;animation-delay:.7s}
+.abx-word-particle.p8{--x:92%;--y:40%;--size:17px;animation-delay:.4s}
+.abx-word-particle.p9{--x:33%;--y:83%;--size:15px;animation-delay:.8s}
+.abx-word-particle.p10{--x:68%;--y:10%;--size:13px;animation-delay:.6s}
+.abx-word-particle.p11{--x:18%;--y:83%;--size:11px;animation-delay:.35s}
+.abx-word-particle.p12{--x:83%;--y:84%;--size:12px;animation-delay:.9s}
+@keyframes abx-heart-beat{0%,100%{transform:scale(.94)}15%{transform:scale(1.12)}30%{transform:scale(.98)}45%{transform:scale(1.08)}}
+@keyframes abx-heart-rise{0%{opacity:0;transform:translateY(35px) scale(.45) rotate(-15deg)}20%{opacity:1}100%{opacity:0;transform:translateY(-85px) scale(1.15) rotate(18deg)}}
+@keyframes abx-miss-drift{0%,100%{transform:translate(0,5px) rotate(-8deg);opacity:.75}50%{transform:translate(7px,-12px) rotate(8deg);opacity:1}}
+@keyframes abx-miss-fall{0%{opacity:0;transform:translateY(-35px) scale(.6)}25%{opacity:.9}100%{opacity:0;transform:translateY(70px) scale(1.15)}}
+@keyframes abx-kiss-pop{0%,100%{transform:scale(.94) rotate(-5deg)}50%{transform:scale(1.12) rotate(5deg)}}
+@keyframes abx-kiss-heart{0%,100%{transform:translateY(5px) scale(.7);opacity:.4}50%{transform:translateY(-17px) scale(1.2);opacity:1}}
+@keyframes abx-laugh-bounce{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-18px) rotate(-8deg)}50%{transform:translateY(0) rotate(7deg)}75%{transform:translateY(-10px) rotate(-4deg)}}
+@keyframes abx-cry-sob{0%,100%{transform:translateY(0) rotate(0)}35%{transform:translateY(4px) rotate(-4deg)}65%{transform:translateY(2px) rotate(4deg)}}
+@keyframes abx-drop-fall{0%{opacity:0;transform:translateY(-2px) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translateY(38px) scale(1)}}
+@keyframes abx-angry-shake{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-4px) rotate(-3deg)}75%{transform:translateX(4px) rotate(3deg)}}
+@keyframes abx-steam-rise{0%{opacity:0;transform:translateY(10px) scale(.7)}35%{opacity:.9}100%{opacity:0;transform:translateY(-28px) scale(1.2)}}
+@keyframes abx-angry-sparks{0%{opacity:0;transform:scale(.4) rotate(0)}30%{opacity:1}100%{opacity:0;transform:scale(1.3) rotate(100deg)}}
+@keyframes abx-ghost-float{0%,100%{transform:translateY(4px) rotate(-4deg)}50%{transform:translateY(-13px) rotate(4deg)}}
+@keyframes abx-sparkle{0%{opacity:0;transform:scale(.3) rotate(0)}30%{opacity:1}100%{opacity:0;transform:scale(1.4) rotate(80deg)}}
+@media (prefers-reduced-motion:reduce){
+  .abx-animation-scene,.abx-animation-scene *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+}

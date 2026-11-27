@@ -824,10 +824,11 @@
 
   // Word/context-based ABAROX chat animation trigger. No animation button or picker.
   const autoAnimationRules = [
+    { kind:'angry', label:'Angry', patterns:[/\bangry\b/i,/\bmad\s+at\s+(?:you|me|him|her|them)\b/i,/\bfurious\b/i,/\bgussa\b|\bgus्सा\b|\bgusse\b|\bnaraz\b/i,/गुस्सा|नाराज़|नाराज|क्रोधित|चिढ़/u,/😡|🤬|😠/u] },
     { kind:'horror', label:'Horror', patterns:[/\bboo\b/i,/\bghost\b/i,/\bhorror\b/i,/\bscary\b/i,/\bspooky\b/i,/\b डर\b/u,/\bdar+r?\b|\bdarna\b|\bdarawna\b/i,/डर(?:ा|ी|े|ना|ावना)?/u,/भूत|भूतिया|चुड़ैल|डरावना/u] },
     { kind:'kiss', label:'Kiss', patterns:[/\bkiss(?:ing|ed)?\b/i,/\bkisses\b/i,/\bkiss(?:i|y|ee)\s*(?:do|de|dena|diyo|please|me)\b/i,/\bmuah\b/i,/\bchumma\b/i,/\bpappi\b/i,/\bchum(?:na|o|u|a)\b/i,/चुम्मा|चूम|पप्पी/u,/kiss\s*कर|kiss\s*दे|kiss\s*दो/i] },
     { kind:'love', label:'Love', patterns:[/\bi\s*(?:really\s*)?love\s*you\b/i,/\blove\s*you\b/i,/\bluv\s*u\b/i,/\bily\b/i,/\bmy\s*love\b/i,/\bpyar\b|\bpyaar\b|\bmohabbat\b|\bishq\b/i,/प्यार|प्रेम|मोहब्बत|इश्क/u] },
-    { kind:'miss', label:'Miss You', patterns:[/\bmiss\s*you\b/i,/\bmissing\s*you\b/i,/\bi\s*miss\s*u\b/i,/\byaad\s*aa\b/i,/\byad\s*aa\b/i,/\byaad\s*kar(?:ta|ti)?\b/i,/याद\s*(?:आ|कर)|तुम्हारी\s*याद|तेरी\s*याद/u] },
+    { kind:'miss', label:'Miss You', patterns:[/\bmiss\s*you\b/i,/\bmissing\s*you\b/i,/\bi\s*miss\s*u\b/i,/\byaad\s*(?:aa|aate|aati|aata)\b/i,/\byad\s*(?:aa|aate|aati|aata)\b/i,/\byaad\s*kar(?:ta|ti|te)?\b/i,/याद\s*(?:आ|कर)|तुम्हारी\s*याद|तेरी\s*याद/u] },
     { kind:'cry', label:'Cry', patterns:[/\b(?:i am|im|i'm)?\s*cry(?:ing)?\b/i,/\bsob(?:bing)?\b/i,/\btears\b/i,/\bro\s*raha\b|\bro\s*rahi\b|\brona\b|\bsad\b|\budaas\b/i,/😭|😢|🥲|😿|रो\s*रहा|रो\s*रही|रोना|आँसू|आंसू/u] },
     { kind:'laugh', label:'Laugh', patterns:[/\b(?:haha+|hehe+|lol+|lmao|rofl)\b/i,/\bfunny\b/i,/\blaugh(?:ing|ed)?\b/i,/\bhasi\b|\bhasna\b|\bhans\b/i,/😂|🤣|😆|हँस|हंस|मज़ाक|मजाक/u] }
   ];
@@ -877,35 +878,46 @@
   function showAutoAnimation(kind) {
     const messages = document.getElementById('chatMessages');
     if (!messages) return;
-    const old = messages.querySelector('.abx-animation-scene'); if (old) old.remove();
-    const scene = document.createElement('div'); scene.className = `abx-animation-scene abx-scene-${kind}`; scene.setAttribute('aria-hidden','true');
-    const stage = document.createElement('div'); stage.className = 'abx-animation-stage';
-    stage.append(createCartoonCharacter('char-one',1), createCartoonCharacter('char-two',2));
-    const effects = document.createElement('div'); effects.className = 'abx-effects';
-    for (let i=0;i<8;i++){ const particle=document.createElement('i'); particle.className=`abx-particle p${i+1}`; effects.appendChild(particle); }
-    const extras = document.createElement('div'); extras.className = 'abx-scene-extras';
-    if(kind==='love') extras.innerHTML='<div class="abx-big-heart">♥</div>';
-    if(kind==='miss') extras.innerHTML='<div class="abx-thought-heart">♡</div>';
-    if(kind==='cry') extras.innerHTML='<i class="abx-tear t1"></i><i class="abx-tear t2"></i>';
-    if(kind==='horror') extras.innerHTML='<div class="abx-ghost"><svg viewBox="0 0 100 110"><path d="M15 94V47C15 22 32 7 51 7S86 22 86 47V94L73 84 60 95 48 84 34 95 22 84Z" fill="#d9f8ff" stroke="#6dbfff" stroke-width="4"/><ellipse cx="38" cy="43" rx="9" ry="13" fill="#061b42"/><ellipse cx="65" cy="43" rx="9" ry="13" fill="#061b42"/><ellipse cx="38" cy="43" rx="4" ry="6" fill="#31c8ff"/><ellipse cx="65" cy="43" rx="4" ry="6" fill="#31c8ff"/><ellipse cx="52" cy="67" rx="10" ry="14" fill="#142b50"/></svg></div>';
-    scene.append(stage,effects,extras); messages.appendChild(scene);
-    requestAnimationFrame(()=>scene.classList.add('show'));
-    window.setTimeout(()=>scene.classList.add('fade-out'),1900);
-    window.setTimeout(()=>scene.remove(),2350);
-  }
-  function showAutoAnimation(kind) {
-    const messages = document.getElementById('chatMessages');
-    if (!messages) return;
-    const old = messages.querySelector('.abx-animation-scene'); if (old) old.remove();
-    const scene = document.createElement('div'); scene.className = `abx-animation-scene abx-scene-${kind}`; scene.setAttribute('aria-hidden','true');
-    const stage = document.createElement('div'); stage.className = 'abx-animation-stage';
-    stage.append(createCartoonCharacter('char-one',1), createCartoonCharacter('char-two',2));
-    const effects = document.createElement('div'); effects.className = 'abx-effects';
-    for (let i=0;i<6;i++){ const particle=document.createElement('i'); particle.className=`abx-particle p${i+1}`; effects.appendChild(particle); }
-    scene.append(stage,effects); messages.appendChild(scene);
-    requestAnimationFrame(()=>scene.classList.add('show'));
-    window.setTimeout(()=>scene.classList.add('fade-out'),1750);
-    window.setTimeout(()=>scene.remove(),2200);
+
+    // Keep the animation visual-only: it never changes the message text or Hug flow.
+    const old = messages.querySelector('.abx-animation-scene');
+    if (old) old.remove();
+
+    const scene = document.createElement('div');
+    scene.className = `abx-animation-scene abx-scene-${kind}`;
+    scene.setAttribute('aria-hidden', 'true');
+
+    const stage = document.createElement('div');
+    stage.className = 'abx-word-animation-stage';
+
+    const hero = document.createElement('div');
+    hero.className = 'abx-animation-hero';
+    const heroContent = {
+      love: '<span class="abx-hero-heart">♥</span>',
+      miss: '<span class="abx-miss-heart">♡</span><span class="abx-miss-heart abx-miss-heart-two">♡</span>',
+      kiss: '<span class="abx-kiss-lips">💋</span><span class="abx-kiss-heart">♥</span>',
+      laugh: '<span class="abx-hero-emoji">😂</span>',
+      cry: '<span class="abx-hero-emoji">😢</span><i class="abx-cry-drop abx-cry-drop-one"></i><i class="abx-cry-drop abx-cry-drop-two"></i>',
+      angry: '<span class="abx-hero-emoji">😡</span><i class="abx-angry-steam abx-angry-steam-one">〰</i><i class="abx-angry-steam abx-angry-steam-two">〰</i>',
+      horror: '<span class="abx-hero-emoji">👻</span>'
+    };
+    hero.innerHTML = heroContent[kind] || heroContent.love;
+    stage.appendChild(hero);
+
+    const particles = document.createElement('div');
+    particles.className = 'abx-word-particles';
+    const particleCount = kind === 'miss' ? 9 : 12;
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('i');
+      particle.className = `abx-word-particle p${(i % 12) + 1}`;
+      particles.appendChild(particle);
+    }
+
+    scene.append(stage, particles);
+    messages.appendChild(scene);
+    requestAnimationFrame(() => scene.classList.add('show'));
+    window.setTimeout(() => scene.classList.add('fade-out'), 2550);
+    window.setTimeout(() => scene.remove(), 3000);
   }
 
   // Chat status preview: all delivery/read states below are simulated locally.
