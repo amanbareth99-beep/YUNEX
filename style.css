@@ -850,3 +850,52 @@ body[data-theme="light"] #founderDatesOverlay .theme-choice{background:#fff!impo
 body[data-theme="light"] #founderDatesOverlay .theme-choice b{color:#17253a!important}
 body[data-theme="light"] #founderDatesOverlay .theme-choice small{color:#5c7088!important}
 @media(max-width:420px){#founderDatesOverlay .settings-layer-dialog{padding:17px 14px!important}#founderDatesOverlay .settings-menu-item{min-height:62px!important;padding:10px!important;gap:10px!important}#founderDatesOverlay .settings-menu-icon{width:36px!important;height:36px!important;flex-basis:36px!important}#founderDatesOverlay .settings-menu-item b{font-size:13px!important}#founderDatesOverlay .settings-menu-item small{font-size:10px!important}}
+
+/* ABAROX global light-theme contrast repair (2026-11-27): searched profiles,
+   profile stats, notification icon and fixed mobile navigation. */
+body[data-theme="light"] #demoProfile .demo-user-card,
+body[data-theme="light"] #demoProfile .profile-card,
+body[data-theme="light"] #demoProfile .panel{background:#fff!important;border-color:#d6e1ed!important;color:#17253a!important;box-shadow:0 10px 28px #173b650c!important}
+body[data-theme="light"] #demoProfile .demo-profile-identity h2,
+body[data-theme="light"] #demoProfile .demo-profile-bio,
+body[data-theme="light"] #demoProfile .demo-empty-state,
+body[data-theme="light"] #demoProfile .demo-empty-state b,
+body[data-theme="light"] #demoProfile .stats b{color:#17253a!important}
+body[data-theme="light"] #demoProfile .demo-profile-handle,
+body[data-theme="light"] #demoProfile .demo-profile-identity .muted,
+body[data-theme="light"] #demoProfile .demo-empty-state p,
+body[data-theme="light"] #demoProfile .stats small{color:#64788f!important}
+body[data-theme="light"] #demoProfile .demo-account-id,
+body[data-theme="light"] #demoProfile .demo-account-id span{color:#64788f!important;background:transparent!important;border:0!important;box-shadow:none!important}
+body[data-theme="light"] #demoProfile .demo-profile-stats{border-color:#d6e1ed!important}
+body[data-theme="light"] #demoProfile .demo-profile-stats>div+div:before{background:#d6e1ed!important}
+body[data-theme="light"] #demoProfile .founder-content-tabs{border-color:#d6e1ed!important}
+body[data-theme="light"] #demoProfile .founder-content-tabs button{color:#64788f!important}
+body[data-theme="light"] #demoProfile .founder-content-tabs button.selected{color:#1678ed!important;border-bottom-color:#1678ed!important}
+body[data-theme="light"] #demoProfile .empty-grid-icon{background:#eaf4ff!important;border-color:#cbdff3!important;color:#1678ed!important}
+body[data-theme="light"] #demoProfile .secondary{background:#edf5fd!important;border-color:#d1e0ef!important;color:#193957!important}
+body[data-theme="light"] #demoProfile .brand-collaboration-action{background:linear-gradient(110deg,#edf6ff,#fff)!important;border-color:#c8def2!important;color:#1678ed!important}
+body[data-theme="light"] #profile .founder-stats b,
+body[data-theme="light"] .founder-stats b,
+body[data-theme="light"] .stats b{color:#17253a!important}
+body[data-theme="light"] #profile .founder-stats small,
+body[data-theme="light"] .founder-stats small,
+body[data-theme="light"] .stats small{color:#64788f!important}
+body[data-theme="light"] #profile .founder-stats>div+div:before,
+body[data-theme="light"] .founder-stats>div+div:before{background:#d6e1ed!important}
+body[data-theme="light"] #profile .founder-stats{border-color:#d6e1ed!important}
+body[data-theme="light"] .notification-shortcut{background:#eaf4ff!important;border-color:#c8def2!important;color:#1678ed!important}
+body[data-theme="light"] .notification-shortcut svg{stroke:#1678ed!important;color:#1678ed!important;fill:none!important}
+@media(max-width:700px){
+ body[data-theme="light"]:not(.chat-open):not(.registration-open)>nav.tabs,
+ body[data-theme="light"]:not(.chat-open):not(.registration-open)>nav.tabs{background:#ffffffed!important;border-color:#d5e0ec!important;box-shadow:0 -8px 28px #173b650d!important}
+ body[data-theme="light"] nav.tabs .tab{background:transparent!important;color:#64788f!important}
+ body[data-theme="light"] nav.tabs .tab.active{background:#e5f2ff!important;color:#1678ed!important}
+ body[data-theme="light"] nav.tabs .tab.active svg{stroke:#1678ed!important;color:#1678ed!important}
+ body[data-theme="light"] nav.tabs .create-tab{background:linear-gradient(100deg,#0879f9,#25b9ff)!important;color:#fff!important}
+ body[data-theme="light"] nav.tabs .create-tab svg{stroke:#fff!important;color:#fff!important}
+}
+body[data-theme="light"] .explore-result-item{background:#fff!important;border-color:#d5e0ec!important;color:#17253a!important}
+body[data-theme="light"] .explore-result-item b{color:#17253a!important}
+body[data-theme="light"] .explore-result-item span,
+body[data-theme="light"] .explore-result-item small{color:#64788f!important}
