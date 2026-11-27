@@ -192,9 +192,6 @@
       const pair = gender === 'male' && otherGender === 'male' ? '👦🏻🤗👦🏽' : gender === 'female' && otherGender === 'female' ? '👧🏻🤗👧🏽' : '👦🏻🤗👧🏻';
       appendAnimatedReaction('hug', 'Hug', pair); return;
     }
-    const reactionButton = event.target.closest('[data-reaction]');
-    if (reactionButton) { appendAnimatedReaction(reactionButton.dataset.reaction, reactionButton.innerText.trim(), reactionButton.querySelector('span')?.textContent || 'Reaction'); document.getElementById('reactionTray').hidden = true; return; }
-    if (event.target.closest('#reactionToggle')) { const tray = document.getElementById('reactionTray'); tray.hidden = !tray.hidden; return; }
     if (event.target.closest('#gamesButton')) { document.getElementById('gamesOverlay').hidden = false; return; }
     if (event.target.closest('#closeGames')) { document.getElementById('gamesOverlay').hidden = true; return; }
     const gameChoice = event.target.closest('.game-choice');
@@ -825,18 +822,48 @@
     }, 350);
   });
 
-  function appendAnimatedReaction(kind, label, art) {
-    const box = document.createElement('div'); box.className = 'chat-bubble sent yunex-reaction reaction-' + kind;
-    const visual = document.createElement('div'); visual.className = 'reaction-art'; visual.textContent = art || ({kiss:'💋',love:'💞',miss:'💔',laugh:'😂',cry:'😭',horror:'👻'}[kind] || '💗');
-    const caption = document.createElement('b'); caption.textContent = label;
-    box.append(visual, caption); addMessageMetaSafe(box);
-    const messages = document.getElementById('chatMessages'); messages.appendChild(box); messages.scrollTop = messages.scrollHeight;
+  // Word/context-based ABAROX chat animation trigger. No animation button or picker.
+  const autoAnimationRules = [
+    { kind:'horror', label:'Horror', patterns:[/\bboo\b/i,/\bghost\b/i,/\bhorror\b/i,/\bscary\b/i,/\bspooky\b/i,/\b डर\b/u,/\bdar+r?\b|\bdarna\b|\bdarawna\b/i,/डर(?:ा|ी|े|ना|ावना)?/u,/भूत|भूतिया|चुड़ैल|डरावना/u] },
+    { kind:'kiss', label:'Kiss', patterns:[/\bkiss(?:ing|ed)?\b/i,/\bkisses\b/i,/\bkiss(?:i|y|ee)\s*(?:do|de|dena|diyo|please|me)\b/i,/\bmuah\b/i,/\bchumma\b/i,/\bpappi\b/i,/\bchum(?:na|o|u|a)\b/i,/चुम्मा|चूम|पप्पी/u,/kiss\s*कर|kiss\s*दे|kiss\s*दो/i] },
+    { kind:'love', label:'Love', patterns:[/\bi\s*(?:really\s*)?love\s*you\b/i,/\blove\s*you\b/i,/\bluv\s*u\b/i,/\bily\b/i,/\bmy\s*love\b/i,/\bpyar\b|\bpyaar\b|\bmohabbat\b|\bishq\b/i,/प्यार|प्रेम|मोहब्बत|इश्क/u] },
+    { kind:'miss', label:'Miss You', patterns:[/\bmiss\s*you\b/i,/\bmissing\s*you\b/i,/\bi\s*miss\s*u\b/i,/\byaad\s*aa\b/i,/\byad\s*aa\b/i,/\byaad\s*kar(?:ta|ti)?\b/i,/याद\s*(?:आ|कर)|तुम्हारी\s*याद|तेरी\s*याद/u] },
+    { kind:'cry', label:'Cry', patterns:[/\b(?:i am|im|i'm)?\s*cry(?:ing)?\b/i,/\bsob(?:bing)?\b/i,/\btears\b/i,/\bro\s*raha\b|\bro\s*rahi\b|\brona\b|\bsad\b|\budaas\b/i,/😭|😢|🥲|😿|रो\s*रहा|रो\s*रही|रोना|आँसू|आंसू/u] },
+    { kind:'laugh', label:'Laugh', patterns:[/\b(?:haha+|hehe+|lol+|lmao|rofl)\b/i,/\bfunny\b/i,/\blaugh(?:ing|ed)?\b/i,/\bhasi\b|\bhasna\b|\bhans\b/i,/😂|🤣|😆|हँस|हंस|मज़ाक|मजाक/u] }
+  ];
+  const animationNegation = /\b(?:don't|dont|do not|not|never|stop|no|mat|nahi|nahin|na)\b|मत|नहीं|ना/u;
+  function detectAutoAnimation(text) {
+    const normalized = String(text || '').toLowerCase().replace(/[\u200b-\u200d]/g,' ').replace(/[.!?,;]+/g,' ');
+    for (const rule of autoAnimationRules) {
+      const match = rule.patterns.some(pattern => pattern.test(normalized));
+      if (!match) continue;
+      // Negation near the detected intent suppresses the animation. Keep common
+      // positive constructions ("I can't stop laughing") from being suppressed.
+      const negated = animationNegation.test(normalized) && !/can't\s+stop\s+(?:laugh|lov)|cannot\s+stop\s+(?:laugh|lov)/i.test(normalized);
+      if (negated) return null;
+      return rule.kind;
+    }
+    return null;
   }
-  // Reactions launcher is added beside the existing chat input without disturbing send/gallery behavior.
-  const chatFormForReaction = document.getElementById('chatForm');
-  if (chatFormForReaction && !document.getElementById('reactionToggle')) {
-    const toggle = document.createElement('button'); toggle.type = 'button'; toggle.id = 'reactionToggle'; toggle.className = 'chat-reaction-toggle'; toggle.setAttribute('aria-label','Open animated reactions'); toggle.textContent = '☺';
-    chatFormForReaction.insertBefore(toggle, chatFormForReaction.firstChild);
+  function createCartoonCharacter(role, index) {
+    const character = document.createElement('div');
+    character.className = `abx-3d-character ${role} character-${index}`;
+    character.innerHTML = '<div class="abx-shadow"></div><div class="abx-body"><div class="abx-arm arm-left"></div><div class="abx-arm arm-right"></div><div class="abx-head"><div class="abx-hair"></div><div class="abx-ear ear-left"></div><div class="abx-ear ear-right"></div><div class="abx-eye eye-left"><i></i></div><div class="abx-eye eye-right"><i></i></div><div class="abx-blush blush-left"></div><div class="abx-blush blush-right"></div><div class="abx-mouth"></div></div><div class="abx-leg leg-left"><div class="abx-shoe"></div></div><div class="abx-leg leg-right"><div class="abx-shoe"></div></div></div>';
+    return character;
+  }
+  function showAutoAnimation(kind) {
+    const messages = document.getElementById('chatMessages');
+    if (!messages) return;
+    const old = messages.querySelector('.abx-animation-scene'); if (old) old.remove();
+    const scene = document.createElement('div'); scene.className = `abx-animation-scene abx-scene-${kind}`; scene.setAttribute('aria-hidden','true');
+    const stage = document.createElement('div'); stage.className = 'abx-animation-stage';
+    stage.append(createCartoonCharacter('char-one',1), createCartoonCharacter('char-two',2));
+    const effects = document.createElement('div'); effects.className = 'abx-effects';
+    for (let i=0;i<6;i++){ const particle=document.createElement('i'); particle.className=`abx-particle p${i+1}`; effects.appendChild(particle); }
+    scene.append(stage,effects); messages.appendChild(scene);
+    requestAnimationFrame(()=>scene.classList.add('show'));
+    window.setTimeout(()=>scene.classList.add('fade-out'),1750);
+    window.setTimeout(()=>scene.remove(),2200);
   }
 
   // Chat status preview: all delivery/read states below are simulated locally.
@@ -1296,6 +1323,8 @@
     bubble.appendChild(messageText);
     addMessageMeta(bubble, '✓ Sent · demo', true);
     chatMessages.appendChild(bubble);
+    const detectedAnimation = detectAutoAnimation(value);
+    if (detectedAnimation) showAutoAnimation(detectedAnimation);
     chatInput.value = '';
     chatInput.focus({ preventScroll: true });
     chatMessages.scrollTop = chatMessages.scrollHeight;
