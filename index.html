@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#070b14">
   <title>ABAROX — Connect. Create. Win.</title>
   <meta name="description" content="ABAROX — Connect. Create. Win. A social media and competition platform.">
-  <link rel="stylesheet" href="style.css?v=20261127-theme-contrast2">
+  <link rel="stylesheet" href="style.css?v=20261127-profile-adjust4">
 </head>
 <body>
   <header class="topbar">
@@ -121,48 +121,48 @@
           <button type="button" class="settings-menu-item settings-logout-item" data-settings-open="logout"><span class="settings-menu-icon">↪</span><span><b>Log out</b><small>Sign out of ABAROX</small></span><span class="settings-chevron">›</span></button>
         </section>
         <section class="settings-layer settings-subpage" data-settings-page="password" hidden>
-          <button type="button" class="settings-back" data-settings-back>‹ Back to Settings</button><h4>Change login password</h4>
+          <h4>Change login password</h4>
           <label>New password<input id="founderNewPassword" type="password" autocomplete="new-password" placeholder="Enter new password"></label>
           <label>Confirm new password<input id="founderConfirmPassword" type="password" autocomplete="new-password" placeholder="Confirm new password"></label>
           <button type="button" class="secondary full" id="changeFounderPassword">Update password</button>
           <p class="tiny muted">Password is never saved in this browser. Password updates use your current secure Supabase session.</p>
         </section>
         <section class="settings-layer settings-subpage" data-settings-page="birthday" hidden>
-          <button type="button" class="settings-back" data-settings-back>‹ Back to Settings</button><h4>Birthday</h4>
+          <h4>Birthday</h4>
           <label>Birthday date<input id="founderBirthday" type="date"></label><label class="founder-toggle-row"><input id="founderBirthdayAlerts" type="checkbox"> Allow birthday notifications to followers / following</label>
           <p class="tiny muted">Your full birth date stays private. Follower notifications require the ABAROX notification backend.</p>
           <button type="button" class="primary full settings-save">Save settings</button>
         </section>
         <section class="settings-layer settings-subpage" data-settings-page="privacy" hidden>
-          <button type="button" class="settings-back" data-settings-back>‹ Back to Settings</button><h4>Account privacy</h4>
+          <h4>Account privacy</h4>
           <label class="founder-toggle-row"><input id="privateAccountToggle" type="checkbox"> Private account</label><label class="founder-toggle-row"><input id="manualTagApproval" type="checkbox" checked> Manually approve tagged posts</label>
           <p class="tiny muted">Private account par naye followers ko approval chahiye. Existing followers remain. These preview preferences save in this browser; backend policy connection is pending.</p>
           <button type="button" class="primary full settings-save">Save settings</button>
         </section>
         <section class="settings-layer settings-subpage" data-settings-page="special" hidden>
-          <button type="button" class="settings-back" data-settings-back>‹ Back to Settings</button><h4>My Special Days</h4>
+          <h4>My Special Days</h4>
           <label>Special day name<input id="specialDayTitle" maxlength="40" placeholder="e.g. Business launch day"></label><div class="founder-date-grid"><label>Date<input id="specialDayDate" type="date"></label><label>Reminder time<input id="specialDayTime" type="time" value="09:00"></label></div>
           <button type="button" class="secondary full" id="addSpecialDay">＋ Add special day</button><div id="specialDaysList" class="special-days-list"></div><p class="tiny muted">Special day details are private to this browser preview. Reliable reminders need backend / notification integration.</p><button type="button" class="primary full settings-save">Save settings</button>
         </section>
         <section class="settings-layer settings-subpage" data-settings-page="theme" hidden>
-          <button type="button" class="settings-back" data-settings-back>‹ Back to Settings</button><h4>Choose Theme</h4>
+          <h4>Choose Theme</h4>
           <p class="muted settings-intro">Choose how ABAROX looks on this device. Your preference is saved.</p>
           <div class="theme-choice-grid"><button type="button" class="theme-choice" data-theme-choice="dark"><span class="theme-preview theme-preview-dark">🌙</span><b>Dark Mode</b><small>Black · Navy · Electric Blue</small></button><button type="button" class="theme-choice" data-theme-choice="light"><span class="theme-preview theme-preview-light">☀️</span><b>Light Mode</b><small>White · Light Gray · Blue</small></button></div>
         </section>
         <section class="settings-layer settings-subpage" data-settings-page="logout" hidden>
-          <button type="button" class="settings-back" data-settings-back>‹ Back to Settings</button><h4>Log out</h4><p class="muted">Log out from your current ABAROX account on this device.</p><button type="button" class="secondary full" id="yunexProfileLogoutButton">Log out</button><p class="tiny muted" id="profileLogoutFeedback" role="status"></p>
+          <h4>Log out</h4><p class="muted">Log out from your current ABAROX account on this device.</p><button type="button" class="secondary full" id="yunexProfileLogoutButton">Log out</button><p class="tiny muted" id="profileLogoutFeedback" role="status"></p>
         </section>
       </div></div>
       <div class="founder-edit-overlay" id="photoAdjustOverlay" hidden><div class="founder-edit-dialog photo-adjust-dialog" role="dialog" aria-modal="true" aria-labelledby="photoAdjustTitle">
         <div class="founder-edit-head"><div><p class="eyebrow">PROFILE PHOTO</p><h3 id="photoAdjustTitle">Adjust your photo</h3></div><button type="button" class="games-close" id="closePhotoAdjust" aria-label="Close">×</button></div>
-        <div class="photo-adjust-preview"><img id="photoAdjustPreview" alt="Profile photo crop preview"></div><p class="photo-gesture-hint">Drag to position · Pinch to zoom and rotate, or use the controls below.</p><label class="photo-adjust-control">Zoom <input id="photoZoom" type="range" min="1" max="4" step="0.05" value="1"></label><label class="photo-adjust-control">Rotate <input id="photoRotation" type="range" min="-180" max="180" step="1" value="0"></label><button type="button" class="secondary full" id="resetPhotoAdjust">Reset adjustment</button><button type="button" class="primary full" id="savePhotoAdjust">Use this photo</button>
+        <div class="photo-adjust-preview"><img id="photoAdjustPreview" alt="Profile photo crop preview"></div><p class="photo-gesture-hint">Drag with one finger to move · Pinch with two fingers to zoom and rotate.</p><button type="button" class="primary full" id="savePhotoAdjust">Save photo</button>
       </div></div>
       <div class="founder-photo-lightbox" id="founderPhotoLightbox" hidden><img id="founderPhotoLarge" alt="Expanded profile photo"><span>Tap anywhere to close</span></div>
     </section>
 
     <section id="demoProfile" class="view">
       <div class="panel profile-card demo-user-card">
-        <div class="demo-profile-heading"><div class="demo-profile-photo-column"><div class="founder-avatar demo-profile-avatar" id="demoAvatar" data-profile-avatar="user:@riya_demo">R</div><p class="muted demo-profile-handle" id="demoHandle">@riya_demo</p></div><div class="demo-profile-identity"><h2 id="demoName">Riya Creates</h2><div class="profile-badge-id-row"><div class="founder-badge founder-crown-badge" id="demoFounderBadge" hidden>♛ <span>FOUNDER</span></div><p class="demo-account-id"><span id="demoAccountId">Not available</span></p></div></div></div>
+        <div class="demo-profile-heading"><div class="demo-profile-photo-column"><div class="founder-avatar demo-profile-avatar" id="demoAvatar" data-profile-avatar="user:@riya_demo">R</div><p class="muted demo-profile-handle" id="demoHandle">@riya_demo</p></div><div class="demo-profile-identity"><h2 id="demoName">Riya Creates</h2><div class="profile-badge-id-row"><div class="founder-badge founder-crown-badge" id="demoFounderBadge" hidden><svg class="demo-founder-crown" viewBox="0 0 24 18" aria-hidden="true"><path d="M2 4.2 6.7 8 11.9 1.8 17.2 8 22 4.2 20 15.8H4L2 4.2Z" fill="currentColor" stroke="#fff0ad" stroke-width=".7" stroke-linejoin="round"/><path d="M4.1 16.8h15.8" stroke="#fff0ad" stroke-width="1.2" stroke-linecap="round"/></svg><span>FOUNDER</span></div><p class="demo-account-id"><span id="demoAccountId">Not available</span></p></div></div></div>
         <p class="muted demo-profile-bio" id="demoBio">Creator profile</p>
         <div class="stats demo-profile-stats"><div><b>—</b><small>Posts</small></div><div><b>—</b><small>Followers</small></div><div><b>—</b><small>Following</small></div></div>
         <div class="profile-actions demo-profile-actions"><button class="primary" id="followDemo">Follow</button><button class="secondary" id="messageDemo">Message</button></div>
@@ -244,6 +244,6 @@
   <footer>© 2026 ABAROX <span>Built to create something bigger.</span></footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=20261127-theme-contrast2"></script>
+  <script src="script.js?v=20261127-profile-adjust4"></script>
 </body>
 </html>

@@ -1001,8 +1001,8 @@
         photoTransform.rotation=((gestureStart.rotation+delta)%360+360)%360;
       } else if(pts.length===1 && gestureStart && gestureStart.mode==='pan'){
         const rect=adjustStage.getBoundingClientRect();
-        photoTransform.x=Math.max(0,Math.min(100,gestureStart.px+(e.clientX-gestureStart.x)/rect.width*100));
-        photoTransform.y=Math.max(0,Math.min(100,gestureStart.py+(e.clientY-gestureStart.y)/rect.height*100));
+        photoTransform.x=Math.max(0,Math.min(100,gestureStart.px-(e.clientX-gestureStart.x)/rect.width*100));
+        photoTransform.y=Math.max(0,Math.min(100,gestureStart.py-(e.clientY-gestureStart.y)/rect.height*100));
       }
       paintPhotoPreview();
     });
@@ -1014,12 +1014,6 @@
     };
     ['pointerup','pointercancel','lostpointercapture'].forEach(t=>adjustStage.addEventListener(t,stop));
   }
-  const photoZoomControl=document.getElementById('photoZoom');
-  const photoRotationControl=document.getElementById('photoRotation');
-  const resetPhotoAdjust=document.getElementById('resetPhotoAdjust');
-  if(photoZoomControl)photoZoomControl.addEventListener('input',()=>{photoTransform.zoom=Number(photoZoomControl.value)||1;paintPhotoPreview();});
-  if(photoRotationControl)photoRotationControl.addEventListener('input',()=>{photoTransform.rotation=Number(photoRotationControl.value)||0;paintPhotoPreview();});
-  if(resetPhotoAdjust)resetPhotoAdjust.addEventListener('click',()=>{photoTransform={zoom:1,x:50,y:50,rotation:0};paintPhotoPreview();});
   const closePhotoAdjust=document.getElementById('closePhotoAdjust');if(closePhotoAdjust)closePhotoAdjust.addEventListener('click',()=>{photoAdjustOverlay.hidden=true;document.body.classList.remove('photo-adjust-open');pendingPhotoData='';});
   if(photoAdjustOverlay)photoAdjustOverlay.addEventListener('click',e=>{if(e.target===photoAdjustOverlay){photoAdjustOverlay.hidden=true;document.body.classList.remove('photo-adjust-open');pendingPhotoData='';}});
   const savePhotoAdjust=document.getElementById('savePhotoAdjust');if(savePhotoAdjust)savePhotoAdjust.addEventListener('click',async(e)=>{e.preventDefault();e.stopPropagation();if(!pendingPhotoData)return;savePhotoAdjust.disabled=true;const oldLabel=savePhotoAdjust.textContent;savePhotoAdjust.textContent='Saving…';const saved=await applyFounderPhoto(pendingPhotoData,photoTransform);savePhotoAdjust.disabled=false;savePhotoAdjust.textContent=oldLabel;if(saved){pendingPhotoData='';if(photoAdjustOverlay){photoAdjustOverlay.hidden=true;document.body.classList.remove('photo-adjust-open');}}});

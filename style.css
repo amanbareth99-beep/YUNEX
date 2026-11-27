@@ -899,3 +899,12 @@ body[data-theme="light"] .explore-result-item{background:#fff!important;border-c
 body[data-theme="light"] .explore-result-item b{color:#17253a!important}
 body[data-theme="light"] .explore-result-item span,
 body[data-theme="light"] .explore-result-item small{color:#64788f!important}
+
+/* Requested final polish: keep demo founder badge size, enlarge only crown artwork; settings subpages have no redundant back buttons; photo editor uses gesture-only controls and a bottom save CTA. */
+.demo-profile-identity .founder-crown-badge .demo-founder-crown{width:20px!important;height:15px!important;flex:0 0 20px!important;display:block!important;color:#f5c64e!important;filter:drop-shadow(0 1px 2px #e8ad35aa!important)}
+#demoFounderBadge{display:inline-flex!important;align-items:center!important;gap:4px!important}
+#demoFounderBadge[hidden]{display:none!important}
+#photoAdjustOverlay .photo-gesture-hint{margin:10px 0 18px!important}
+#photoAdjustOverlay #savePhotoAdjust{margin-top:auto!important;margin-bottom:env(safe-area-inset-bottom)!important;min-height:54px!important}
+#photoAdjustOverlay .photo-adjust-control,#photoZoom,#photoRotation,#resetPhotoAdjust{display:none!important}
+
