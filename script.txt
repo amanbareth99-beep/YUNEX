@@ -847,9 +847,51 @@
   }
   function createCartoonCharacter(role, index) {
     const character = document.createElement('div');
-    character.className = `abx-3d-character ${role} character-${index}`;
-    character.innerHTML = '<div class="abx-shadow"></div><div class="abx-body"><div class="abx-arm arm-left"></div><div class="abx-arm arm-right"></div><div class="abx-head"><div class="abx-hair"></div><div class="abx-ear ear-left"></div><div class="abx-ear ear-right"></div><div class="abx-eye eye-left"><i></i></div><div class="abx-eye eye-right"><i></i></div><div class="abx-blush blush-left"></div><div class="abx-blush blush-right"></div><div class="abx-mouth"></div></div><div class="abx-leg leg-left"><div class="abx-shoe"></div></div><div class="abx-leg leg-right"><div class="abx-shoe"></div></div></div>';
+    character.className = `abx-svg-character ${role} character-${index}`;
+    const isGirl = role === 'char-two';
+    const hair = isGirl ? '#33202a' : '#24151d';
+    const jacket = isGirl ? '#087be9' : '#111a2b';
+    const accent = isGirl ? '#55b9ff' : '#168bff';
+    const bow = isGirl ? '<g class="abx-bow"><path d="M130 37 Q108 14 112 37 Q109 55 130 49 Q149 63 150 43 Q153 23 130 37Z" fill="#087cff" stroke="#7bc7ff" stroke-width="3"/><circle cx="131" cy="43" r="7" fill="#034cae"/></g>' : '';
+    const eyeExpression = '<g class="abx-eyes"><ellipse cx="65" cy="83" rx="11" ry="16" fill="#152b50"/><ellipse cx="99" cy="83" rx="11" ry="16" fill="#152b50"/><ellipse cx="62" cy="78" rx="4" ry="6" fill="#fff"/><ellipse cx="96" cy="78" rx="4" ry="6" fill="#fff"/></g>';
+    character.innerHTML = `<svg viewBox="0 0 170 230" class="abx-character-svg" role="presentation">
+      <defs><linearGradient id="skin-${index}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe4cc"/><stop offset=".62" stop-color="#f4c4a1"/><stop offset="1" stop-color="#d98f74"/></linearGradient>
+      <linearGradient id="cloth-${index}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${accent}"/><stop offset=".6" stop-color="${jacket}"/><stop offset="1" stop-color="#070c17"/></linearGradient>
+      <linearGradient id="hair-${index}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6b4851"/><stop offset=".3" stop-color="${hair}"/><stop offset="1" stop-color="#100b12"/></linearGradient>
+      <filter id="soft-${index}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2"/></filter></defs>
+      <ellipse cx="85" cy="217" rx="55" ry="9" fill="#030814" opacity=".3" filter="url(#soft-${index})"/>
+      <g class="abx-character-body"><path d="M54 135 Q42 141 38 160 L29 190 Q29 200 43 202 L57 181 L61 162 L72 177 L76 202 Q85 208 99 202 L101 174 L114 188 L125 201 Q140 198 138 187 L120 156 Q115 139 105 135Z" fill="url(#cloth-${index})" stroke="#243c63" stroke-width="2"/>
+      <path d="M58 145 L80 177 L105 145" fill="none" stroke="${accent}" stroke-width="5" opacity=".9"/>
+      <path d="M48 156 Q32 168 43 181 L57 177" fill="url(#skin-${index})" stroke="#c78b72" stroke-width="1.5" class="abx-arm-a"/><path d="M112 155 Q133 166 122 181 L111 177" fill="url(#skin-${index})" stroke="#c78b72" stroke-width="1.5" class="abx-arm-b"/>
+      <path d="M60 188 L57 211 Q63 218 78 216 L81 190" fill="#18233a"/><path d="M92 190 L96 212 Q110 218 122 214 L117 189" fill="#18233a"/><path d="M51 211 Q42 214 39 224 Q42 229 75 227 Q83 223 78 216Z" fill="#f4f7ff" stroke="#8da9d3" stroke-width="2"/><path d="M92 213 Q87 217 89 225 Q96 230 126 226 Q132 222 121 215Z" fill="#f4f7ff" stroke="#8da9d3" stroke-width="2"/>
+      <path d="M54 45 Q42 51 39 72 L45 117 Q52 136 72 140 L111 138 Q130 127 132 106 L133 70 Q126 47 107 40Z" fill="url(#skin-${index})" stroke="#b97762" stroke-width="1.5"/>
+      <path d="M39 69 Q30 35 61 23 Q78 7 105 18 Q132 22 137 52 Q140 72 126 83 L120 57 Q99 62 84 45 Q65 62 48 58Z" fill="url(#hair-${index})" stroke="#180f17" stroke-width="2"/>
+      <path d="M44 43 Q50 24 67 28 Q58 39 57 53 Q72 32 86 30 Q76 48 75 57 Q93 33 111 32 Q103 46 106 56 Q124 41 132 58 Q132 39 119 25 Q100 6 75 15 Q48 12 38 39Z" fill="url(#hair-${index})" stroke="#4a303b" stroke-width="2"/>
+      <path d="M49 51 Q61 43 70 31 M71 53 Q84 38 92 27 M99 50 Q113 36 123 40" fill="none" stroke="#9b6a77" stroke-width="3" stroke-linecap="round" opacity=".45"/>
+      ${eyeExpression}<path d="M55 66 Q65 61 74 65 M90 65 Q101 61 110 66" fill="none" stroke="#3b2228" stroke-width="3" stroke-linecap="round"/>
+      <ellipse cx="54" cy="100" rx="12" ry="6" fill="#f28e9d" opacity=".5"/><ellipse cx="112" cy="100" rx="12" ry="6" fill="#f28e9d" opacity=".5"/>
+      <path d="M80 98 Q85 103 89 98" fill="none" stroke="#bb6d67" stroke-width="2"/><path d="M77 111 Q85 120 95 111" fill="none" stroke="#9b3f55" stroke-width="3" stroke-linecap="round" class="abx-mouth"/>
+      ${bow}</g></svg>`;
     return character;
+  }
+  function showAutoAnimation(kind) {
+    const messages = document.getElementById('chatMessages');
+    if (!messages) return;
+    const old = messages.querySelector('.abx-animation-scene'); if (old) old.remove();
+    const scene = document.createElement('div'); scene.className = `abx-animation-scene abx-scene-${kind}`; scene.setAttribute('aria-hidden','true');
+    const stage = document.createElement('div'); stage.className = 'abx-animation-stage';
+    stage.append(createCartoonCharacter('char-one',1), createCartoonCharacter('char-two',2));
+    const effects = document.createElement('div'); effects.className = 'abx-effects';
+    for (let i=0;i<8;i++){ const particle=document.createElement('i'); particle.className=`abx-particle p${i+1}`; effects.appendChild(particle); }
+    const extras = document.createElement('div'); extras.className = 'abx-scene-extras';
+    if(kind==='love') extras.innerHTML='<div class="abx-big-heart">♥</div>';
+    if(kind==='miss') extras.innerHTML='<div class="abx-thought-heart">♡</div>';
+    if(kind==='cry') extras.innerHTML='<i class="abx-tear t1"></i><i class="abx-tear t2"></i>';
+    if(kind==='horror') extras.innerHTML='<div class="abx-ghost"><svg viewBox="0 0 100 110"><path d="M15 94V47C15 22 32 7 51 7S86 22 86 47V94L73 84 60 95 48 84 34 95 22 84Z" fill="#d9f8ff" stroke="#6dbfff" stroke-width="4"/><ellipse cx="38" cy="43" rx="9" ry="13" fill="#061b42"/><ellipse cx="65" cy="43" rx="9" ry="13" fill="#061b42"/><ellipse cx="38" cy="43" rx="4" ry="6" fill="#31c8ff"/><ellipse cx="65" cy="43" rx="4" ry="6" fill="#31c8ff"/><ellipse cx="52" cy="67" rx="10" ry="14" fill="#142b50"/></svg></div>';
+    scene.append(stage,effects,extras); messages.appendChild(scene);
+    requestAnimationFrame(()=>scene.classList.add('show'));
+    window.setTimeout(()=>scene.classList.add('fade-out'),1900);
+    window.setTimeout(()=>scene.remove(),2350);
   }
   function showAutoAnimation(kind) {
     const messages = document.getElementById('chatMessages');

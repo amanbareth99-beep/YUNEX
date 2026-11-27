@@ -950,3 +950,48 @@ body.chat-open .abx-animation-stage{width:min(330px,88vw)!important;height:clamp
 body.chat-open .abx-3d-character{height:200px!important;bottom:0!important;transform-origin:bottom center!important;}
 body.chat-open .abx-animation-scene .abx-effects{overflow:hidden!important;}
 @media(max-height:520px){body.chat-open .abx-animation-stage{height:clamp(130px,28svh,175px)!important;transform:scale(.64)!important;}body.chat-open .abx-3d-character{transform-origin:bottom center!important;}}
+
+/* New hand-authored SVG character animation layer; chat viewport stays clipped above composer. */
+.abx-animation-scene{background:radial-gradient(ellipse at center,rgba(23,106,237,.14),transparent 70%)!important}
+.abx-animation-stage{width:min(360px,94vw)!important;height:clamp(160px,34svh,230px)!important;filter:drop-shadow(0 10px 15px rgba(0,0,0,.28))!important}
+.abx-svg-character{position:absolute;width:clamp(116px,35vw,160px);height:auto;bottom:0;transform-origin:bottom center;filter:drop-shadow(0 5px 7px rgba(0,0,0,.22))}
+.abx-svg-character.char-one{left:2%;--moveX:24px;z-index:2}
+.abx-svg-character.char-two{right:2%;--moveX:-24px;z-index:2}
+.abx-character-svg{display:block;width:100%;height:auto;overflow:visible}
+.abx-scene-kiss .char-one{animation:abx-svg-kiss-a 1.7s ease-in-out both}
+.abx-scene-kiss .char-two{animation:abx-svg-kiss-b 1.7s ease-in-out both}
+.abx-scene-love .char-one{animation:abx-svg-heart-offer 1.6s ease-in-out both}
+.abx-scene-love .char-two{animation:abx-svg-delight 1.6s ease-in-out both}
+.abx-scene-miss .char-one{animation:abx-svg-miss 1.7s ease-in-out both}
+.abx-scene-miss .char-two{animation:abx-svg-memory 1.7s ease-in-out both}
+.abx-scene-laugh .char-one{animation:abx-svg-laugh .55s ease-in-out 3}
+.abx-scene-laugh .char-two{animation:abx-svg-laugh .55s ease-in-out 3 .12s}
+.abx-scene-cry .char-one{animation:abx-svg-sob 1.6s ease-in-out both}
+.abx-scene-cry .char-two{animation:abx-svg-comfort 1.6s ease-in-out both}
+.abx-scene-horror .char-one{animation:abx-svg-scare 1.6s ease-in-out both}
+.abx-scene-horror .char-two{animation:abx-svg-scare2 1.6s ease-in-out both}
+.abx-scene-kiss .abx-particle,.abx-scene-love .abx-particle{animation:abx-heart-float 1.6s ease-out infinite!important}
+.abx-scene-miss .abx-particle,.abx-scene-cry .abx-particle{background:linear-gradient(#d5f4ff,#3d9dff)!important;clip-path:none!important;border-radius:50%!important;animation:abx-tear-float 1.3s ease-in infinite!important}
+.abx-scene-laugh .abx-particle,.abx-scene-horror .abx-particle{background:linear-gradient(#fff18c,#ff9a24)!important;clip-path:polygon(50% 0,62% 36%,100% 50%,62% 64%,50% 100%,38% 64%,0 50%,38% 36%)!important;animation:abx-spark 1.2s ease-out infinite!important}
+.abx-scene-extras{position:absolute;inset:0;pointer-events:none;z-index:5}
+.abx-big-heart{position:absolute;left:50%;top:42%;font-size:clamp(42px,12vw,66px);color:#ff2f6f;text-shadow:0 0 14px #ff2f6f,0 5px 8px #8b143c;animation:abx-heart-present 1.55s ease both}
+.abx-thought-heart{position:absolute;right:16%;top:9%;font-size:48px;color:#8bd5ff;text-shadow:0 0 18px #35a7ff;animation:abx-thought 1.6s ease both}
+.abx-tear{position:absolute;width:9px;height:18px;border-radius:80% 20% 65% 65%;background:linear-gradient(#e7fbff,#45aaff);filter:drop-shadow(0 0 5px #38aaff);top:42%;animation:abx-real-tear 1.15s ease-in infinite}
+.abx-tear.t1{left:36%}.abx-tear.t2{left:43%;animation-delay:.2s}
+.abx-ghost{position:absolute;right:0;top:0;width:clamp(65px,22vw,92px);animation:abx-ghost-entrance 1.5s ease both;filter:drop-shadow(0 0 14px #3ebdff)}
+@keyframes abx-svg-kiss-a{0%{transform:translateX(0) rotate(0)}50%,80%{transform:translateX(19%) rotate(7deg) scale(1.03)}100%{transform:translateX(19%) rotate(7deg)}}
+@keyframes abx-svg-kiss-b{0%{transform:translateX(0) rotate(0)}50%,80%{transform:translateX(-19%) rotate(-7deg) scale(1.03)}100%{transform:translateX(-19%) rotate(-7deg)}}
+@keyframes abx-svg-heart-offer{0%,100%{transform:translateY(0)}45%{transform:translateY(-12px) rotate(-5deg)}}
+@keyframes abx-svg-delight{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-15px) rotate(7deg)}70%{transform:translateY(-4px) rotate(-3deg)}}
+@keyframes abx-svg-miss{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(5px) rotate(-6deg) scale(.96)}}
+@keyframes abx-svg-memory{0%{transform:translateY(18px) scale(.75);opacity:.3}50%,100%{transform:translateY(0) scale(1);opacity:1}}
+@keyframes abx-svg-laugh{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-13px) rotate(7deg)}}
+@keyframes abx-svg-sob{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(4px) rotate(-5deg)}65%{transform:translateY(4px) rotate(5deg)}}
+@keyframes abx-svg-comfort{0%,100%{transform:translateX(0)}55%{transform:translateX(-8%) rotate(-5deg)}}
+@keyframes abx-svg-scare{0%,100%{transform:translateX(0) scale(1)}35%{transform:translateX(-12%) rotate(-10deg) scale(.92)}60%{transform:translateX(3%) rotate(4deg)}}
+@keyframes abx-svg-scare2{0%{transform:translateX(0)}35%{transform:translateX(8%) rotate(9deg)}70%,100%{transform:translateX(-4%) rotate(-5deg)}}
+@keyframes abx-heart-present{0%{opacity:0;transform:translate(-50%,20px) scale(.3)}45%{opacity:1;transform:translate(-50%,-10px) scale(1.2)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes abx-thought{0%{opacity:0;transform:scale(.2)}50%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+@keyframes abx-real-tear{0%{opacity:0;transform:translateY(-6px) scale(.6)}35%{opacity:1}100%{opacity:0;transform:translateY(40px) scale(.85)}}
+@keyframes abx-ghost-entrance{0%{opacity:0;transform:translateY(35px) scale(.4)}45%{opacity:1;transform:translateY(-8px) scale(1.12)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-height:520px){.abx-animation-stage{height:clamp(120px,26svh,170px)!important}.abx-svg-character{width:clamp(100px,30vw,132px)}}
