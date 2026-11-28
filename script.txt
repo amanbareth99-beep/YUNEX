@@ -50,7 +50,7 @@
   function renderView(id) {
     if (!document.getElementById(id)) id = 'feed';
     currentView = id;
-    if (id !== 'chat') chatKeyboardHistoryEntry = false;
+    if (id !== 'chat') { chatKeyboardHistoryEntry = false; document.querySelectorAll('.abx-reaction-overlay').forEach(node => node.remove()); }
     views.forEach(view => view.classList.toggle('active', view.id === id));
     document.querySelectorAll('.tab[data-view]').forEach(button => {
       button.classList.toggle('active', button.dataset.view === id);
@@ -877,7 +877,7 @@
   }
   function showAutoAnimation(kind) {
     const chatShell = document.querySelector('#chat .chat-shell');
-    if (!chatShell) return;
+    if (!chatShell || !document.body.classList.contains('chat-open')) return;
 
     // The reaction layer is a sibling of the scrolling message list, so it stays
     // visible even when a newly-sent message makes the list scroll.
@@ -886,7 +886,10 @@
       overlay = document.createElement('div');
       overlay.className = 'abx-reaction-overlay';
       overlay.setAttribute('aria-hidden', 'true');
-      chatShell.appendChild(overlay);
+      // Keep the visual layer attached to the document viewport, not inside
+      // the chat's scrolling/grid containers. This avoids mobile stacking and
+      // overflow clipping that could make a valid reaction completely invisible.
+      document.body.appendChild(overlay);
     }
     overlay.replaceChildren();
     overlay.className = `abx-reaction-overlay abx-reaction-${kind} is-playing`;
