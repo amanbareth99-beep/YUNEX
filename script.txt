@@ -875,9 +875,21 @@
       ${bow}</g></svg>`;
     return character;
   }
-  function showAutoAnimation(kind) {
-    // Mount outside the app/chat stacking contexts. The animation is triggered
-    // only by the chat submit handler, so do not gate it on a CSS view class.
+  function showAutoAnimation(kind, messageBubble) {
+    const chatView = document.getElementById('chat');
+    const chatHeader = chatView && chatView.querySelector('.chat-top-fixed');
+    const composer = chatView && chatView.querySelector('#chatForm');
+    if (!chatView || !chatHeader || !composer || !messageBubble) return;
+
+    // A viewport-fixed layer is measured against the real chat header/composer,
+    // so it can never cover the profile header or the keyboard/send controls.
+    const headerRect = chatHeader.getBoundingClientRect();
+    const composerRect = composer.getBoundingClientRect();
+    const messageRect = messageBubble.getBoundingClientRect();
+    const top = Math.max(0, headerRect.bottom);
+    const bottom = Math.max(0, window.innerHeight - composerRect.top);
+    if (composerRect.top <= headerRect.bottom) return;
+
     const root = document.documentElement;
     let overlay = root.querySelector(':scope > .abx-reaction-overlay');
     if (!overlay) {
@@ -886,89 +898,44 @@
       overlay.setAttribute('aria-hidden', 'true');
       root.appendChild(overlay);
     }
-
     window.clearTimeout(overlay._hideTimer);
     window.clearTimeout(overlay._removeTimer);
     overlay.replaceChildren();
-    overlay.className = `abx-reaction-overlay abx-reaction-${kind} is-playing is-visible`;
-
-    // Inline critical visibility/layout styles so Android browser CSS
-    // stacking/selector quirks cannot silently hide the reaction layer.
-    Object.entries({
-      position: 'fixed', left: '0', right: '0',
-      top: 'calc(var(--yunex-vv-top, 0px) + 56px)',
-      bottom: 'calc(var(--yunex-vv-bottom-gap, 0px) + 68px)',
-      width: '100vw', height: 'auto', display: 'block',
-      overflow: 'hidden', 'pointer-events': 'none',
-      'z-index': '2147483647', opacity: '1', visibility: 'visible',
-      'contain': 'none', 'isolation': 'isolate'
-    }).forEach(([property, value]) => overlay.style.setProperty(property, value, 'important'));
+    overlay.className = `abx-reaction-overlay abx-reaction-${kind} is-visible`;
+    Object.assign(overlay.style, {
+      position:'fixed', left:'0px', right:'0px', top:`${top}px`, bottom:`${bottom}px`,
+      width:'100vw', height:'auto', zIndex:'2147483647', overflow:'hidden',
+      pointerEvents:'none', opacity:'1', visibility:'visible', contain:'none'
+    });
 
     const stage = document.createElement('div');
     stage.className = 'abx-reaction-stage';
-    stage.style.cssText = 'position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;pointer-events:none!important;';
-    const heartSvg = '<svg viewBox="0 0 100 90" aria-hidden="true"><defs><linearGradient id="abx-heart-shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1fa"/><stop offset=".35" stop-color="#ff5ca8"/><stop offset="1" stop-color="#e90062"/></linearGradient></defs><path d="M50 82 13 47C-7 25 13 -1 36 9c7 3 12 9 14 15 3-7 9-12 16-15 23-10 43 16 21 38Z" fill="url(#abx-heart-shine)"/></svg>';
+    const target = document.createElement('div');
+    target.className = 'abx-reaction-target';
+    const x = Math.min(Math.max(messageRect.left + messageRect.width / 2, 72), window.innerWidth - 72);
+    const y = Math.min(Math.max(messageRect.top + messageRect.height / 2 - top, 72), Math.max(72, window.innerHeight - bottom - top - 72));
+    target.style.left = `${x}px`;
+    target.style.top = `${y}px`;
 
-    if (kind === 'love' || kind === 'miss' || kind === 'kiss') {
-      const count = kind === 'love' ? 12 : kind === 'miss' ? 10 : 8;
-      for (let i = 0; i < count; i++) {
-        const item = document.createElement('span');
-        item.className = `abx-reaction-heart heart-${i + 1}`;
-        item.innerHTML = heartSvg;
-        item.style.setProperty('--delay', `${(i % 6) * -0.19}s`);
-        item.style.setProperty('--duration', `${1.9 + (i % 4) * 0.28}s`);
-        item.style.setProperty('--size', `${kind === 'miss' ? 48 : 58 + ((i * 19) % 64)}px`);
-        item.style.setProperty('--x', `${4 + ((i * 29) % 90)}%`);
-        item.style.setProperty('--y', `${10 + ((i * 19) % 72)}%`);
-        stage.appendChild(item);
-      }
-      // One large centrepiece makes the reaction unmistakable on phone screens.
-      if (kind === 'love' || kind === 'miss') {
-        const centre = document.createElement('span');
-        centre.className = 'abx-reaction-heart abx-reaction-heart-centre';
-        centre.innerHTML = heartSvg;
-        centre.style.setProperty('--x', '50%');
-        centre.style.setProperty('--y', '46%');
-        centre.style.setProperty('--size', 'clamp(112px, 34vw, 190px)');
-        centre.style.setProperty('--duration', '1.65s');
-        centre.style.setProperty('--delay', '0s');
-        stage.appendChild(centre);
-      }
-      if (kind === 'kiss') {
-        const lips = document.createElement('span');
-        lips.className = 'abx-reaction-lips';
-        lips.textContent = '💋';
-        stage.appendChild(lips);
-      }
-    } else {
-      const hero = document.createElement('span');
-      hero.className = 'abx-reaction-hero';
-      hero.textContent = ({laugh:'😂', cry:'😢', angry:'😡', horror:'👻'})[kind] || '✨';
-      hero.style.fontSize = 'clamp(112px, 34vw, 190px)';
-      stage.appendChild(hero);
-      for (let i = 0; i < 12; i++) {
-        const spark = document.createElement('i');
-        spark.className = `abx-reaction-spark spark-${i + 1}`;
-        stage.appendChild(spark);
-      }
-      if (kind === 'cry') {
-        for (let i = 0; i < 5; i++) { const tear = document.createElement('i'); tear.className = `abx-reaction-tear tear-${i + 1}`; stage.appendChild(tear); }
-      }
-      if (kind === 'angry') {
-        const steam = document.createElement('span'); steam.className = 'abx-reaction-steam'; steam.textContent = '〰 〰'; stage.appendChild(steam);
-      }
-    }
+    const art = {
+      love: `<svg viewBox="0 0 220 200" role="presentation"><defs><linearGradient id="abxL" x2=".8" y2="1"><stop stop-color="#fff4fb"/><stop offset=".28" stop-color="#ff83c0"/><stop offset=".68" stop-color="#f52b88"/><stop offset="1" stop-color="#a90050"/></linearGradient><radialGradient id="abxSh"><stop stop-color="white" stop-opacity=".9"/><stop offset="1" stop-color="white" stop-opacity="0"/></radialGradient></defs><path d="M110 181 25 99C-24 48 40-12 91 28l19 19 19-19c51-40 115 20 66 71Z" fill="url(#abxL)" stroke="#fff0fa" stroke-width="5"/><ellipse cx="70" cy="62" rx="35" ry="18" fill="url(#abxSh)" transform="rotate(-28 70 62)"/><path d="M35 99Q110 180 185 99" fill="none" stroke="#ffdaed" stroke-width="4" opacity=".65"/></svg>`,
+      miss: `<svg viewBox="0 0 220 200" role="presentation"><defs><linearGradient id="abxM" x2=".8" y2="1"><stop stop-color="#e8fbff"/><stop offset=".35" stop-color="#75caff"/><stop offset="1" stop-color="#2768d9"/></linearGradient></defs><path d="M110 181 25 99C-24 48 40-12 91 28l19 19 19-19c51-40 115 20 66 71Z" fill="url(#abxM)" stroke="#e8f9ff" stroke-width="5"/><ellipse cx="77" cy="88" rx="17" ry="23" fill="white"/><ellipse cx="143" cy="88" rx="17" ry="23" fill="white"/><ellipse cx="80" cy="94" rx="8" ry="13" fill="#173a70"/><ellipse cx="140" cy="94" rx="8" ry="13" fill="#173a70"/><circle cx="83" cy="88" r="4" fill="white"/><circle cx="143" cy="88" r="4" fill="white"/><path d="M85 139Q110 119 135 139" fill="none" stroke="#713d70" stroke-width="8" stroke-linecap="round"/><path d="M66 111q-18 22-7 37" fill="none" stroke="#b9edff" stroke-width="8" stroke-linecap="round"/><path d="M154 111q18 22 7 37" fill="none" stroke="#b9edff" stroke-width="8" stroke-linecap="round"/></svg>`,
+      kiss: `<svg viewBox="0 0 240 160" role="presentation"><defs><linearGradient id="abxK" x2="0" y2="1"><stop stop-color="#ffb3d0"/><stop offset=".42" stop-color="#f32676"/><stop offset="1" stop-color="#8b063d"/></linearGradient></defs><path d="M15 78Q48 18 119 65Q190 18 225 78Q190 138 119 94Q48 138 15 78Z" fill="url(#abxK)" stroke="#ffd8e8" stroke-width="5"/><path d="M22 78Q75 48 119 65Q163 48 218 78Q166 91 119 94Q72 91 22 78Z" fill="#b90d52"/><path d="M53 57Q83 45 103 66" fill="none" stroke="#fff1f7" stroke-width="8" stroke-linecap="round" opacity=".8"/></svg>`,
+      angry: `<svg viewBox="0 0 220 220" role="presentation"><defs><radialGradient id="abxA"><stop stop-color="#ffb19b"/><stop offset=".55" stop-color="#ff4a36"/><stop offset="1" stop-color="#a80016"/></radialGradient></defs><circle cx="110" cy="110" r="91" fill="url(#abxA)" stroke="#ffd0c5" stroke-width="6"/><path d="M48 78 94 94M172 78 126 94" stroke="#5b0010" stroke-width="13" stroke-linecap="round"/><ellipse cx="77" cy="111" rx="13" ry="18" fill="#fff"/><ellipse cx="143" cy="111" rx="13" ry="18" fill="#fff"/><circle cx="80" cy="113" r="8" fill="#5b0010"/><circle cx="140" cy="113" r="8" fill="#5b0010"/><path d="M75 165Q110 125 145 165" fill="#690018" stroke="#4b0012" stroke-width="5"/><path d="M25 33l22 18M195 33l-22 18" stroke="#ffdf69" stroke-width="8" stroke-linecap="round"/></svg>`,
+      horror: `<svg viewBox="0 0 300 220" role="presentation"><defs><linearGradient id="abxW" x2="0" y2="1"><stop stop-color="#d8e0dc"/><stop offset="1" stop-color="#58606a"/></linearGradient></defs><path d="M18 185Q145 163 278 190" stroke="#8a4d22" stroke-width="9" stroke-linecap="round"/><path d="M30 177l-13-20m25 18-4-25m13 24 6-22m-34 25-13-12" stroke="#c58a42" stroke-width="6"/><path d="M113 53 151 8l35 45" fill="#15151d" stroke="#7a253b" stroke-width="5"/><path d="M91 88Q92 42 151 43Q213 46 211 112L192 177Q151 198 108 174Z" fill="url(#abxW)" stroke="#313642" stroke-width="6"/><path d="M108 94 144 106M194 94 158 106" stroke="#72001d" stroke-width="11" stroke-linecap="round"/><ellipse cx="128" cy="119" rx="12" ry="18" fill="#ff172e"/><ellipse cx="174" cy="119" rx="12" ry="18" fill="#ff172e"/><circle cx="128" cy="119" r="5" fill="#fff"/><circle cx="174" cy="119" r="5" fill="#fff"/><path d="M135 158Q151 140 168 158L160 178 143 178Z" fill="#230d18"/><path d="M150 176l-6 15m16-15 6 15" stroke="#fff" stroke-width="4"/><path d="M98 184 50 188M202 184l48 4" stroke="#4d2930" stroke-width="6"/></svg>`
+    };
+    target.innerHTML = art[kind] || art.love;
+    stage.appendChild(target);
+    if (kind === 'angry') stage.classList.add('abx-red-wash');
+    if (kind === 'horror') stage.classList.add('abx-horror-mist');
     overlay.appendChild(stage);
-    // Force style/layout once, then retain the reaction for a short, visible burst.
     void overlay.offsetHeight;
     overlay._hideTimer = window.setTimeout(() => {
-      overlay.style.setProperty('opacity', '0', 'important');
-      overlay.style.setProperty('visibility', 'hidden', 'important');
+      overlay.style.opacity = '0';
+      overlay.style.visibility = 'hidden';
       overlay.classList.remove('is-visible');
-    }, 3600);
-    overlay._removeTimer = window.setTimeout(() => {
-      if (overlay && overlay.parentNode) overlay.remove();
-    }, 4100);
+    }, 2500);
+    overlay._removeTimer = window.setTimeout(() => overlay.remove(), 2800);
   }
 
   // Chat status preview: all delivery/read states below are simulated locally.
@@ -1429,7 +1396,7 @@
     addMessageMeta(bubble, '✓ Sent · demo', true);
     chatMessages.appendChild(bubble);
     const detectedAnimation = detectAutoAnimation(value);
-    if (detectedAnimation) showAutoAnimation(detectedAnimation);
+    if (detectedAnimation) requestAnimationFrame(() => showAutoAnimation(detectedAnimation, bubble));
     chatInput.value = '';
     chatInput.focus({ preventScroll: true });
     chatMessages.scrollTop = chatMessages.scrollHeight;
