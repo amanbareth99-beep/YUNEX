@@ -1114,16 +1114,28 @@ body.chat-open .abx-animation-scene .abx-effects{overflow:hidden!important;}
 @media(prefers-reduced-motion:reduce){.abx-reaction-heart,.abx-reaction-hero,.abx-reaction-lips,.abx-reaction-spark,.abx-reaction-tear,.abx-reaction-steam{animation-duration:2.5s!important}}
 
 
-/* ABAROX reaction visibility fix v6: body-level overlay, outside chat clipping/stacking contexts. */
+/* ABAROX reaction visibility fix v7: JS mounts this layer as a direct child of body. */
 body > .abx-reaction-overlay{
-  position:fixed!important;left:0!important;right:0!important;
-  top:calc(var(--yunex-vv-top,0px) + 58px)!important;
-  bottom:calc(var(--yunex-vv-bottom-gap,0px) + 62px)!important;
-  z-index:999999!important;display:block!important;overflow:hidden!important;
-  pointer-events:none!important;opacity:0!important;visibility:hidden!important;
+  position:fixed!important;
+  left:0!important;right:0!important;
+  top:calc(var(--yunex-vv-top, 0px) + 58px)!important;
+  bottom:calc(var(--yunex-vv-bottom-gap, 0px) + 62px)!important;
+  width:100vw!important;height:auto!important;
+  z-index:2147483000!important;
+  display:block!important;overflow:hidden!important;
+  pointer-events:none!important;
+  opacity:0!important;visibility:hidden!important;
   contain:none!important;isolation:isolate!important;
 }
 body > .abx-reaction-overlay.is-visible{
-  opacity:1!important;visibility:visible!important;transition:opacity .22s ease!important;
+  opacity:1!important;visibility:visible!important;
+  transition:opacity .22s ease!important;
 }
-body > .abx-reaction-overlay .abx-reaction-stage{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;}
+body > .abx-reaction-overlay .abx-reaction-stage{
+  position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;
+  overflow:hidden!important;pointer-events:none!important;
+}
+@media(max-width:540px){
+  body > .abx-reaction-overlay{top:calc(var(--yunex-vv-top, 0px) + 56px)!important;}
+}
