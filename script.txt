@@ -876,51 +876,69 @@
     return character;
   }
   function showAutoAnimation(kind) {
-    const messages = document.getElementById('chatMessages');
-    const chatShell = document.querySelector('.chat-shell');
-    if (!messages || !chatShell) return;
+    const chatShell = document.querySelector('#chat .chat-shell');
+    if (!chatShell) return;
 
-    // Keep the visual scene outside the scrollable message list. Otherwise
-    // scrolling to the newest message can scroll the animation out of view.
-    // The scene is a sibling overlay inside chat-shell, clipped above composer.
-    const old = chatShell.querySelector('.abx-animation-scene');
-    if (old) old.remove();
-
-    const scene = document.createElement('div');
-    scene.className = `abx-animation-scene abx-scene-${kind}`;
-    scene.setAttribute('aria-hidden', 'true');
+    // The reaction layer is a sibling of the scrolling message list, so it stays
+    // visible even when a newly-sent message makes the list scroll.
+    let overlay = chatShell.querySelector('.abx-reaction-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'abx-reaction-overlay';
+      overlay.setAttribute('aria-hidden', 'true');
+      chatShell.appendChild(overlay);
+    }
+    overlay.replaceChildren();
+    overlay.className = `abx-reaction-overlay abx-reaction-${kind} is-playing`;
 
     const stage = document.createElement('div');
-    stage.className = 'abx-word-animation-stage';
+    stage.className = 'abx-reaction-stage';
+    const heartSvg = '<svg viewBox="0 0 100 90" aria-hidden="true"><path d="M50 82 13 47C-7 25 13 -1 36 9c7 3 12 9 14 15 3-7 9-12 16-15 23-10 43 16 21 38Z"/></svg>';
 
-    const hero = document.createElement('div');
-    hero.className = 'abx-animation-hero';
-    const heroContent = {
-      love: '<span class="abx-hero-heart">♥</span>',
-      miss: '<span class="abx-miss-heart">♡</span><span class="abx-miss-heart abx-miss-heart-two">♡</span>',
-      kiss: '<span class="abx-kiss-lips">💋</span><span class="abx-kiss-heart">♥</span>',
-      laugh: '<span class="abx-hero-emoji">😂</span>',
-      cry: '<span class="abx-hero-emoji">😢</span><i class="abx-cry-drop abx-cry-drop-one"></i><i class="abx-cry-drop abx-cry-drop-two"></i>',
-      angry: '<span class="abx-hero-emoji">😡</span><i class="abx-angry-steam abx-angry-steam-one">〰</i><i class="abx-angry-steam abx-angry-steam-two">〰</i>',
-      horror: '<span class="abx-hero-emoji">👻</span>'
-    };
-    hero.innerHTML = heroContent[kind] || heroContent.love;
-    stage.appendChild(hero);
-
-    const particles = document.createElement('div');
-    particles.className = 'abx-word-particles';
-    const particleCount = kind === 'miss' ? 16 : 18;
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('i');
-      particle.className = `abx-word-particle p${(i % 12) + 1}`;
-      particles.appendChild(particle);
+    if (kind === 'love' || kind === 'miss' || kind === 'kiss') {
+      const count = kind === 'love' ? 10 : kind === 'miss' ? 8 : 6;
+      for (let i = 0; i < count; i++) {
+        const item = document.createElement('span');
+        item.className = `abx-reaction-heart heart-${i + 1}`;
+        item.innerHTML = heartSvg;
+        item.style.setProperty('--delay', `${(i % 5) * -0.22}s`);
+        item.style.setProperty('--duration', `${2.2 + (i % 4) * 0.35}s`);
+        item.style.setProperty('--size', `${34 + ((i * 17) % 58)}px`);
+        item.style.setProperty('--x', `${5 + ((i * 29) % 88)}%`);
+        item.style.setProperty('--y', `${12 + ((i * 19) % 68)}%`);
+        stage.appendChild(item);
+      }
+      if (kind === 'kiss') {
+        const lips = document.createElement('span');
+        lips.className = 'abx-reaction-lips';
+        lips.textContent = '💋';
+        stage.appendChild(lips);
+      }
+    } else {
+      const hero = document.createElement('span');
+      hero.className = 'abx-reaction-hero';
+      hero.textContent = ({laugh:'😂', cry:'😢', angry:'😡', horror:'👻'})[kind] || '✨';
+      stage.appendChild(hero);
+      for (let i = 0; i < 12; i++) {
+        const spark = document.createElement('i');
+        spark.className = `abx-reaction-spark spark-${i + 1}`;
+        stage.appendChild(spark);
+      }
+      if (kind === 'cry') {
+        for (let i = 0; i < 5; i++) { const tear = document.createElement('i'); tear.className = `abx-reaction-tear tear-${i + 1}`; stage.appendChild(tear); }
+      }
+      if (kind === 'angry') {
+        const steam = document.createElement('span'); steam.className = 'abx-reaction-steam'; steam.textContent = '〰 〰'; stage.appendChild(steam);
+      }
     }
-
-    scene.append(stage, particles);
-    chatShell.appendChild(scene);
-    requestAnimationFrame(() => scene.classList.add('show'));
-    window.setTimeout(() => scene.classList.add('fade-out'), 3650);
-    window.setTimeout(() => scene.remove(), 4100);
+    overlay.appendChild(stage);
+    window.clearTimeout(overlay._hideTimer);
+    window.clearTimeout(overlay._removeTimer);
+    requestAnimationFrame(() => overlay.classList.add('is-visible'));
+    overlay._hideTimer = window.setTimeout(() => overlay.classList.remove('is-visible'), 3400);
+    overlay._removeTimer = window.setTimeout(() => {
+      if (overlay && overlay.parentNode) overlay.remove();
+    }, 3900);
   }
 
   // Chat status preview: all delivery/read states below are simulated locally.
