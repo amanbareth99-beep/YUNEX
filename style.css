@@ -1139,3 +1139,49 @@ body > .abx-reaction-overlay .abx-reaction-stage{
 @media(max-width:540px){
   body > .abx-reaction-overlay{top:calc(var(--yunex-vv-top, 0px) + 56px)!important;}
 }
+
+
+/* ABAROX reaction reliability + visibility fix v8 */
+html > .abx-reaction-overlay {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  pointer-events: none !important;
+  contain: none !important;
+  isolation: isolate !important;
+}
+html > .abx-reaction-overlay .abx-reaction-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+html > .abx-reaction-overlay .abx-reaction-heart {
+  width: var(--size) !important;
+  height: calc(var(--size) * .9) !important;
+  filter: drop-shadow(0 0 7px #fff) drop-shadow(0 0 16px #ff1682) drop-shadow(0 0 28px #ff1682) !important;
+}
+html > .abx-reaction-overlay .abx-reaction-heart svg {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+}
+html > .abx-reaction-overlay .abx-reaction-heart path {
+  fill: #ff3c91 !important;
+  fill-opacity: .94 !important;
+  stroke: #fff0f8 !important;
+  stroke-width: 2.5 !important;
+  filter: drop-shadow(0 0 8px #ff4b9d) drop-shadow(0 0 18px #ff1682) !important;
+}
+html > .abx-reaction-overlay.abx-reaction-miss .abx-reaction-heart path {
+  fill: #58bfff !important;
+  stroke: #eaf8ff !important;
+  filter: drop-shadow(0 0 9px #51baff) drop-shadow(0 0 20px #268cff) !important;
+}
+html > .abx-reaction-overlay .abx-reaction-heart-centre {
+  z-index: 3 !important;
+  filter: drop-shadow(0 0 12px #fff) drop-shadow(0 0 28px #ff1682) !important;
+}
+html > .abx-reaction-overlay.abx-reaction-miss .abx-reaction-heart-centre {
+  filter: drop-shadow(0 0 12px #fff) drop-shadow(0 0 28px #268cff) !important;
+}

@@ -876,38 +876,63 @@
     return character;
   }
   function showAutoAnimation(kind) {
-    // IMPORTANT: attach the reaction layer directly to <body>, not .chat-shell.
-    // The chat shell and its message list use clipping/stacking contexts on
-    // Android. A child overlay can be hidden even when its trigger fires.
-    const chatView = document.getElementById('chat');
-    if (!chatView || !chatView.classList.contains('active')) return;
-
-    let overlay = document.body.querySelector(':scope > .abx-reaction-overlay');
+    // Mount outside the app/chat stacking contexts. The animation is triggered
+    // only by the chat submit handler, so do not gate it on a CSS view class.
+    const root = document.documentElement;
+    let overlay = root.querySelector(':scope > .abx-reaction-overlay');
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.className = 'abx-reaction-overlay';
       overlay.setAttribute('aria-hidden', 'true');
-      document.body.appendChild(overlay);
+      root.appendChild(overlay);
     }
+
+    window.clearTimeout(overlay._hideTimer);
+    window.clearTimeout(overlay._removeTimer);
     overlay.replaceChildren();
-    overlay.className = `abx-reaction-overlay abx-reaction-${kind} is-playing`;
+    overlay.className = `abx-reaction-overlay abx-reaction-${kind} is-playing is-visible`;
+
+    // Inline critical visibility/layout styles so Android browser CSS
+    // stacking/selector quirks cannot silently hide the reaction layer.
+    Object.entries({
+      position: 'fixed', left: '0', right: '0',
+      top: 'calc(var(--yunex-vv-top, 0px) + 56px)',
+      bottom: 'calc(var(--yunex-vv-bottom-gap, 0px) + 68px)',
+      width: '100vw', height: 'auto', display: 'block',
+      overflow: 'hidden', 'pointer-events': 'none',
+      'z-index': '2147483647', opacity: '1', visibility: 'visible',
+      'contain': 'none', 'isolation': 'isolate'
+    }).forEach(([property, value]) => overlay.style.setProperty(property, value, 'important'));
 
     const stage = document.createElement('div');
     stage.className = 'abx-reaction-stage';
-    const heartSvg = '<svg viewBox="0 0 100 90" aria-hidden="true"><path d="M50 82 13 47C-7 25 13 -1 36 9c7 3 12 9 14 15 3-7 9-12 16-15 23-10 43 16 21 38Z"/></svg>';
+    stage.style.cssText = 'position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;pointer-events:none!important;';
+    const heartSvg = '<svg viewBox="0 0 100 90" aria-hidden="true"><defs><linearGradient id="abx-heart-shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1fa"/><stop offset=".35" stop-color="#ff5ca8"/><stop offset="1" stop-color="#e90062"/></linearGradient></defs><path d="M50 82 13 47C-7 25 13 -1 36 9c7 3 12 9 14 15 3-7 9-12 16-15 23-10 43 16 21 38Z" fill="url(#abx-heart-shine)"/></svg>';
 
     if (kind === 'love' || kind === 'miss' || kind === 'kiss') {
-      const count = kind === 'love' ? 10 : kind === 'miss' ? 8 : 6;
+      const count = kind === 'love' ? 12 : kind === 'miss' ? 10 : 8;
       for (let i = 0; i < count; i++) {
         const item = document.createElement('span');
         item.className = `abx-reaction-heart heart-${i + 1}`;
         item.innerHTML = heartSvg;
-        item.style.setProperty('--delay', `${(i % 5) * -0.22}s`);
-        item.style.setProperty('--duration', `${2.2 + (i % 4) * 0.35}s`);
-        item.style.setProperty('--size', `${34 + ((i * 17) % 58)}px`);
-        item.style.setProperty('--x', `${5 + ((i * 29) % 88)}%`);
-        item.style.setProperty('--y', `${12 + ((i * 19) % 68)}%`);
+        item.style.setProperty('--delay', `${(i % 6) * -0.19}s`);
+        item.style.setProperty('--duration', `${1.9 + (i % 4) * 0.28}s`);
+        item.style.setProperty('--size', `${kind === 'miss' ? 48 : 58 + ((i * 19) % 64)}px`);
+        item.style.setProperty('--x', `${4 + ((i * 29) % 90)}%`);
+        item.style.setProperty('--y', `${10 + ((i * 19) % 72)}%`);
         stage.appendChild(item);
+      }
+      // One large centrepiece makes the reaction unmistakable on phone screens.
+      if (kind === 'love' || kind === 'miss') {
+        const centre = document.createElement('span');
+        centre.className = 'abx-reaction-heart abx-reaction-heart-centre';
+        centre.innerHTML = heartSvg;
+        centre.style.setProperty('--x', '50%');
+        centre.style.setProperty('--y', '46%');
+        centre.style.setProperty('--size', 'clamp(112px, 34vw, 190px)');
+        centre.style.setProperty('--duration', '1.65s');
+        centre.style.setProperty('--delay', '0s');
+        stage.appendChild(centre);
       }
       if (kind === 'kiss') {
         const lips = document.createElement('span');
@@ -919,6 +944,7 @@
       const hero = document.createElement('span');
       hero.className = 'abx-reaction-hero';
       hero.textContent = ({laugh:'😂', cry:'😢', angry:'😡', horror:'👻'})[kind] || '✨';
+      hero.style.fontSize = 'clamp(112px, 34vw, 190px)';
       stage.appendChild(hero);
       for (let i = 0; i < 12; i++) {
         const spark = document.createElement('i');
@@ -933,13 +959,16 @@
       }
     }
     overlay.appendChild(stage);
-    window.clearTimeout(overlay._hideTimer);
-    window.clearTimeout(overlay._removeTimer);
-    requestAnimationFrame(() => overlay.classList.add('is-visible'));
-    overlay._hideTimer = window.setTimeout(() => overlay.classList.remove('is-visible'), 3400);
+    // Force style/layout once, then retain the reaction for a short, visible burst.
+    void overlay.offsetHeight;
+    overlay._hideTimer = window.setTimeout(() => {
+      overlay.style.setProperty('opacity', '0', 'important');
+      overlay.style.setProperty('visibility', 'hidden', 'important');
+      overlay.classList.remove('is-visible');
+    }, 3600);
     overlay._removeTimer = window.setTimeout(() => {
       if (overlay && overlay.parentNode) overlay.remove();
-    }, 3900);
+    }, 4100);
   }
 
   // Chat status preview: all delivery/read states below are simulated locally.
