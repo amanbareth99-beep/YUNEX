@@ -1383,6 +1383,51 @@
     chatSendButton.addEventListener('mousedown', event => event.preventDefault());
   }
 
+
+  // Local-preview emoji-send reaction animations: send an emoji message to play its effect.
+  // No long-press picker. The animation runs once in the viewport zone and each emoji
+  // has an independent 60-second cooldown. Reaction effects are separate from auto text animations.
+  const reactionCooldownMs = 60000;
+  const reactionCooldowns = new Map();
+  const reactionEmojiAnimations = ['😘','❤️','😂','🥺','😢','🔥'];
+  function triggerSentEmojiReaction(value) {
+    const emoji = value.trim();
+    if (!reactionEmojiAnimations.includes(emoji)) return;
+    const now = Date.now(), until = reactionCooldowns.get(emoji) || 0;
+    if (now < until) return;
+    reactionCooldowns.set(emoji, now + reactionCooldownMs);
+    if (emoji === '😘') playKissReaction();
+    else playSimpleReaction(emoji);
+  }
+  function getReactionZone() {
+    const chat = document.getElementById('chat');
+    const header = chat && chat.querySelector('.chat-top-fixed');
+    const composer = chat && chat.querySelector('#chatForm');
+    if (!header || !composer) return null;
+    const hr = header.getBoundingClientRect(), cr = composer.getBoundingClientRect();
+    if (cr.top <= hr.bottom) return null;
+    return { top: hr.bottom, bottom: Math.max(0, window.innerHeight - cr.top) };
+  }
+  function playKissReaction() {
+    const zone = getReactionZone(); if (!zone) return;
+    const layer = document.createElement('div'); layer.className = 'abx-user-reaction-layer'; document.body.appendChild(layer);
+    layer.replaceChildren(); layer.style.top = `${zone.top}px`; layer.style.bottom = `${zone.bottom}px`;
+    const image = document.createElement('img'); image.src = 'assets/reactions/kiss.gif'; image.alt = ''; image.className = 'abx-user-reaction-kiss';
+    layer.appendChild(image);
+    layer.classList.remove('is-fading'); void layer.offsetHeight;
+    window.setTimeout(() => layer.classList.add('is-fading'), 1600);
+    window.setTimeout(() => layer.remove(), 2050);
+  }
+  function playSimpleReaction(emoji) {
+    const zone = getReactionZone(); if (!zone) return;
+    const layer = document.createElement('div'); layer.className = 'abx-user-reaction-layer'; document.body.appendChild(layer);
+    layer.replaceChildren(); layer.style.top = `${zone.top}px`; layer.style.bottom = `${zone.bottom}px`;
+    const burst = document.createElement('div'); burst.className = 'abx-user-reaction-emoji'; burst.textContent = emoji;
+    layer.appendChild(burst); layer.classList.remove('is-fading'); void layer.offsetHeight;
+    window.setTimeout(() => layer.classList.add('is-fading'), 1150);
+    window.setTimeout(() => layer.remove(), 1500);
+  }
+
   if (chatForm) chatForm.addEventListener('submit', event => {
     event.preventDefault();
     const value = chatInput.value.trim();
@@ -1397,6 +1442,7 @@
     chatMessages.appendChild(bubble);
     const detectedAnimation = detectAutoAnimation(value);
     if (detectedAnimation) requestAnimationFrame(() => showAutoAnimation(detectedAnimation, bubble));
+    triggerSentEmojiReaction(value);
     chatInput.value = '';
     chatInput.focus({ preventScroll: true });
     chatMessages.scrollTop = chatMessages.scrollHeight;

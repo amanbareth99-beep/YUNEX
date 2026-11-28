@@ -1206,3 +1206,18 @@ html > .abx-reaction-overlay .abx-reaction-stage{position:absolute;inset:0;overf
 @keyframes abx-v9-fly{0%{opacity:0;transform:translate(-50%,-20%) translateX(80px) scale(.55)}25%{opacity:1}65%{transform:translate(-50%,-55%) translateX(-8px) scale(1.05)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @keyframes abx-v9-mist{from{opacity:.25}to{opacity:.85}}
 @media(prefers-reduced-motion:reduce){.abx-reaction-target,.abx-reaction-target svg,.abx-reaction-stage:before{animation:none!important}}
+
+/* ABAROX lightweight reaction overlay and message reaction picker */
+.abx-message-reaction-tray{display:flex;gap:4px;position:absolute;z-index:30;left:6px;bottom:calc(100% + 5px);padding:6px;background:#101a2c;border:1px solid #35547a;border-radius:22px;box-shadow:0 8px 22px #0008;max-width:min(94vw,340px)}
+.chat-bubble{position:relative}
+.abx-message-reaction-tray button{border:0;background:transparent;padding:3px 5px;font-size:21px;line-height:1;cursor:pointer}
+.abx-message-reaction-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.abx-message-reaction-badge{border:1px solid #4b6891;background:#0a1830;color:#e8f4ff;border-radius:13px;padding:2px 7px;font-size:12px;line-height:1.35;cursor:pointer}
+.abx-user-reaction-layer{position:fixed;left:0;right:0;z-index:4;overflow:hidden;pointer-events:none;display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity .3s ease}
+.abx-user-reaction-layer.is-fading{opacity:0}
+.abx-user-reaction-kiss{width:min(56vw,230px);max-height:70%;object-fit:contain;opacity:.86;filter:drop-shadow(0 0 7px rgba(255,93,170,.25)) drop-shadow(0 0 13px rgba(58,151,255,.22));animation:abx-kiss-reaction-pop .2s ease-out both}
+.abx-user-reaction-emoji{font-size:clamp(55px,18vw,105px);opacity:.83;text-shadow:0 0 14px rgba(255,80,150,.28),0 0 22px rgba(40,145,255,.2);animation:abx-reaction-pop .24s ease-out both}
+@keyframes abx-kiss-reaction-pop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:.86}}
+@keyframes abx-reaction-pop{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:.83}}
+.chat-top-fixed{z-index:5}
+.chat-compose{position:relative;z-index:5}
