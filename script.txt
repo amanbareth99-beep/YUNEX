@@ -906,7 +906,7 @@
 
     const particles = document.createElement('div');
     particles.className = 'abx-word-particles';
-    const particleCount = kind === 'miss' ? 9 : 12;
+    const particleCount = kind === 'miss' ? 16 : 18;
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('i');
       particle.className = `abx-word-particle p${(i % 12) + 1}`;
@@ -916,8 +916,8 @@
     scene.append(stage, particles);
     messages.appendChild(scene);
     requestAnimationFrame(() => scene.classList.add('show'));
-    window.setTimeout(() => scene.classList.add('fade-out'), 2550);
-    window.setTimeout(() => scene.remove(), 3000);
+    window.setTimeout(() => scene.classList.add('fade-out'), 3650);
+    window.setTimeout(() => scene.remove(), 4100);
   }
 
   // Chat status preview: all delivery/read states below are simulated locally.
