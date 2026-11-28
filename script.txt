@@ -50,7 +50,7 @@
   function renderView(id) {
     if (!document.getElementById(id)) id = 'feed';
     currentView = id;
-    if (id !== 'chat') { chatKeyboardHistoryEntry = false; document.querySelectorAll('.abx-reaction-overlay').forEach(node => node.remove()); }
+    if (id !== 'chat') chatKeyboardHistoryEntry = false;
     views.forEach(view => view.classList.toggle('active', view.id === id));
     document.querySelectorAll('.tab[data-view]').forEach(button => {
       button.classList.toggle('active', button.dataset.view === id);
@@ -59,6 +59,10 @@
     document.body.classList.toggle('section-open', id !== 'feed');
     document.body.classList.toggle('registration-open', id === 'account');
     document.body.classList.toggle('chat-open', id === 'chat');
+    if (id !== 'chat') {
+      const reactionOverlay = document.body.querySelector(':scope > .abx-reaction-overlay');
+      if (reactionOverlay) reactionOverlay.remove();
+    }
     document.body.classList.toggle('founder-account-open', id === 'profile');
     document.body.classList.toggle('public-profile-open', id === 'demoProfile');
     const profileView = document.getElementById('profile');
@@ -876,19 +880,18 @@
     return character;
   }
   function showAutoAnimation(kind) {
-    const chatShell = document.querySelector('#chat .chat-shell');
+    const chat = document.getElementById('chat');
+    const chatShell = chat && chat.querySelector('.chat-shell');
     if (!chatShell || !document.body.classList.contains('chat-open')) return;
 
-    // The reaction layer is a sibling of the scrolling message list, so it stays
-    // visible even when a newly-sent message makes the list scroll.
-    let overlay = chatShell.querySelector('.abx-reaction-overlay');
+    // Keep reactions at the document root. The chat shell and message list use
+    // several mobile overflow/stacking contexts; a child overlay can be clipped
+    // or painted underneath them. A body-level fixed layer avoids those traps.
+    let overlay = document.body.querySelector(':scope > .abx-reaction-overlay');
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.className = 'abx-reaction-overlay';
       overlay.setAttribute('aria-hidden', 'true');
-      // Keep the visual layer attached to the document viewport, not inside
-      // the chat's scrolling/grid containers. This avoids mobile stacking and
-      // overflow clipping that could make a valid reaction completely invisible.
       document.body.appendChild(overlay);
     }
     overlay.replaceChildren();
@@ -935,6 +938,17 @@
       }
     }
     overlay.appendChild(stage);
+    // Measure the real visible chat boundaries so the effect never covers the
+    // header, Send row, or Android keyboard-safe composer.
+    const header = chatShell.querySelector('.chat-top-fixed');
+    const composer = chatShell.querySelector('.chat-compose');
+    const vv = window.visualViewport;
+    const viewportHeight = vv ? vv.height : window.innerHeight;
+    const viewportTop = vv ? vv.offsetTop : 0;
+    const headerBottom = header ? header.getBoundingClientRect().bottom : viewportTop + 58;
+    const composerTop = composer ? composer.getBoundingClientRect().top : viewportTop + viewportHeight - 62;
+    overlay.style.setProperty('top', `${Math.max(viewportTop, headerBottom)}px`, 'important');
+    overlay.style.setProperty('bottom', `${Math.max(0, window.innerHeight - composerTop)}px`, 'important');
     window.clearTimeout(overlay._hideTimer);
     window.clearTimeout(overlay._removeTimer);
     requestAnimationFrame(() => overlay.classList.add('is-visible'));
