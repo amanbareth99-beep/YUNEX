@@ -877,10 +877,13 @@
   }
   function showAutoAnimation(kind) {
     const messages = document.getElementById('chatMessages');
-    if (!messages) return;
+    const chatShell = document.querySelector('.chat-shell');
+    if (!messages || !chatShell) return;
 
-    // Keep the animation visual-only: it never changes the message text or Hug flow.
-    const old = messages.querySelector('.abx-animation-scene');
+    // Keep the visual scene outside the scrollable message list. Otherwise
+    // scrolling to the newest message can scroll the animation out of view.
+    // The scene is a sibling overlay inside chat-shell, clipped above composer.
+    const old = chatShell.querySelector('.abx-animation-scene');
     if (old) old.remove();
 
     const scene = document.createElement('div');
@@ -914,7 +917,7 @@
     }
 
     scene.append(stage, particles);
-    messages.appendChild(scene);
+    chatShell.appendChild(scene);
     requestAnimationFrame(() => scene.classList.add('show'));
     window.setTimeout(() => scene.classList.add('fade-out'), 3650);
     window.setTimeout(() => scene.remove(), 4100);
